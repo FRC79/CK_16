@@ -11,3 +11,10 @@
 *.lai
 *.la
 *.a
+
+# Build Artifacts
+PPC603gnu/*
+
+# Cruft from OS_X
+.DS_Store
+
