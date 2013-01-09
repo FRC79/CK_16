@@ -1,9 +1,9 @@
 #include "WPILib.h"
 
 /**
- * This "BuiltinDefaultCode" provides the "default code" functionality as used in the "Benchtop Test."
+ * This "CK16_Main" provides the "default code" functionality as used in the "Benchtop Test."
  * 
- * The BuiltinDefaultCode extends the IterativeRobot base class to provide the "default code"
+ * The CK16_Main extends the IterativeRobot base class to provide the "default code"
  * functionality to confirm the operation and usage of the core control system components, as 
  * used in the "Benchtop Test" described in Chapter 2 of the 2009 FRC Control System Manual.
  * 
@@ -46,7 +46,7 @@
  *     - PWM 1/3 - Connected to "left" drive motor(s)
  *     - PWM 2/4 - Connected to "right" drive motor(s)
  */
-class BuiltinDefaultCode : public IterativeRobot
+class CK16_Main : public IterativeRobot
 {
 	// Declare variable for the robot drive system
 	RobotDrive *m_robotDrive;		// robot will use PWM 1-4 for drive motors
@@ -81,14 +81,14 @@ class BuiltinDefaultCode : public IterativeRobot
 		
 public:
 /**
- * Constructor for this "BuiltinDefaultCode" Class.
+ * Constructor for this "CK16_Main" Class.
  * 
  * The constructor creates all of the objects used for the different inputs and outputs of
  * the robot.  Essentially, the constructor defines the input/output mapping for the robot,
  * providing named objects for each of the robot interfaces. 
  */
-	BuiltinDefaultCode(void)	{
-		printf("BuiltinDefaultCode Constructor Started\n");
+	CK16_Main(void)	{
+		printf("CK16_Main Constructor Started\n");
 
 		// Create a robot using standard right/left robot drive on PWMS 1, 2, 3, and #4
 		m_robotDrive = new RobotDrive(1, 3, 2, 4);
@@ -123,7 +123,7 @@ public:
 		m_disabledPeriodicLoops = 0;
 		m_telePeriodicLoops = 0;
 
-		printf("BuiltinDefaultCode Constructor Completed\n");
+		printf("CK16_Main Constructor Completed\n");
 	}
 	
 	
@@ -405,4 +405,4 @@ public:
 			
 };
 
-START_ROBOT_CLASS(BuiltinDefaultCode);
+START_ROBOT_CLASS(CK16_Main);
