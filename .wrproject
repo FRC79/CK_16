@@ -240,9 +240,9 @@
         </mapAttribute>
     </attributes>
     <buildtargets>
-        <buildtarget buildtool="Linker" name="DefaultRobot" passed="false" targetname="DefaultRobot">
+        <buildtarget buildtool="Linker" name="CK_16" passed="false" targetname="CK_16">
             <contents>
-                <folder name="/CK16" recursive="true"/>
+                <folder name="/BuiltinDefaultCode" recursive="false"/>
             </contents>
         </buildtarget>
     </buildtargets>
