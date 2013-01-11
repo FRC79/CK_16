@@ -200,7 +200,9 @@ public:
 		 * to prevent an unsuspecting team from having their robot drive autonomously!
 		 */
 		// below code commented out for safety
-		if (m_autoPeriodicLoops == 1) {
+		
+		// todo uncomment for auton
+		/*if (m_autoPeriodicLoops == 1) {
 			// When on the first periodic loop in autonomous mode, start driving forwards at half speed
 			m_robotDrive->Drive(0.5, 0.0);			// drive forwards at half speed
 		}
@@ -208,7 +210,7 @@ public:
 			// After 2 seconds, stop the robot 
 			m_robotDrive->Drive(0.0, 0.0);			// stop robot
 		}
-		
+		*/
 	}
 
 	
