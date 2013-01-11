@@ -1,4 +1,7 @@
 #include "WPILib.h"
+#include "CANJaguar.h"
+#include "Joystick.h"
+#include "RobotConfiguration.h"
 
 /**
  * This "CK16_Main" provides the "default code" functionality as used in the "Benchtop Test."
@@ -51,6 +54,9 @@ class CK16_Main : public IterativeRobot
 	// Declare variable for the robot drive system
 	RobotDrive *m_robotDrive;		// robot will use PWM 1-4 for drive motors
 	
+	//Robot will use CAN bus for motor control
+	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
+	
 	// Declare a variable to use to access the driver station object
 	DriverStation *m_ds;						// driver station object
 	UINT32 m_priorPacketNumber;					// keep track of the most recent packet number from the DS
@@ -90,17 +96,23 @@ public:
 	CK16_Main(void)	{
 		printf("CK16_Main Constructor Started\n");
 
-		// Create a robot using standard right/left robot drive on PWMS 1, 2, 3, and #4
-		m_robotDrive = new RobotDrive(1, 3, 2, 4);
+		// Initialize the CAN Jaguars
+		Front_R = new CANJaguar(RobotConfiguration::FR_CAN_ID);
+		Front_L = new CANJaguar(RobotConfiguration::FR_CAN_ID);
+		Rear_R = new CANJaguar(RobotConfiguration::FR_CAN_ID);
+		Rear_L = new CANJaguar(RobotConfiguration::FR_CAN_ID);
+		printf("TEAM 79 FOR THE WIN!\n");
+		
+		// Initialize Robot Drive System Using Jaguars
+		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
 
 		// Acquire the Driver Station object
 		m_ds = DriverStation::GetInstance();
 		m_priorPacketNumber = 0;
 		m_dsPacketsReceivedInCurrentSecond = 0;
 
-		// Define joysticks being used at USB port #1 and USB port #2 on the Drivers Station
+		// Define joysticks being used at USB port #1 on the Drivers Station
 		m_rightStick = new Joystick(1);
-		m_leftStick = new Joystick(2);
 
 		// Iterate over all the buttons on each joystick, setting state to false for each
 		UINT8 buttonNum = 1;						// start counting buttons at button 1
@@ -132,6 +144,7 @@ public:
 	void RobotInit(void) {
 		// Actions which would be performed once (and only once) upon initialization of the
 		// robot would be put here.
+		
 		
 		printf("RobotInit() completed.\n");
 	}
@@ -186,7 +199,7 @@ public:
 		 * robot in autonomous mode, but is not enabled in the default code in order
 		 * to prevent an unsuspecting team from having their robot drive autonomously!
 		 */
-		/* below code commented out for safety
+		// below code commented out for safety
 		if (m_autoPeriodicLoops == 1) {
 			// When on the first periodic loop in autonomous mode, start driving forwards at half speed
 			m_robotDrive->Drive(0.5, 0.0);			// drive forwards at half speed
@@ -195,13 +208,14 @@ public:
 			// After 2 seconds, stop the robot 
 			m_robotDrive->Drive(0.0, 0.0);			// stop robot
 		}
-		*/
+		
 	}
 
 	
 	void TeleopPeriodic(void) {
 		// increment the number of teleop periodic loops completed
 		m_telePeriodicLoops++;
+		GetWatchdog().Feed();
 
 		/*
 		 * No longer needed since periodic loops are now synchronized with incoming packets.
@@ -214,7 +228,9 @@ public:
 			 */
 			 
 			m_dsPacketsReceivedInCurrentSecond++;					// increment DS packets received
-						
+			
+			
+			
 			// put Driver Station-dependent code here
 
 			// Demonstrate the use of the Joystick buttons
@@ -243,7 +259,10 @@ public:
 		}  // if (m_ds->GetPacketNumber()...
 		*/
 
-	} // TeleopPeriodic(void)
+	}  
+	
+	//TeleopPeriodic(void)
+		
 
 
 /********************************** Continuous Routines *************************************/
