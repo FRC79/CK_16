@@ -3,52 +3,6 @@
 #include "Joystick.h"
 #include "RobotConfiguration.h"
 
-/**
- * This "CK16_Main" provides the "default code" functionality as used in the "Benchtop Test."
- * 
- * The CK16_Main extends the IterativeRobot base class to provide the "default code"
- * functionality to confirm the operation and usage of the core control system components, as 
- * used in the "Benchtop Test" described in Chapter 2 of the 2009 FRC Control System Manual.
- * 
- * This program provides features in the Disabled, Autonomous, and Teleop modes as described
- * in the benchtop test directions, including "once-a-second" debugging printouts when disabled, 
- * a "KITT light show" on the solenoid lights when in autonomous, and elementary driving
- * capabilities and "button mapping" of joysticks when teleoperated.  This demonstration
- * program also shows the use of the MotorSafety timer.
- * 
- * This demonstration is not intended to serve as a "starting template" for development of
- * robot code for a team, as there are better templates and examples created specifically
- * for that purpose.  However, teams may find the techniques used in this program to be
- * interesting possibilities for use in their own robot code.
- * 
- * The details of the behavior provided by this demonstration are summarized below:
- *  
- * Disabled Mode:
- * - Once per second, print (on the console) the number of seconds the robot has been disabled.
- * 
- * Autonomous Mode:
- * - Flash the solenoid lights like KITT in Knight Rider
- * - Example code (commented out by default) to drive forward at half-speed for 2 seconds
- * 
- * Teleop Mode:
- * - Select between two different drive options depending upon Z-location of Joystick1
- * - When "Z-Up" (on Joystick1) provide "arcade drive" on Joystick1
- * - When "Z-Down" (on Joystick1) provide "tank drive" on Joystick1 and Joystick2
- * - Use Joystick buttons (on Joystick1 or Joystick2) to display the button number in binary on
- *   the solenoid LEDs (Note that this feature can be used to easily "map out" the buttons on a
- *   Joystick.  Note also that if multiple buttons are pressed simultaneously, a "15" is displayed
- *   on the solenoid LEDs to indicate that multiple buttons are pressed.)
- *
- * This code assumes the following connections:
- * - Driver Station:
- *   - USB 1 - The "right" joystick.  Used for either "arcade drive" or "right" stick for tank drive
- *   - USB 2 - The "left" joystick.  Used as the "left" stick for tank drive
- * 
- * - Robot:
- *   - Digital Sidecar 1:
- *     - PWM 1/3 - Connected to "left" drive motor(s)
- *     - PWM 2/4 - Connected to "right" drive motor(s)
- */
 class CK16_Main : public IterativeRobot
 {
 	// Declare variable for the robot drive system
@@ -63,11 +17,11 @@ class CK16_Main : public IterativeRobot
 	UINT8 m_dsPacketsReceivedInCurrentSecond;	// keep track of the ds packets received in the current second
 	
 	// Declare variables for the two joysticks being used
-	Joystick *m_rightStick;			// joystick 1 (arcade stick or right tank stick)
+	Joystick *operatorGamepad;			// joystick 1 (arcade stick or right tank stick)
 	Joystick *m_leftStick;			// joystick 2 (tank left stick)
 	
 	static const int NUM_JOYSTICK_BUTTONS = 16;
-	bool m_rightStickButtonState[(NUM_JOYSTICK_BUTTONS+1)];
+	bool operatorGamepadButtonState[(NUM_JOYSTICK_BUTTONS+1)];
 	bool m_leftStickButtonState[(NUM_JOYSTICK_BUTTONS+1)];	
 	
 	// Declare variables for each of the eight solenoid outputs
@@ -112,12 +66,12 @@ public:
 		m_dsPacketsReceivedInCurrentSecond = 0;
 
 		// Define joysticks being used at USB port #1 on the Drivers Station
-		m_rightStick = new Joystick(1);
+		operatorGamepad = new Joystick(1);
 
 		// Iterate over all the buttons on each joystick, setting state to false for each
 		UINT8 buttonNum = 1;						// start counting buttons at button 1
 		for (buttonNum = 1; buttonNum <= NUM_JOYSTICK_BUTTONS; buttonNum++) {
-			m_rightStickButtonState[buttonNum] = false;
+			operatorGamepadButtonState[buttonNum] = false;
 			m_leftStickButtonState[buttonNum] = false;
 		}
 
@@ -236,27 +190,12 @@ public:
 			// put Driver Station-dependent code here
 
 			// Demonstrate the use of the Joystick buttons
-			DemonstrateJoystickButtons(m_rightStick, m_rightStickButtonState, "Right Stick", &m_solenoids[1]);
+			DemonstrateJoystickButtons(operatorGamepad, operatorGamepadButtonState, "Right Stick", &m_solenoids[1]);
 			DemonstrateJoystickButtons(m_leftStick, m_leftStickButtonState, "Left Stick ", &m_solenoids[5]);
 		
-			// determine if tank or arcade mode, based upon position of "Z" wheel on kit joystick
-			if (m_rightStick->GetZ() <= 0) {    // Logitech Attack3 has z-polarity reversed; up is negative
-				// use arcade drive
-				m_robotDrive->ArcadeDrive(m_rightStick);			// drive with arcade style (use right stick)
-				if (m_driveMode != ARCADE_DRIVE) {
-					// if newly entered arcade drive, print out a message
-					printf("Arcade Drive\n");
-					m_driveMode = ARCADE_DRIVE;
-				}
-			} else {
+		
 				// use tank drive
-				m_robotDrive->TankDrive(m_leftStick, m_rightStick);	// drive with tank style
-				if (m_driveMode != TANK_DRIVE) {
-					// if newly entered tank drive, print out a message
-					printf("Tank Drive\n");
-					m_driveMode = TANK_DRIVE;
-				}
-			} 
+				m_robotDrive->SetLeftRightMotorOutputs(operatorGamepad->GetRawAxis(2), operatorGamepad->GetRawAxis(5));
 		/*
 		}  // if (m_ds->GetPacketNumber()...
 		*/

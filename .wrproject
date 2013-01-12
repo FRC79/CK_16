@@ -242,7 +242,7 @@
     <buildtargets>
         <buildtarget buildtool="Linker" name="CK_16" passed="false" targetname="CK_16">
             <contents>
-                <folder name="/CK_16" recursive="true"/>
+                <folder name="/BuiltinDefaultCode" recursive="true"/>
             </contents>
         </buildtarget>
     </buildtargets>
