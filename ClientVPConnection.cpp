@@ -8,22 +8,23 @@
  * the SmartDashboard
  */
 
-bool ClientVPConnection::IsTargetFound()
-{
-	return SmartDashboard.GetBoolean("found");
-}
+//bool ClientVPConnection::IsTargetFound()
+//{
+//	return GetBoolean("found");
+//}
+//
+//double ClientVPConnection::GetAzimuth()
+//{
+//	return GetNumber("azimuth");
+//}
+//
+//double ClientVPConnection::GetRange()
+//{
+//	return GetNumber("range");
+//}
+//
+//double ClientVPConnection::GetRPMs()
+//{
+//	return GetNumber("rpms");
+//}
 
-double ClientVPConnection::GetAzimuth()
-{
-	return SmartDashboard.GetNumber("azimuth");
-}
-
-double ClientVPConnection::GetRange()
-{
-	return SmartDashboard.GetNumber("range");
-}
-
-double ClientVPConnection::GetRPMs()
-{
-	return SmartDashboard.GetNumber("rpms");
-}
