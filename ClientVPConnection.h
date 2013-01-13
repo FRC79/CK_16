@@ -20,8 +20,8 @@ public:
 	 * that shooting for the goal with the greatest
 	 * amount of points awarded is always a priority.
 	 */
-	static bool IsTargetFound();
-	static double GetAzimuth();
+	bool IsTargetFound();
+	double GetAzimuth();
 	double GetRange();
 	double GetRPMS();
 };

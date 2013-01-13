@@ -1,5 +1,5 @@
 #include "ClientVPConnection.h"
-#include "SmartDashboard.h"
+#include "SmartDashboard/SmartDashboard.h"
 
 /*
  * It is possible to make this class completely with
@@ -8,22 +8,22 @@
  * the SmartDashboard
  */
 
-ClientVPConnection::IsTargetFound()
+bool ClientVPConnection::IsTargetFound()
 {
 	return SmartDashboard.GetBoolean("found");
 }
 
-ClientVPConnection::GetAzimuth()
+double ClientVPConnection::GetAzimuth()
 {
 	return SmartDashboard.GetNumber("azimuth");
 }
 
-ClientVPConnection::GetRange()
+double ClientVPConnection::GetRange()
 {
 	return SmartDashboard.GetNumber("range");
 }
 
-ClientVPConnection::GetRPMs()
+double ClientVPConnection::GetRPMs()
 {
 	return SmartDashboard.GetNumber("rpms");
 }
