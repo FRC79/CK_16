@@ -23,7 +23,7 @@ public:
 	bool IsTargetFound();
 	double GetAzimuth();
 	double GetRange();
-	double GetRPMS();
+	double GetRPMs();
 };
 
 #endif
