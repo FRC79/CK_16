@@ -11,9 +11,6 @@ class CK16_Main : public IterativeRobot
 	//Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
 	
-	// Drive PID Controllers
-	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
-	
 	// Declare a variable to use to access the driver station object
 	DriverStation *m_ds;						// driver station object
 	UINT32 m_priorPacketNumber;					// keep track of the most recent packet number from the DS
