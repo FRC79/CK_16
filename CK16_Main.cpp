@@ -11,6 +11,9 @@ class CK16_Main : public IterativeRobot
 	//Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
 	
+	// Drive PID Controllers
+	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
+	
 	// Declare a variable to use to access the driver station object
 	DriverStation *m_ds;						// driver station object
 	UINT32 m_priorPacketNumber;					// keep track of the most recent packet number from the DS
@@ -38,14 +41,17 @@ public:
 
 		// Initialize the CAN Jaguars
 		Front_R = new CANJaguar(RobotConfiguration::FR_CAN_ID);
-		Front_L = new CANJaguar(RobotConfiguration::FR_CAN_ID);
-		Rear_R = new CANJaguar(RobotConfiguration::FR_CAN_ID);
-		Rear_L = new CANJaguar(RobotConfiguration::FR_CAN_ID);
+		Front_L = new CANJaguar(RobotConfiguration::FL_CAN_ID);
+		Rear_R = new CANJaguar(RobotConfiguration::RR_CAN_ID);
+		Rear_L = new CANJaguar(RobotConfiguration::RL_CAN_ID);
 		printf("TEAM 79 FOR THE WIN!\n");
 		
 		// Initialize Robot Drive System Using Jaguars
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
 
+		// Jags on the right side will show full reverse even when going full forward PLEASE BE AWARE
+		
+		
 		// Acquire the Driver Station object
 		m_ds = DriverStation::GetInstance();
 		m_priorPacketNumber = 0;
@@ -69,7 +75,6 @@ public:
 		// Actions which would be performed once (and only once) upon initialization of the
 		// robot would be put here.
 		
-		
 		printf("RobotInit() completed.\n");
 	}
 	
@@ -81,11 +86,13 @@ public:
 
 	void AutonomousInit(void) {
 		m_autoPeriodicLoops = 0;				// Reset the loop counter for autonomous mode
+		
 	}
 
 	void TeleopInit(void) {
 		m_telePeriodicLoops = 0;				// Reset the loop counter for teleop mode
 		m_dsPacketsReceivedInCurrentSecond = 0;	// Reset the number of dsPackets in current second
+		
 	}
 
 	/********************************** Periodic Routines *************************************/
@@ -120,7 +127,6 @@ public:
 		GetWatchdog().Feed();
 
 		m_robotDrive->SetLeftRightMotorOutputs(operatorGamepad->GetRawAxis(2), operatorGamepad->GetRawAxis(5));
-		
 	}  
 	
 	//TeleopPeriodic(void)
