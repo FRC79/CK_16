@@ -10,20 +10,20 @@
 
 bool ClientVPConnection::IsTargetFound()
 {
-	return SmartDashboard::GetBoolean("found");
+	//return SmartDashboard::GetBoolean("found");
 }
 
 double ClientVPConnection::GetAzimuth()
 {
-	return SmartDashboard::GetNumber("azimuth");
+	//return SmartDashboard::GetNumber("azimuth");
 }
 
 double ClientVPConnection::GetRange()
 {
-	return SmartDashboard::GetNumber("range");
+	//return SmartDashboard::GetNumber("range");
 }
 
 double ClientVPConnection::GetRPMs()
 {
-	return SmartDashboard::GetNumber("rpms");
+	//sreturn SmartDashboard::GetNumber("rpms");
 }
