@@ -1,6 +1,7 @@
 #include "WPILib.h"
 #include "CANJaguar.h"
 #include "Joystick.h"
+#include "CAN_PID_Controller.h"
 #include "Gyro.h"
 #include "RobotTurnPIDOutput.h"
 #include "PIDController.h"
@@ -18,6 +19,9 @@ class CK16_Main : public IterativeRobot
 	
 	//Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
+	
+	// Declare left and right encoder drive PIDControllers
+	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
 	
 	// Declare Gyro that will be used to determine left and right robot rotation
 	Gyro *Yaw_Gyro;
@@ -73,6 +77,10 @@ public:
 
 		// Jags on the right side will show full reverse even when going full forward PLEASE BE AWARE
 		
+		// Initialize left and right encoder drive PIDControllers
+		Left_Drive_PID = new CAN_PID_Controller(1.0, 1.0, 1.0, Front_L, Front_L, Rear_L); // Input: Jag Encoder, Output: Jags
+		Right_Drive_PID = new CAN_PID_Controller(1.0, 1.0, 1.0, Front_R, Front_R, Rear_R);
+		
 		// Initialize Gyro
 		Yaw_Gyro = new Gyro(RobotConfiguration::YAW_GYRO);
 		
@@ -80,7 +88,7 @@ public:
 		Robot_Turn = new RobotTurnPIDOutput(m_robotDrive);
 		
 		// Initialize Goal Alignment PID Controller
-		Goal_Align_PID = new PIDController(1.0, 0.0, 0.5, Yaw_Gyro, Robot_Turn);
+		Goal_Align_PID = new PIDController(1.0, 0.0, 1.0, Yaw_Gyro, Robot_Turn);
 		
 		// Acquire the Driver Station object
 		m_ds = DriverStation::GetInstance();
@@ -105,7 +113,13 @@ public:
 		// Actions which would be performed once (and only once) upon initialization of the
 		// robot would be put here.
 		
-		// Set Output range for RobotTurn
+		// Initialize settings for encoder drive PIDControllers
+		Left_Drive_PID->SetOutputRange(-0.2, 0.2);
+		Right_Drive_PID->SetOutputRange(-0.2, 0.2);
+		Left_Drive_PID->SetTolerance(0.1);
+		Right_Drive_PID->SetTolerance(0.1);
+		
+		// Initialize settings for RobotTurn
 		Goal_Align_PID->SetOutputRange(-0.2, 0.2);
 		Goal_Align_PID->SetTolerance(0.1);
 		
@@ -120,6 +134,12 @@ public:
 
 	void AutonomousInit(void) {
 		m_autoPeriodicLoops = 0;				// Reset the loop counter for autonomous mode
+		
+		// Enable left and right encoder PID
+		Left_Drive_PID->Enable();
+		Right_Drive_PID->Enable();
+		Left_Drive_PID->SetSetpoint(0.0);
+		Right_Drive_PID->SetSetpoint(0.0);
 		
 		// Enable Goal Align PID
 		Goal_Align_PID->Enable();
@@ -159,9 +179,19 @@ public:
 	}
 
 	void AutonomousPeriodic(void) {
-		m_autoPeriodicLoops++;
-
 		
+		switch(m_autoPeriodicLoops)
+		{
+		case 0:
+			// Drive 2 feet
+			double encoderCounts = (2 * 12.0) * 360.0 / RobotConfiguration::WHEEL_CIRCUMFERENCE;
+			Left_Drive_PID->SetSetpoint(encoderCounts);
+			Right_Drive_PID->SetSetpoint(encoderCounts);
+			break;
+					
+		}
+		
+		m_autoPeriodicLoops++;
 	}
 
 	
@@ -175,7 +205,8 @@ public:
 			// Auto Align Disable Button
 			if(operatorGamepad->GetButton(Joystick::kTopButton) == 2)
 			{
-				Goal_Align_PID->Disable();
+				Goal_Align_PID->Disable(); // Stop outputs
+				Goal_Align_PID->Enable(); // Start PIDContoller up again
 				Goal_Align_PID->SetSetpoint(0.0);
 				autoPilot = false;
 			}
