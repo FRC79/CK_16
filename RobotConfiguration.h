@@ -9,6 +9,8 @@ public:
 	static const UINT8 RR_CAN_ID = 3;
 	static const UINT8 RL_CAN_ID = 4;
 	
+	// Analog inputs
+	static const UINT8 YAW_GYRO = 8; // This is not certain yet
 };
 #endif
 
