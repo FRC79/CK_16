@@ -13,7 +13,7 @@ public:
 	static const UINT8 YAW_GYRO = 8; // This is not certain yet
 	
 	// Measurements
-	static const double WHEEL_CIRCUMFERENCE = 5.0 * 3.1415; // Maybe define PI later
+	static const double WHEEL_CIRCUMFERENCE = 6.0 * 3.1415; // Maybe define PI later
 };
 #endif
 

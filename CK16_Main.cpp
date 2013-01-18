@@ -8,9 +8,13 @@
 #include "RobotConfiguration.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include <string>
+#include "CSVReader.h"
 
 class CK16_Main : public IterativeRobot
-{	
+{
+    // Declare CSV readers
+    CSVReader *PWM_CSV, *AnalogInputs_CSV, *DigitalIO_CSV, *CAN_IDS_CSV;
+    
 	// SmartDashboard Keys
 	std::string FOUND_KEY, AZIMUTH_KEY, RANGE_KEY;
 	
@@ -40,7 +44,7 @@ class CK16_Main : public IterativeRobot
 	UINT32 m_priorPacketNumber;					// keep track of the most recent packet number from the DS
 	UINT8 m_dsPacketsReceivedInCurrentSecond;	// keep track of the ds packets received in the current second
 	
-	// Declare variables for the two joysticks being used
+	// Declare variables for the two joysticks being used on port 1
 	Joystick *operatorGamepad;			// joystick 1 (arcade stick or right tank stick)
 	
 
@@ -48,6 +52,7 @@ class CK16_Main : public IterativeRobot
 	UINT32 m_autoPeriodicLoops;
 	UINT32 m_disabledPeriodicLoops;
 	UINT32 m_telePeriodicLoops;
+    
 		
 public:
 /**
@@ -59,7 +64,14 @@ public:
  */
 	CK16_Main(void)	{
 		printf("CK16_Main Constructor Started\n");
-
+        
+        // Configuration files
+        printf("Loading the configuration files.\n");
+        AnalogInputs_CSV = new CSVReader("AnalogInputs.csv");
+        CAN_IDS_CSV = new CSVReader("CAN_IDs.csv");
+        DigitalIO_CSV = new CSVReader("DigitalIO.csv");
+        PWM_CSV = new CSVReader("PWM.csv");
+                                 
 		// Initialize SmartDashboard Keys
 		FOUND_KEY = "found";
 		AZIMUTH_KEY = "azimuth";
@@ -122,6 +134,15 @@ public:
 		// Initialize settings for RobotTurn
 		Goal_Align_PID->SetOutputRange(-0.2, 0.2);
 		Goal_Align_PID->SetTolerance(0.1);
+        
+        // Set each drive motor to have an encoder to be its friend
+        Front_R->SetSpeedReference(CANJaguar::kSpeedRef_QuadEncoder);
+        Front_L->SetSpeedReference(CANJaguar::kSpeedRef_QuadEncoder);
+        
+        // Set encoders
+        Front_R->ConfigEncoderCodesPerRev(360);
+        Front_L->ConfigEncoderCodesPerRev(360);
+        
 		
 		printf("RobotInit() completed.\n");
 	}
