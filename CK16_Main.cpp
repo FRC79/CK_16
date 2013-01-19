@@ -8,6 +8,7 @@
 #include "RobotConfiguration.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include <string>
+#include <math.h>
 #include "CSVReader.h"
 
 class CK16_Main : public IterativeRobot
@@ -16,13 +17,16 @@ class CK16_Main : public IterativeRobot
     CSVReader *PWM_CSV, *AnalogInputs_CSV, *DigitalIO_CSV, *CAN_IDS_CSV;
     
 	// SmartDashboard Keys
-	std::string FOUND_KEY, AZIMUTH_KEY, RANGE_KEY;
+	std::string FOUND_KEY, AZIMUTH_KEY, RANGE_KEY, EXP_KEY;
 	
 	// Declare variable for the robot drive system
 	RobotDrive *m_robotDrive;		// robot will use PWM 1-4 for drive motors
 	
 	//Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
+	
+	// Declare local variable that will hold the exponent for mapping joystick to jaguars
+	double exp;
 	
 	// Declare left and right encoder drive PIDControllers
 	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
@@ -76,12 +80,13 @@ public:
 		FOUND_KEY = "found";
 		AZIMUTH_KEY = "azimuth";
 		RANGE_KEY = "range";
+		EXP_KEY = "exp";
 		
 		// Initialize the CAN Jaguars
-		Front_R = new CANJaguar(RobotConfiguration::FR_CAN_ID);
-		Front_L = new CANJaguar(RobotConfiguration::FL_CAN_ID);
-		Rear_R = new CANJaguar(RobotConfiguration::RR_CAN_ID);
-		Rear_L = new CANJaguar(RobotConfiguration::RL_CAN_ID);
+		Front_R = new CANJaguar(CAN_IDS_CSV->GetValue("FR_CAN_ID"));
+		Front_L = new CANJaguar(CAN_IDS_CSV->GetValue("FL_CAN_ID"));
+		Rear_R = new CANJaguar(CAN_IDS_CSV->GetValue("RR_CAN_ID"));
+		Rear_L = new CANJaguar(CAN_IDS_CSV->GetValue("RL_CAN_ID"));
 		printf("TEAM 79 FOR THE WIN!\n");
 		
 		// Initialize Robot Drive System Using Jaguars
@@ -94,7 +99,7 @@ public:
 		Right_Drive_PID = new CAN_PID_Controller(1.0, 1.0, 1.0, Front_R, Front_R, Rear_R);
 		
 		// Initialize Gyro
-		Yaw_Gyro = new Gyro(RobotConfiguration::YAW_GYRO);
+		Yaw_Gyro = new Gyro(AnalogInputs_CSV->GetValue("YAW_GYRO_ID"));
 		
 		// Initialize the RobotTurnPIDOutput
 		Robot_Turn = new RobotTurnPIDOutput(m_robotDrive);
@@ -124,6 +129,13 @@ public:
 	void RobotInit(void) {
 		// Actions which would be performed once (and only once) upon initialization of the
 		// robot would be put here.
+		
+		// Test to see if Dashboard is connected---------------------------------------------------------
+		printf("HUE MIN: %d\n", SmartDashboard::GetNumber("HUE MIN"));
+		
+		// Initialize exponent value from SmartDashboard
+		exp = 3.0;
+		exp = SmartDashboard::GetNumber(EXP_KEY);
 		
 		// Initialize settings for encoder drive PIDControllers
 		Left_Drive_PID->SetOutputRange(-0.2, 0.2);
@@ -200,21 +212,26 @@ public:
 	}
 
 	void AutonomousPeriodic(void) {
+		m_autoPeriodicLoops++;
 		
 		switch(m_autoPeriodicLoops)
 		{
-		case 0:
+		case 1:
 			// Drive 2 feet
-			double encoderCounts = (2 * 12.0) * 360.0 / RobotConfiguration::WHEEL_CIRCUMFERENCE;
+			double encoderCounts;
+			encoderCounts = (2 * 12.0) * 360.0 / RobotConfiguration::WHEEL_CIRCUMFERENCE;
 			Left_Drive_PID->SetSetpoint(encoderCounts);
 			Right_Drive_PID->SetSetpoint(encoderCounts);
 			break;
-					
+		default:
+			break;
 		}
-		
-		m_autoPeriodicLoops++;
 	}
 
+	double calculateOutputFromFunction(double input, double exponent)
+	{
+		return pow(input, exponent);
+	}
 	
 	void TeleopPeriodic(void) {
 		// increment the number of teleop periodic loops completed
@@ -234,8 +251,13 @@ public:
 		}
 		else
 		{
+			// Calculate jaguar output based on exponent we pass from SmartDashboard
+			double leftOutput, rightOutput;
+			leftOutput = calculateOutputFromFunction(operatorGamepad->GetRawAxis(2), exp);
+			rightOutput = calculateOutputFromFunction(operatorGamepad->GetRawAxis(5), exp);
+			
 			// Joystick Driving
-			m_robotDrive->SetLeftRightMotorOutputs(operatorGamepad->GetRawAxis(2), operatorGamepad->GetRawAxis(5));
+			m_robotDrive->SetLeftRightMotorOutputs(leftOutput, rightOutput);
 			
 			// Auto Align Button
 			if(operatorGamepad->GetButton(Joystick::kTopButton) == 1)
@@ -249,8 +271,7 @@ public:
 			}
 		}
 		
-		
-	}  
+	} 
 	
 	//TeleopPeriodic(void)
 			
