@@ -22,8 +22,16 @@ class CK16_Main : public IterativeRobot
 	
 	// Declare variable for the robot drive system
 	RobotDrive *m_robotDrive;		// robot will use PWM 1-4 for drive motors
+    
+    // Declare log buffers for information to be logged. Buffer set at 16 arbitrary.
 	Log *m_Log;
-	//Robot will use CAN bus for motor control
+    char logFrontRightTemperature[16];
+    char logFrontLeftTemperature[16];
+    char logFrontRightOutputVoltage[16];
+    char logFrontLeftOutputVoltage[16];
+    char logClock[16];
+    
+	// Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
 	
 	// Declare local variable that will hold the exponent for mapping joystick to jaguars
@@ -242,14 +250,21 @@ public:
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
         
+        // Setting variables equal to current values before logging. These should be overwritten every instance.
+        logFrontRightTemperature = Front_L->GetTemperature();
+        logFrontLeftTemperature = Front_R->GetTemperature();
+        logFrontLeftOutputVoltage = Front_L->GetOutputVoltage();
+        logFrontRightOutputVoltage = Front_R->GetOutputVoltage();
+        logClock = GetClock();
+        
         // Assuming that each add line adds a line containing the information requested
         // to a log file.
-        //m_Log->addLine(Front_L->GetTemperature());
-        //m_Log->addLine(Front_R->GetTemperature());
-        //m_Log->addLine(Front_L->GetOutputVoltage());
-        //m_Log->addLine(Front_R->GetOutputVoltage());
-        //m_Log->addLine(GetClock());
-        //m_Log->closeLog();
+        m_Log->addLine(logFrontRightTemperature);
+        m_Log->addLine(logFrontLeftTemperature);
+        m_Log->addLine(logFrontRightOutputVoltage);
+        m_Log->addLine(logFrontLeftOutputVoltage);
+        m_Log->addLine(logClock);
+        m_Log->closeLog();
 
 		if(autoPilot == true)
 		{
