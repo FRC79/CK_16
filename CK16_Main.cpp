@@ -10,6 +10,7 @@
 #include <string>
 #include <math.h>
 #include "CSVReader.h"
+#include "Logger.h"
 
 class CK16_Main : public IterativeRobot
 {
@@ -91,6 +92,9 @@ public:
 		
 		// Initialize Robot Drive System Using Jaguars
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
+        
+        // Log files
+        m_Log = new Log("CK_16_Log.csv")
 
 		// Jags on the right side will show full reverse even when going full forward PLEASE BE AWARE
 		
@@ -237,6 +241,15 @@ public:
 		// increment the number of teleop periodic loops completed
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
+        
+        // Assuming that each add line adds a line containing the information requested
+        // to a log file.
+        m_Log->addLine(Front_L->GetTemperature());
+        m_Log->addLine(Front_R->GetTemperature());
+        m_Log->addLine(FrontL->GetOutputVoltage());
+        m_Log->addLine(Front_R->GetOutputVoltage());
+        m_Log->addLine(GetClock());
+        m_Log->closeLog();
 
 		if(autoPilot == true)
 		{
