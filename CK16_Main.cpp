@@ -22,7 +22,7 @@ class CK16_Main : public IterativeRobot
 	
 	// Declare variable for the robot drive system
 	RobotDrive *m_robotDrive;		// robot will use PWM 1-4 for drive motors
-	
+	Log *m_Log;
 	//Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
 	
@@ -94,7 +94,7 @@ public:
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
         
         // Log files
-        m_Log = new Log("CK_16_Log.csv")
+        m_Log = new Log("CK_16_Log.csv");
 
 		// Jags on the right side will show full reverse even when going full forward PLEASE BE AWARE
 		
@@ -244,12 +244,12 @@ public:
         
         // Assuming that each add line adds a line containing the information requested
         // to a log file.
-        m_Log->addLine(Front_L->GetTemperature());
-        m_Log->addLine(Front_R->GetTemperature());
-        m_Log->addLine(FrontL->GetOutputVoltage());
-        m_Log->addLine(Front_R->GetOutputVoltage());
-        m_Log->addLine(GetClock());
-        m_Log->closeLog();
+        //m_Log->addLine(Front_L->GetTemperature());
+        //m_Log->addLine(Front_R->GetTemperature());
+        //m_Log->addLine(Front_L->GetOutputVoltage());
+        //m_Log->addLine(Front_R->GetOutputVoltage());
+        //m_Log->addLine(GetClock());
+        //m_Log->closeLog();
 
 		if(autoPilot == true)
 		{
