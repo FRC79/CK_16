@@ -251,12 +251,14 @@ public:
 		GetWatchdog().Feed();
         
         // Setting variables equal to current values before logging. These should be overwritten every instance.
-        logFrontRightTemperature = Front_L->GetTemperature();
-        logFrontLeftTemperature = Front_R->GetTemperature();
-        logFrontLeftOutputVoltage = Front_L->GetOutputVoltage();
-        logFrontRightOutputVoltage = Front_R->GetOutputVoltage();
-        logClock = GetClock();
+        //logFrontRightTemperature = Front_L->GetTemperature();
+        //logFrontLeftTemperature = Front_R->GetTemperature();
+        //logFrontLeftOutputVoltage = Front_L->GetOutputVoltage();
+        //logFrontRightOutputVoltage = Front_R->GetOutputVoltage();
+        //logClock = GetClock();
         
+		sprintf(logFrontRightTemperature, "%f", Front_R->GetTemperature());
+		
         // Assuming that each add line adds a line containing the information requested
         // to a log file.
         m_Log->addLine(logFrontRightTemperature);
