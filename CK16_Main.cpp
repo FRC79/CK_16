@@ -25,11 +25,7 @@ class CK16_Main : public IterativeRobot
     
     // Declare log buffers for information to be logged. Buffer set at 16 arbitrary.
 	Log *m_Log;
-    char logFrontRightTemperature[16];
-    char logFrontLeftTemperature[16];
-    char logFrontRightOutputVoltage[16];
-    char logFrontLeftOutputVoltage[16];
-    char logClock[16];
+	char logAllValues[64];
     
 	// Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
@@ -102,7 +98,7 @@ public:
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
         
         // Log files
-        m_Log = new Log("CK_16_Log.csv");
+        m_Log = new Log("CK_16_Log.txt");
 
 		// Jags on the right side will show full reverse even when going full forward PLEASE BE AWARE
 		
@@ -257,15 +253,12 @@ public:
         //logFrontRightOutputVoltage = Front_R->GetOutputVoltage();
         //logClock = GetClock();
         
-		sprintf(logFrontRightTemperature, "%f", Front_R->GetTemperature());
+		sprintf(logAllValues, "%f, %f, %f, %f, %d" , Front_R->GetTemperature(), Front_L->GetTemperature(), Front_R->GetOutputVoltage(), Front_L->GetOutputVoltage(),
+				GetClock());
 		
         // Assuming that each add line adds a line containing the information requested
         // to a log file.
-        m_Log->addLine(logFrontRightTemperature);
-        m_Log->addLine(logFrontLeftTemperature);
-        m_Log->addLine(logFrontRightOutputVoltage);
-        m_Log->addLine(logFrontLeftOutputVoltage);
-        m_Log->addLine(logClock);
+        m_Log->addLine(logAllValues);
         m_Log->closeLog();
 
 		if(autoPilot == true)
