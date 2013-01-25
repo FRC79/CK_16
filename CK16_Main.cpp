@@ -26,6 +26,7 @@ class CK16_Main : public IterativeRobot
     // Declare log buffers for information to be logged. Buffer set at 16 arbitrary.
 	Log *m_Log;
 	char logAllValues[64];
+	
     
 	// Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
@@ -253,12 +254,12 @@ public:
         //logFrontRightOutputVoltage = Front_R->GetOutputVoltage();
         //logClock = GetClock();
         
-		sprintf(logAllValues, "%f, %f, %f, %f, %d" , Front_R->GetTemperature(), Front_L->GetTemperature(), Front_R->GetOutputVoltage(), Front_L->GetOutputVoltage(),
+		sprintf(logAllValues, "%f, %f, %f, %f, %d\n", Front_R->GetTemperature(), Front_L->GetTemperature(), Front_R->GetOutputVoltage(), Front_L->GetOutputVoltage(),
 				GetClock());
-		
+		printf(logAllValues);
         // Assuming that each add line adds a line containing the information requested
         // to a log file.
-        m_Log->addLine(logAllValues);
+        m_Log->addLine("%s", logAllValues);
         m_Log->closeLog();
 
 		if(autoPilot == true)
