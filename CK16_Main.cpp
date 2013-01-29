@@ -10,6 +10,7 @@
 #include <string>
 #include <math.h>
 #include "CSVReader.h"
+#include "Logger.h"
 
 class CK16_Main : public IterativeRobot
 {
@@ -21,8 +22,13 @@ class CK16_Main : public IterativeRobot
 	
 	// Declare variable for the robot drive system
 	RobotDrive *m_robotDrive;		// robot will use PWM 1-4 for drive motors
+    
+    // Declare log buffers for information to be logged. Buffer set at 16 arbitrary.
+	Log *m_Log;
+	char logAllValues[64];
 	
-	//Robot will use CAN bus for motor control
+    
+	// Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
 	CANJaguar *ShooterFeed, *ShooterFire;
 	
@@ -98,6 +104,9 @@ public:
 		
 		// Initialize Robot Drive System Using Jaguars
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
+        
+        // Log files
+        m_Log = new Log("CK_16_Log.txt");
 
 		// Jags on the right side will show full reverse even when going full forward PLEASE BE AWARE
 		
@@ -277,6 +286,21 @@ public:
 		// increment the number of teleop periodic loops completed
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
+        
+        // Setting variables equal to current values before logging. These should be overwritten every instance.
+        //logFrontRightTemperature = Front_L->GetTemperature();
+        //logFrontLeftTemperature = Front_R->GetTemperature();
+        //logFrontLeftOutputVoltage = Front_L->GetOutputVoltage();
+        //logFrontRightOutputVoltage = Front_R->GetOutputVoltage();
+        //logClock = GetClock();
+        
+		sprintf(logAllValues, "%f, %f, %f, %f, %d\n", Front_R->GetTemperature(), Front_L->GetTemperature(), Front_R->GetOutputVoltage(), Front_L->GetOutputVoltage(),
+				GetClock());
+		printf(logAllValues);
+        // Assuming that each add line adds a line containing the information requested
+        // to a log file.
+        m_Log->addLine("%s", logAllValues);
+        m_Log->closeLog();
 
 //		
 //		if(autoPilot == true)
