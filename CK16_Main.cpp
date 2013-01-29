@@ -24,6 +24,9 @@ class CK16_Main : public IterativeRobot
 	
 	//Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
+	CANJaguar *ShooterFeed, *ShooterFire;
+	
+	
 	
 	// Declare local variable that will hold the exponent for mapping joystick to jaguars
 	double exp;
@@ -31,20 +34,22 @@ class CK16_Main : public IterativeRobot
 	// Declare left and right encoder drive PIDControllers
 	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
 	
+	
 	// Declare Gyro that will be used to determine left and right robot rotation
 	Gyro *Yaw_Gyro;
 	
 	// Declare RobotTurnPIDOutput that will control the robot turning aspect of the goal alignment
-	RobotTurnPIDOutput *Robot_Turn;
+//	RobotTurnPIDOutput *Robot_Turn;
 	
 	// Declare PID Controller that will handle aligning the robot with the goal
-	PIDController *Goal_Align_PID;
+//	PIDController *Goal_Align_PID;
 	
 	// State boolean that represents if robot is driving with joystick input or using auto align
 	bool autoPilot;
 	
 	// Declare a variable to use to access the driver station object
 	DriverStation *m_ds;						// driver station object
+	DriverStationLCD *m_ds_lcd;
 	UINT32 m_priorPacketNumber;					// keep track of the most recent packet number from the DS
 	UINT8 m_dsPacketsReceivedInCurrentSecond;	// keep track of the ds packets received in the current second
 	
@@ -70,12 +75,12 @@ public:
 		printf("CK16_Main Constructor Started\n");
         
         // Configuration files
-        printf("Loading the configuration files.\n");
-        AnalogInputs_CSV = new CSVReader("AnalogInputs.csv");
-        CAN_IDS_CSV = new CSVReader("CAN_IDs.csv");
-        DigitalIO_CSV = new CSVReader("DigitalIO.csv");
-        PWM_CSV = new CSVReader("PWM.csv");
-                                 
+        
+		printf("Loading the configuration files.\n");
+		AnalogInputs_CSV = new CSVReader("AnalogInputs.csv");
+		CAN_IDS_CSV = new CSVReader("CAN_IDs.csv");
+		DigitalIO_CSV = new CSVReader("DigitalIO.csv");
+		PWM_CSV = new CSVReader("PWM.csv");                    
 		// Initialize SmartDashboard Keys
 		FOUND_KEY = "found";
 		AZIMUTH_KEY = "azimuth";
@@ -83,10 +88,12 @@ public:
 		EXP_KEY = "exp";
 		
 		// Initialize the CAN Jaguars
-		Front_R = new CANJaguar(CAN_IDS_CSV->GetValue("FR_CAN_ID"));
-		Front_L = new CANJaguar(CAN_IDS_CSV->GetValue("FL_CAN_ID"));
-		Rear_R = new CANJaguar(CAN_IDS_CSV->GetValue("RR_CAN_ID"));
-		Rear_L = new CANJaguar(CAN_IDS_CSV->GetValue("RL_CAN_ID"));
+		Front_R = new CANJaguar((int)CAN_IDS_CSV->GetValue("FR_CAN_ID"));
+		Front_L = new CANJaguar((int)CAN_IDS_CSV->GetValue("FL_CAN_ID"));
+		Rear_R = new CANJaguar((int)CAN_IDS_CSV->GetValue("RR_CAN_ID"));
+		Rear_L = new CANJaguar((int)CAN_IDS_CSV->GetValue("RL_CAN_ID"));
+		ShooterFeed = new CANJaguar((int)CAN_IDS_CSV->GetValue("FEED_CAN_ID"));
+		ShooterFire = new CANJaguar((int)CAN_IDS_CSV->GetValue("FIRE_CAN_ID"));
 		printf("TEAM 79 FOR THE WIN!\n");
 		
 		// Initialize Robot Drive System Using Jaguars
@@ -95,20 +102,24 @@ public:
 		// Jags on the right side will show full reverse even when going full forward PLEASE BE AWARE
 		
 		// Initialize left and right encoder drive PIDControllers
-		Left_Drive_PID = new CAN_PID_Controller(1.0, 1.0, 1.0, Front_L, Front_L, Rear_L); // Input: Jag Encoder, Output: Jags
-		Right_Drive_PID = new CAN_PID_Controller(1.0, 1.0, 1.0, Front_R, Front_R, Rear_R);
+		Left_Drive_PID = new CAN_PID_Controller(1.0, 1.0, 1.0, Front_L, Front_L, Rear_L, false, 0.05 ); // Input: Jag Encoder, Output: Jags
+		Right_Drive_PID = new CAN_PID_Controller(1.0, 1.0, 1.0, Front_R, Front_R, Rear_R, false, 0.05);
 		
 		// Initialize Gyro
-		Yaw_Gyro = new Gyro(AnalogInputs_CSV->GetValue("YAW_GYRO_ID"));
+//		Yaw_Gyro = new Gyro(1);
+
+		m_ds = DriverStation::GetInstance();
+		m_ds_lcd = DriverStationLCD::GetInstance();
 		
+		m_ds_lcd->PrintfLine(DriverStationLCD::kUser_Line1,"Gyro Done Initializing\n");
+		m_ds_lcd->UpdateLCD();
 		// Initialize the RobotTurnPIDOutput
-		Robot_Turn = new RobotTurnPIDOutput(m_robotDrive);
+//		Robot_Turn = new RobotTurnPIDOutput(m_robotDrive);
 		
 		// Initialize Goal Alignment PID Controller
-		Goal_Align_PID = new PIDController(1.0, 0.0, 1.0, Yaw_Gyro, Robot_Turn);
+//		Goal_Align_PID = new PIDController(1.0, 0.0, 1.0, Yaw_Gyro, Robot_Turn);
 		
 		// Acquire the Driver Station object
-		m_ds = DriverStation::GetInstance();
 		m_priorPacketNumber = 0;
 		m_dsPacketsReceivedInCurrentSecond = 0;
 
@@ -131,11 +142,10 @@ public:
 		// robot would be put here.
 		
 		// Test to see if Dashboard is connected---------------------------------------------------------
-		printf("HUE MIN: %d\n", SmartDashboard::GetNumber("HUE MIN"));
+//		printf("HUE MIN: %f\n", SmartDashboard::GetNumber("HUE MIN"));
 		
 		// Initialize exponent value from SmartDashboard
 		exp = 3.0;
-		exp = SmartDashboard::GetNumber(EXP_KEY);
 		
 		// Initialize settings for encoder drive PIDControllers
 		Left_Drive_PID->SetOutputRange(-0.2, 0.2);
@@ -144,18 +154,18 @@ public:
 		Right_Drive_PID->SetTolerance(0.1);
 		
 		// Initialize settings for RobotTurn
-		Goal_Align_PID->SetOutputRange(-0.2, 0.2);
-		Goal_Align_PID->SetTolerance(0.1);
+//		Goal_Align_PID->SetOutputRange(-0.2, 0.2);
+//		Goal_Align_PID->SetTolerance(0.1);
         
         // Set each drive motor to have an encoder to be its friend
-        Front_R->SetSpeedReference(CANJaguar::kSpeedRef_QuadEncoder);
-        Front_L->SetSpeedReference(CANJaguar::kSpeedRef_QuadEncoder);
+        Front_R->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+        Front_L->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+        
         
         // Set encoders
-        Front_R->ConfigEncoderCodesPerRev(360);
-        Front_L->ConfigEncoderCodesPerRev(360);
-        
-		
+        Front_R->ConfigEncoderCodesPerRev(TICS_PER_REV); 
+        Front_L->ConfigEncoderCodesPerRev(TICS_PER_REV);
+        		
 		printf("RobotInit() completed.\n");
 	}
 	
@@ -169,14 +179,14 @@ public:
 		m_autoPeriodicLoops = 0;				// Reset the loop counter for autonomous mode
 		
 		// Enable left and right encoder PID
-		Left_Drive_PID->Enable();
-		Right_Drive_PID->Enable();
-		Left_Drive_PID->SetSetpoint(0.0);
-		Right_Drive_PID->SetSetpoint(0.0);
+//		Left_Drive_PID->Enable();
+//		Right_Drive_PID->Enable();
+//		Left_Drive_PID->SetSetpoint(0.0);
+//		Right_Drive_PID->SetSetpoint(0.0);
 		
 		// Enable Goal Align PID
-		Goal_Align_PID->Enable();
-		Goal_Align_PID->SetSetpoint(0.0);
+//		Goal_Align_PID->Enable();
+//		Goal_Align_PID->SetSetpoint(0.0);
 		
 	}
 
@@ -188,8 +198,9 @@ public:
 		autoPilot = false;
 		
 		// Enable Goal Align PID
-		Goal_Align_PID->Enable();
-		Goal_Align_PID->SetSetpoint(0.0);
+//		Goal_Align_PID->Enable();
+//		Goal_Align_PID->SetSetpoint(0.0);
+		printf("Teleop Init Completed\n");
 	}
 
 	/********************************** Periodic Routines *************************************/
@@ -198,6 +209,8 @@ public:
 		static INT32 printSec = (INT32)GetClock() + 1;
 		static const INT32 startSec = (INT32)GetClock();
 
+		
+//		Yaw_Gyro->Reset();
 
 		// increment the number of disabled periodic loops completed
 		m_disabledPeriodicLoops++;
@@ -213,63 +226,106 @@ public:
 
 	void AutonomousPeriodic(void) {
 		m_autoPeriodicLoops++;
-		
+		printf("Auton Loops:%d\n", m_autoPeriodicLoops);
+
 		switch(m_autoPeriodicLoops)
 		{
 		case 1:
 			// Drive 2 feet
 			double encoderCounts;
-			encoderCounts = (2 * 12.0) * 360.0 / RobotConfiguration::WHEEL_CIRCUMFERENCE;
-			Left_Drive_PID->SetSetpoint(encoderCounts);
-			Right_Drive_PID->SetSetpoint(encoderCounts);
+			encoderCounts = (2 * 12.0) * 360.0 / WHEEL_CIRCUMFERENCE;
+//			Left_Drive_PID->SetSetpoint(encoderCounts);
+//			Right_Drive_PID->SetSetpoint(encoderCounts);
+//			Front_L->ChangeControlMode(CANJaguar::kPosition);
+//			Front_R->ChangeControlMode(CANJaguar::kPosition);
+//			Front_L->Set(24.0);
+//			Front_R->Set(24.0);
 			break;
 		default:
 			break;
 		}
 	}
 
-	double calculateOutputFromFunction(double input, double exponent)
-	{
-		return pow(input, exponent);
-	}
+		double calculateDriveOutputForTeleop(double input)
+		{
+
+			if(fabs(input) < 0.05)
+			{
+				// Stop if stick is near zero
+				return 0.0;
+			}
+			else
+			{
+				double mapping;
+
+				if(fabs(input) <= 0.7)
+				{
+					mapping = 0.33 * pow(fabs(input), 2) + 0.2;
+					mapping = (input >= 0) ? mapping : -mapping; // Change to negative if the input was negative
+					return mapping;
+				}
+				else
+				{
+					mapping = 3.57 * fabs(input) - 2.14;
+					mapping = (input >= 0) ? mapping : -mapping; // Change to negative if the input was negative
+					return mapping;
+				}
+			}
+		}
 	
 	void TeleopPeriodic(void) {
 		// increment the number of teleop periodic loops completed
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
 
-		if(autoPilot == true)
-		{
-			// Auto Align Disable Button
-			if(operatorGamepad->GetButton(Joystick::kTopButton) == 2)
-			{
-				Goal_Align_PID->Disable(); // Stop outputs
-				Goal_Align_PID->Enable(); // Start PIDContoller up again
-				Goal_Align_PID->SetSetpoint(0.0);
-				autoPilot = false;
-			}
-		}
-		else
-		{
+//		
+//		if(autoPilot == true)
+//		{
+//			// Auto Align Disable Button
+//			if(operatorGamepad->GetButton(Joystick::kTopButton) == 2)
+//			{
+//				Goal_Align_PID->Disable(); // Stop outputs
+//				Goal_Align_PID->Enable(); // Start PIDContoller up again
+//				Goal_Align_PID->SetSetpoint(0.0);
+//				autoPilot = false;
+//			}
+//		}
+//		else
+//		{
 			// Calculate jaguar output based on exponent we pass from SmartDashboard
 			double leftOutput, rightOutput;
-			leftOutput = calculateOutputFromFunction(operatorGamepad->GetRawAxis(2), exp);
-			rightOutput = calculateOutputFromFunction(operatorGamepad->GetRawAxis(5), exp);
+			leftOutput = -calculateDriveOutputForTeleop(operatorGamepad->GetRawAxis(2));
+			rightOutput = -calculateDriveOutputForTeleop(operatorGamepad->GetRawAxis(5));
 			
 			// Joystick Driving
 			m_robotDrive->SetLeftRightMotorOutputs(leftOutput, rightOutput);
 			
-			// Auto Align Button
-			if(operatorGamepad->GetButton(Joystick::kTopButton) == 1)
+//			printf("Left Encoder Distance: %f\nRight Encoder Distance: %f\n", Front_L->GetPosition()*INCHES_PER_TIC, Front_R->GetPosition()*INCHES_PER_TIC);
+			
+//			m_ds_lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Gyro: %f", Yaw_Gyro->GetAngle());			
+			m_ds_lcd->UpdateLCD();
+			if(operatorGamepad->GetRawButton(2))
 			{
-				// Turn Auto Align on if we see a goal and we know the azimuth
-				if(SmartDashboard::GetBoolean(FOUND_KEY) == true)
-				{
-					Goal_Align_PID->SetSetpoint(SmartDashboard::GetNumber(AZIMUTH_KEY));
-					autoPilot = true;
-				}
+				ShooterFeed->Set(-0.8);
+				ShooterFire->Set(-0.8);
 			}
-		}
+			else
+			{
+				ShooterFeed->Set(0.0);
+				ShooterFire->Set(0.0);
+			}
+			
+			// Auto Align Button
+//			if(operatorGamepad->GetButton(Joystick::kTopButton) == 1)
+//			{
+//				// Turn Auto Align on if we see a goal and we know the azimuth
+//				if(SmartDashboard::GetBoolean(FOUND_KEY) == true)
+//				{
+//					Goal_Align_PID->SetSetpoint(SmartDashboard::GetNumber(AZIMUTH_KEY));
+//					autoPilot = true;
+//				}
+//			}
+//		}
 		
 	} 
 	

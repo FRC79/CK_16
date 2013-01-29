@@ -5,7 +5,12 @@ class RobotConfiguration
 public:
 	
 	// Measurements
-	static const double WHEEL_CIRCUMFERENCE = 6.0 * 3.1415; // Maybe define PI later
+	
 };
+
+#define TICS_PER_REV 250
+#define WHEEL_CIRCUMFERENCE (6.0 * 3.1415)
+#define INCHES_PER_TIC (-WHEEL_CIRCUMFERENCE)
+
 #endif
 
