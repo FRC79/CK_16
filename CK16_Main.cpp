@@ -10,7 +10,7 @@
 #include <string>
 #include <math.h>
 #include "CSVReader.h"
-#include "Logger.h"
+//#include "Logger.h"
 
 class CK16_Main : public IterativeRobot
 {
@@ -22,9 +22,10 @@ class CK16_Main : public IterativeRobot
 	
 	// Declare variable for the robot drive system
 	RobotDrive *m_robotDrive;		// robot will use PWM 1-4 for drive motors
-    
+    Relay *compressor;
+    DigitalInput *pressure_SW;
     // Declare log buffers for information to be logged. Buffer set at 16 arbitrary.
-	Log *m_Log;
+//	Log *m_Log;
 	char logAllValues[64];
 	
     
@@ -43,6 +44,8 @@ class CK16_Main : public IterativeRobot
 	
 	// Declare Gyro that will be used to determine left and right robot rotation
 	Gyro *Yaw_Gyro;
+	
+	Solenoid *fireSolenoid;
 	
 	// Declare RobotTurnPIDOutput that will control the robot turning aspect of the goal alignment
 //	RobotTurnPIDOutput *Robot_Turn;
@@ -104,9 +107,11 @@ public:
 		
 		// Initialize Robot Drive System Using Jaguars
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
-        
+        compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
+		pressure_SW = new DigitalInput(RobotConfiguration::PRESSURE_SWITCH_CHANNEL);
+
         // Log files
-        m_Log = new Log("CK_16_Log.txt");
+//        m_Log = new Log("CK_16_Log.txt");
 
 		// Jags on the right side will show full reverse even when going full forward PLEASE BE AWARE
 		
@@ -117,6 +122,8 @@ public:
 		// Initialize Gyro
 //		Yaw_Gyro = new Gyro(1);
 
+		fireSolenoid = new Solenoid(1);
+		
 		m_ds = DriverStation::GetInstance();
 		m_ds_lcd = DriverStationLCD::GetInstance();
 		
@@ -280,12 +287,17 @@ public:
 					return mapping;
 				}
 			}
+			
 		}
 	
 	void TeleopPeriodic(void) {
 		// increment the number of teleop periodic loops completed
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
+		
+		// Compressor to turn on when A button is pressed
+		compressor->Set((operatorGamepad->GetRawButton(1) ? Relay::kForward : Relay::kOff));
+
         
         // Setting variables equal to current values before logging. These should be overwritten every instance.
         //logFrontRightTemperature = Front_L->GetTemperature();
@@ -294,13 +306,13 @@ public:
         //logFrontRightOutputVoltage = Front_R->GetOutputVoltage();
         //logClock = GetClock();
         
-		sprintf(logAllValues, "%f, %f, %f, %f, %d\n", Front_R->GetTemperature(), Front_L->GetTemperature(), Front_R->GetOutputVoltage(), Front_L->GetOutputVoltage(),
-				GetClock());
-		printf(logAllValues);
+//		sprintf(logAllValues, "%f, %f, %f, %f, %d\n", Front_R->GetTemperature(), Front_L->GetTemperature(), Front_R->GetOutputVoltage(), Front_L->GetOutputVoltage(),
+//				GetClock());
+//		printf(logAllValues);
         // Assuming that each add line adds a line containing the information requested
         // to a log file.
-        m_Log->addLine("%s", logAllValues);
-        m_Log->closeLog();
+//        m_Log->addLine("%s", logAllValues);
+//        m_Log->closeLog();
 
 //		
 //		if(autoPilot == true)
@@ -339,9 +351,10 @@ public:
 				ShooterFire->Set(0.0);
 			}
 			
+			
 			// Auto Align Button
 //			if(operatorGamepad->GetButton(Joystick::kTopButton) == 1)
-//			{
+//			{	
 //				// Turn Auto Align on if we see a goal and we know the azimuth
 //				if(SmartDashboard::GetBoolean(FOUND_KEY) == true)
 //				{

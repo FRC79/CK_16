@@ -5,7 +5,8 @@ class RobotConfiguration
 public:
 	
 	// Measurements
-	
+	static const int PRESSURE_SWITCH_CHANNEL = 1;
+	static const int COMPRESSOR_RELAY_CHANNEL = 1;
 };
 
 #define TICS_PER_REV 250
