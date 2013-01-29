@@ -47,6 +47,7 @@ BangBang_Controller::BangBang_Controller(CANJaguar *source, PIDOutput *output) :
 	m_period = period;
 	m_InvertOutputs = InvertOutputs;
 	m_F = kF;
+	m_controlVelocity = 0.0;
 
 	m_controlLoop->StartPeriodic(m_period);
 }
@@ -73,16 +74,15 @@ void BangBang_Controller::Calculate()
 		//If speed is < desired speed, then output = 1.0
 		//If speed is anything else, output = 0.0 (STOP)
 	
-		float controlVelocity; //TODO need to put in value
 	
 		
-		if(controlVelocity < pidInput){
+		if(m_controlVelocity < pidInput){
 			
 		} else {
 			output = 1.0;
 		}
 	
-		if(controlVelocity = pidInput){
+		if(m_controlVelocity = pidInput){
 			
 		}else{
 			output = 0.0;
@@ -106,22 +106,10 @@ void BangBang_Controller::Calculate()
 		control->Calculate();
 	}
 	
-	/**
-	 * Set the PID Controller gain parameters.
-	 * Set the proportional, integral, and differential coefficients.
-	 * @param p Proportional coefficient
-	 * @param i Integral coefficient
-	 * @param d Differential coefficient
-	 */
-	void BangBang_Controller::SetPID(float p, float i, float d)
+
+	void BangBang_Controller::Set(float controlVelocity)
 	{
-		CRITICAL_REGION(m_semaphore)
-		{
-			m_P = p;
-			m_I = i;
-			m_D = d;
-		}
-		END_REGION;
+		m_controlVelocity = controlVelocity
 	}
 
 	/**

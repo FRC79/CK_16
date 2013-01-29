@@ -2,6 +2,8 @@
 //#include "LiveWindowSendable"
 //#include "ITableListener"
 
+// TODO: Clean out the functions that you don't actually define. 
+
 class BangBang_Controller : public LiveWindowSendable, public Controller, public ITableListener
 {
 public:
@@ -20,7 +22,7 @@ public:
     virtual float GetI();
     virtual float GetD();
     virtual float GetF();
-
+            void Set(float controlVelocity);
     virtual void SetSetpoint(float setpoint);
     virtual float GetSetpoint();
 
@@ -58,6 +60,7 @@ private:
     float m_error;
     float m_result;
     float m_period;
+    float m_controlVelocity;
 
     SEM_ID m_semaphore;
 
