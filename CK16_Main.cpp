@@ -10,7 +10,6 @@
 #include <string>
 #include <math.h>
 #include "CSVReader.h"
-#include "Logger.h"
 
 class CK16_Main : public IterativeRobot
 {
@@ -21,12 +20,7 @@ class CK16_Main : public IterativeRobot
 	std::string FOUND_KEY, AZIMUTH_KEY, RANGE_KEY, EXP_KEY;
 	
 	// Declare variable for the robot drive system
-	RobotDrive *m_robotDrive;		// robot will use PWM 1-4 for drive motors
-    
-    // Declare log buffers for information to be logged. Buffer set at 16 arbitrary.
-	Log *m_Log;
-	char logAllValues[64];
-	
+	RobotDrive *m_robotDrive;		// robot will use PWM 1-4 for drive motors	
     
 	// Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
@@ -81,7 +75,6 @@ public:
 		printf("CK16_Main Constructor Started\n");
         
         // Configuration files
-        
 		printf("Loading the configuration files.\n");
 		AnalogInputs_CSV = new CSVReader("AnalogInputs.csv");
 		CAN_IDS_CSV = new CSVReader("CAN_IDs.csv");
@@ -104,12 +97,7 @@ public:
 		
 		// Initialize Robot Drive System Using Jaguars
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
-        
-        // Log files
-        m_Log = new Log("CK_16_Log.txt");
 
-		// Jags on the right side will show full reverse even when going full forward PLEASE BE AWARE
-		
 		// Initialize left and right encoder drive PIDControllers
 		Left_Drive_PID = new CAN_PID_Controller(1.0, 1.0, 1.0, Front_L, Front_L, Rear_L, false, 0.05 ); // Input: Jag Encoder, Output: Jags
 		Right_Drive_PID = new CAN_PID_Controller(1.0, 1.0, 1.0, Front_R, Front_R, Rear_R, false, 0.05);
@@ -286,21 +274,6 @@ public:
 		// increment the number of teleop periodic loops completed
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
-        
-        // Setting variables equal to current values before logging. These should be overwritten every instance.
-        //logFrontRightTemperature = Front_L->GetTemperature();
-        //logFrontLeftTemperature = Front_R->GetTemperature();
-        //logFrontLeftOutputVoltage = Front_L->GetOutputVoltage();
-        //logFrontRightOutputVoltage = Front_R->GetOutputVoltage();
-        //logClock = GetClock();
-        
-		sprintf(logAllValues, "%f, %f, %f, %f, %d\n", Front_R->GetTemperature(), Front_L->GetTemperature(), Front_R->GetOutputVoltage(), Front_L->GetOutputVoltage(),
-				GetClock());
-		printf(logAllValues);
-        // Assuming that each add line adds a line containing the information requested
-        // to a log file.
-        m_Log->addLine("%s", logAllValues);
-        m_Log->closeLog();
 
 //		
 //		if(autoPilot == true)
