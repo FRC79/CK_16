@@ -24,9 +24,10 @@ class CK16_Main : public IterativeRobot
     
 	// Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
-	CANJaguar *ShooterFeed, *ShooterFire;
+	CANJaguar *ShooterFeed,/* watman strikes again*/ *ShooterFire;
 	
-	
+	// Building the Trojan horse.
+    Relay *Compressor;
 	
 	// Declare local variable that will hold the exponent for mapping joystick to jaguars
 	double exp;
@@ -50,7 +51,7 @@ class CK16_Main : public IterativeRobot
 	// Declare a variable to use to access the driver station object
 	DriverStation *m_ds;						// driver station object
 	DriverStationLCD *m_ds_lcd;
-	UINT32 m_priorPacketNumber;					// keep track of the most recent packet number from the DS
+	UINT32 /* wat */ m_priorPacketNumber;					// keep track of the most recent packet number from the DS
 	UINT8 m_dsPacketsReceivedInCurrentSecond;	// keep track of the ds packets received in the current second
 	
 	// Declare variables for the two joysticks being used on port 1
@@ -127,6 +128,9 @@ public:
 		m_autoPeriodicLoops = 0;
 		m_disabledPeriodicLoops = 0;
 		m_telePeriodicLoops = 0;
+        
+        // Filling the Torjan horse with people, then shipping it off to Troy.
+        Compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
 
 		printf("CK16_Main Constructor Completed\n");
 	}
@@ -274,6 +278,9 @@ public:
 		// increment the number of teleop periodic loops completed
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
+        
+        // Trojan horse has entered Troy
+        Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
 
 //		
 //		if(autoPilot == true)
