@@ -28,6 +28,9 @@ class CK16_Main : public IterativeRobot
 	
 	// Building the Trojan horse.
     Relay *Compressor;
+    
+    // Pulling out Excalibers (2x)
+    Solenoid *Disc_Load, *Disc_Fire;
 	
 	// Declare local variable that will hold the exponent for mapping joystick to jaguars
 	double exp;
@@ -131,6 +134,10 @@ public:
         
         // Filling the Torjan horse with people, then shipping it off to Troy.
         Compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
+        
+        // Sharpening Excalibur on the ye old grindstone in the centre of town.
+        Disc_Load = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_ID"));
+        Disc_Fire = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_ID"));
 
 		printf("CK16_Main Constructor Completed\n");
 	}
@@ -166,6 +173,11 @@ public:
         // Set encoders
         Front_R->ConfigEncoderCodesPerRev(TICS_PER_REV); 
         Front_L->ConfigEncoderCodesPerRev(TICS_PER_REV);
+        
+        // Excalibur is sheathed
+        Disc_Load->Set(false);
+        Disc_Fire->Set(false);
+        
         		
 		printf("RobotInit() completed.\n");
 	}
@@ -319,6 +331,19 @@ public:
 				ShooterFire->Set(0.0);
 			}
 			
+            // Excalibur was actually a horse and now its running away into the wild blue yonder.
+            if(operatorGamepad->GetRawButton(3)) {
+                Disc_Load->Set(true);
+            } else {
+                Disc_Load->Set(false);
+            }
+        
+            // Exaclibur's brother is a little sluggish, but has also escaped. This one was a goat.
+            if(operatorGamepad->GetRawButton(1)) {
+                Disc_Fire->Set(true);
+            } else {
+                Disc_Fire->Set(false);
+            }
 			// Auto Align Button
 //			if(operatorGamepad->GetButton(Joystick::kTopButton) == 1)
 //			{
