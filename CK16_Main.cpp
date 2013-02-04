@@ -339,7 +339,7 @@ public:
             }
         
             // Exaclibur's brother is a little sluggish, but has also escaped. This one was a goat.
-            if(operatorGamepad->GetRawButton(1)) {
+            if(operatorGamepad->GetRawButton(4)) {
                 Disc_Fire->Set(true);
             } else {
                 Disc_Fire->Set(false);
