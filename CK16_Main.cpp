@@ -26,14 +26,14 @@ class CK16_Main : public IterativeRobot
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
 	CANJaguar *ShooterFeed,/* watman strikes again*/ *ShooterFire;
 	
+	// Digital Input pin for the pressure switch
+	DigitalInput *Pressure_SW;
+	
 	// Building the Trojan horse.
     Relay *Compressor;
     
     // Pulling out Excalibers (2x)
-    Solenoid *Disc_Load, *Disc_Fire;
-	
-	// Declare local variable that will hold the exponent for mapping joystick to jaguars
-	double exp;
+    Solenoid *Disc_Load_In, *Disc_Load_Out, *Disc_Fire_In, *Disc_Fire_Out;
 	
 	// Declare left and right encoder drive PIDControllers
 	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
@@ -132,12 +132,17 @@ public:
 		m_disabledPeriodicLoops = 0;
 		m_telePeriodicLoops = 0;
         
-        // Filling the Torjan horse with people, then shipping it off to Troy.
-        Compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
+		// Initialize pressure switch input channel
+		Pressure_SW = new DigitalInput((int)DigitalIO_CSV->GetValue("PRESSURE_SWITCH_ID"));
+		
+        // Filling the Trojan horse with people, then shipping it off to Troy.
+        Compressor = new Relay(COMPRESSOR_RELAY_CHANNEL);
         
         // Sharpening Excalibur on the ye old grindstone in the centre of town.
-        Disc_Load = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_ID"));
-        Disc_Fire = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_ID"));
+        Disc_Load_In = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_IN_ID"));
+        Disc_Load_Out = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_OUT_ID"));
+        Disc_Fire_In = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_IN_ID"));
+        Disc_Fire_Out = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_OUT_ID"));
 
 		printf("CK16_Main Constructor Completed\n");
 	}
@@ -148,12 +153,6 @@ public:
 	void RobotInit(void) {
 		// Actions which would be performed once (and only once) upon initialization of the
 		// robot would be put here.
-		
-		// Test to see if Dashboard is connected---------------------------------------------------------
-//		printf("HUE MIN: %f\n", SmartDashboard::GetNumber("HUE MIN"));
-		
-		// Initialize exponent value from SmartDashboard
-		exp = 3.0;
 		
 		// Initialize settings for encoder drive PIDControllers
 		Left_Drive_PID->SetOutputRange(-0.2, 0.2);
@@ -175,8 +174,10 @@ public:
         Front_L->ConfigEncoderCodesPerRev(TICS_PER_REV);
         
         // Excalibur is sheathed
-        Disc_Load->Set(false);
-        Disc_Fire->Set(false);
+        Disc_Load_In->Set(false);
+        Disc_Load_Out->Set(true);
+        Disc_Fire_In->Set(false);
+        Disc_Fire_Out->Set(true);
         
         		
 		printf("RobotInit() completed.\n");
@@ -246,7 +247,7 @@ public:
 		case 1:
 			// Drive 2 feet
 			double encoderCounts;
-			encoderCounts = (2 * 12.0) * 360.0 / WHEEL_CIRCUMFERENCE;
+			encoderCounts = (2 * 12.0) * TICS_PER_REV / WHEEL_CIRCUMFERENCE;
 //			Left_Drive_PID->SetSetpoint(encoderCounts);
 //			Right_Drive_PID->SetSetpoint(encoderCounts);
 //			Front_L->ChangeControlMode(CANJaguar::kPosition);
@@ -259,32 +260,32 @@ public:
 		}
 	}
 
-		double calculateDriveOutputForTeleop(double input)
-		{
+	double calculateDriveOutputForTeleop(double input)
+	{
 
-			if(fabs(input) < 0.05)
+		if(fabs(input) < 0.05)
+		{
+			// Stop if stick is near zero
+			return 0.0;
+		}
+		else
+		{
+			double mapping;
+
+			if(fabs(input) <= 0.7)
 			{
-				// Stop if stick is near zero
-				return 0.0;
+				mapping = 0.33 * pow(fabs(input), 2) + 0.2;
+				mapping = (input >= 0) ? mapping : -mapping; // Change to negative if the input was negative
+				return mapping;
 			}
 			else
 			{
-				double mapping;
-
-				if(fabs(input) <= 0.7)
-				{
-					mapping = 0.33 * pow(fabs(input), 2) + 0.2;
-					mapping = (input >= 0) ? mapping : -mapping; // Change to negative if the input was negative
-					return mapping;
-				}
-				else
-				{
-					mapping = 3.57 * fabs(input) - 2.14;
-					mapping = (input >= 0) ? mapping : -mapping; // Change to negative if the input was negative
-					return mapping;
-				}
+				mapping = 3.57 * fabs(input) - 2.14;
+				mapping = (input >= 0) ? mapping : -mapping; // Change to negative if the input was negative
+				return mapping;
 			}
 		}
+	}
 	
 	void TeleopPeriodic(void) {
 		// increment the number of teleop periodic loops completed
@@ -332,18 +333,13 @@ public:
 			}
 			
             // Excalibur was actually a horse and now its running away into the wild blue yonder.
-            if(operatorGamepad->GetRawButton(3)) {
-                Disc_Load->Set(true);
-            } else {
-                Disc_Load->Set(false);
-            }
+            Disc_Load_In->Set(operatorGamepad->GetRawButton(3));
+            Disc_Load_Out->Set(!operatorGamepad->GetRawButton(3));
         
             // Exaclibur's brother is a little sluggish, but has also escaped. This one was a goat.
-            if(operatorGamepad->GetRawButton(4)) {
-                Disc_Fire->Set(true);
-            } else {
-                Disc_Fire->Set(false);
-            }
+            Disc_Fire_In->Set(operatorGamepad->GetRawButton(4));
+            Disc_Fire_Out->Set(!operatorGamepad->GetRawButton(4));
+            
 			// Auto Align Button
 //			if(operatorGamepad->GetButton(Joystick::kTopButton) == 1)
 //			{
