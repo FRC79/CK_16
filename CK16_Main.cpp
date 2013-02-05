@@ -10,7 +10,6 @@
 #include <string>
 #include <math.h>
 #include "CSVReader.h"
-//#include "Logger.h"
 
 class CK16_Main : public IterativeRobot
 {
@@ -21,22 +20,20 @@ class CK16_Main : public IterativeRobot
 	std::string FOUND_KEY, AZIMUTH_KEY, RANGE_KEY, EXP_KEY;
 	
 	// Declare variable for the robot drive system
-	RobotDrive *m_robotDrive;		// robot will use PWM 1-4 for drive motors
-    Relay *compressor;
-    DigitalInput *pressure_SW;
-    // Declare log buffers for information to be logged. Buffer set at 16 arbitrary.
-//	Log *m_Log;
-	char logAllValues[64];
-	
+	RobotDrive *m_robotDrive;		// robot will use PWM 1-4 for drive motors	
     
 	// Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
-	CANJaguar *ShooterFeed, *ShooterFire;
+	CANJaguar *ShooterFeed,/* watman strikes again*/ *ShooterFire;
 	
+	// Digital Input pin for the pressure switch
+	DigitalInput *Pressure_SW;
 	
-	
-	// Declare local variable that will hold the exponent for mapping joystick to jaguars
-	double exp;
+	// Building the Trojan horse.
+    Relay *Compressor;
+    
+    // Pulling out Excalibers (2x)
+    Solenoid *Disc_Load_In, *Disc_Load_Out, *Disc_Fire_In, *Disc_Fire_Out;
 	
 	// Declare left and right encoder drive PIDControllers
 	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
@@ -44,8 +41,6 @@ class CK16_Main : public IterativeRobot
 	
 	// Declare Gyro that will be used to determine left and right robot rotation
 	Gyro *Yaw_Gyro;
-	
-	Solenoid *fireSolenoid;
 	
 	// Declare RobotTurnPIDOutput that will control the robot turning aspect of the goal alignment
 //	RobotTurnPIDOutput *Robot_Turn;
@@ -59,7 +54,7 @@ class CK16_Main : public IterativeRobot
 	// Declare a variable to use to access the driver station object
 	DriverStation *m_ds;						// driver station object
 	DriverStationLCD *m_ds_lcd;
-	UINT32 m_priorPacketNumber;					// keep track of the most recent packet number from the DS
+	UINT32 /* wat */ m_priorPacketNumber;					// keep track of the most recent packet number from the DS
 	UINT8 m_dsPacketsReceivedInCurrentSecond;	// keep track of the ds packets received in the current second
 	
 	// Declare variables for the two joysticks being used on port 1
@@ -84,7 +79,6 @@ public:
 		printf("CK16_Main Constructor Started\n");
         
         // Configuration files
-        
 		printf("Loading the configuration files.\n");
 		AnalogInputs_CSV = new CSVReader("AnalogInputs.csv");
 		CAN_IDS_CSV = new CSVReader("CAN_IDs.csv");
@@ -107,14 +101,7 @@ public:
 		
 		// Initialize Robot Drive System Using Jaguars
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
-        compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
-		pressure_SW = new DigitalInput(RobotConfiguration::PRESSURE_SWITCH_CHANNEL);
 
-        // Log files
-//        m_Log = new Log("CK_16_Log.txt");
-
-		// Jags on the right side will show full reverse even when going full forward PLEASE BE AWARE
-		
 		// Initialize left and right encoder drive PIDControllers
 		Left_Drive_PID = new CAN_PID_Controller(1.0, 1.0, 1.0, Front_L, Front_L, Rear_L, false, 0.05 ); // Input: Jag Encoder, Output: Jags
 		Right_Drive_PID = new CAN_PID_Controller(1.0, 1.0, 1.0, Front_R, Front_R, Rear_R, false, 0.05);
@@ -122,8 +109,6 @@ public:
 		// Initialize Gyro
 //		Yaw_Gyro = new Gyro(1);
 
-		fireSolenoid = new Solenoid(1);
-		
 		m_ds = DriverStation::GetInstance();
 		m_ds_lcd = DriverStationLCD::GetInstance();
 		
@@ -146,6 +131,18 @@ public:
 		m_autoPeriodicLoops = 0;
 		m_disabledPeriodicLoops = 0;
 		m_telePeriodicLoops = 0;
+        
+		// Initialize pressure switch input channel
+		Pressure_SW = new DigitalInput((int)DigitalIO_CSV->GetValue("PRESSURE_SWITCH_ID"));
+		
+        // Filling the Trojan horse with people, then shipping it off to Troy.
+        Compressor = new Relay(COMPRESSOR_RELAY_CHANNEL);
+        
+        // Sharpening Excalibur on the ye old grindstone in the centre of town.
+        Disc_Load_In = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_IN_ID"));
+        Disc_Load_Out = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_OUT_ID"));
+        Disc_Fire_In = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_IN_ID"));
+        Disc_Fire_Out = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_OUT_ID"));
 
 		printf("CK16_Main Constructor Completed\n");
 	}
@@ -156,12 +153,6 @@ public:
 	void RobotInit(void) {
 		// Actions which would be performed once (and only once) upon initialization of the
 		// robot would be put here.
-		
-		// Test to see if Dashboard is connected---------------------------------------------------------
-//		printf("HUE MIN: %f\n", SmartDashboard::GetNumber("HUE MIN"));
-		
-		// Initialize exponent value from SmartDashboard
-		exp = 3.0;
 		
 		// Initialize settings for encoder drive PIDControllers
 		Left_Drive_PID->SetOutputRange(-0.2, 0.2);
@@ -181,6 +172,13 @@ public:
         // Set encoders
         Front_R->ConfigEncoderCodesPerRev(TICS_PER_REV); 
         Front_L->ConfigEncoderCodesPerRev(TICS_PER_REV);
+        
+        // Excalibur is sheathed
+        Disc_Load_In->Set(false);
+        Disc_Load_Out->Set(true);
+        Disc_Fire_In->Set(false);
+        Disc_Fire_Out->Set(true);
+        
         		
 		printf("RobotInit() completed.\n");
 	}
@@ -249,7 +247,7 @@ public:
 		case 1:
 			// Drive 2 feet
 			double encoderCounts;
-			encoderCounts = (2 * 12.0) * 360.0 / WHEEL_CIRCUMFERENCE;
+			encoderCounts = (2 * 12.0) * TICS_PER_REV / WHEEL_CIRCUMFERENCE;
 //			Left_Drive_PID->SetSetpoint(encoderCounts);
 //			Right_Drive_PID->SetSetpoint(encoderCounts);
 //			Front_L->ChangeControlMode(CANJaguar::kPosition);
@@ -262,57 +260,40 @@ public:
 		}
 	}
 
-		double calculateDriveOutputForTeleop(double input)
-		{
+	double calculateDriveOutputForTeleop(double input)
+	{
 
-			if(fabs(input) < 0.05)
+		if(fabs(input) < 0.05)
+		{
+			// Stop if stick is near zero
+			return 0.0;
+		}
+		else
+		{
+			double mapping;
+
+			if(fabs(input) <= 0.7)
 			{
-				// Stop if stick is near zero
-				return 0.0;
+				mapping = 0.33 * pow(fabs(input), 2) + 0.2;
+				mapping = (input >= 0) ? mapping : -mapping; // Change to negative if the input was negative
+				return mapping;
 			}
 			else
 			{
-				double mapping;
-
-				if(fabs(input) <= 0.7)
-				{
-					mapping = 0.33 * pow(fabs(input), 2) + 0.2;
-					mapping = (input >= 0) ? mapping : -mapping; // Change to negative if the input was negative
-					return mapping;
-				}
-				else
-				{
-					mapping = 3.57 * fabs(input) - 2.14;
-					mapping = (input >= 0) ? mapping : -mapping; // Change to negative if the input was negative
-					return mapping;
-				}
+				mapping = 3.57 * fabs(input) - 2.14;
+				mapping = (input >= 0) ? mapping : -mapping; // Change to negative if the input was negative
+				return mapping;
 			}
-			
 		}
+	}
 	
 	void TeleopPeriodic(void) {
 		// increment the number of teleop periodic loops completed
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
-		
-		// Compressor to turn on when A button is pressed
-		compressor->Set((operatorGamepad->GetRawButton(1) ? Relay::kForward : Relay::kOff));
-
         
-        // Setting variables equal to current values before logging. These should be overwritten every instance.
-        //logFrontRightTemperature = Front_L->GetTemperature();
-        //logFrontLeftTemperature = Front_R->GetTemperature();
-        //logFrontLeftOutputVoltage = Front_L->GetOutputVoltage();
-        //logFrontRightOutputVoltage = Front_R->GetOutputVoltage();
-        //logClock = GetClock();
-        
-//		sprintf(logAllValues, "%f, %f, %f, %f, %d\n", Front_R->GetTemperature(), Front_L->GetTemperature(), Front_R->GetOutputVoltage(), Front_L->GetOutputVoltage(),
-//				GetClock());
-//		printf(logAllValues);
-        // Assuming that each add line adds a line containing the information requested
-        // to a log file.
-//        m_Log->addLine("%s", logAllValues);
-//        m_Log->closeLog();
+        // Trojan horse has entered Troy
+        Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
 
 //		
 //		if(autoPilot == true)
@@ -351,10 +332,18 @@ public:
 				ShooterFire->Set(0.0);
 			}
 			
-			
+            // Excalibur was actually a horse and now its running away into the wild blue yonder.
+            Disc_Load_In->Set(operatorGamepad->GetRawButton(3));
+            Disc_Load_Out->Set(!operatorGamepad->GetRawButton(3));
+        
+            // Exaclibur's brother is a little sluggish, but has also escaped. This one was a goat.
+            Disc_Fire_In->Set(operatorGamepad->GetRawButton(4));
+            Disc_Fire_Out->Set(!operatorGamepad->GetRawButton(4));
+            
+            
 			// Auto Align Button
 //			if(operatorGamepad->GetButton(Joystick::kTopButton) == 1)
-//			{	
+//			{
 //				// Turn Auto Align on if we see a goal and we know the azimuth
 //				if(SmartDashboard::GetBoolean(FOUND_KEY) == true)
 //				{
