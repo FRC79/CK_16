@@ -323,8 +323,8 @@ public:
 			m_ds_lcd->UpdateLCD();
 			if(operatorGamepad->GetRawButton(2))
 			{
-				ShooterFeed->Set(-0.8);
-				ShooterFire->Set(-0.8);
+				ShooterFeed->Set(-0.75);
+				ShooterFire->Set(-0.75);
 			}
 			else
 			{
