@@ -330,5 +330,3 @@ public:
 	//TeleopPeriodic(void)
 			
 };
-START_ROBOT_CLASS(CK16_Main);
->>>>>>> a5389be88d521c0167592e6ad43021f843287c83
