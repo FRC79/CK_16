@@ -25,6 +25,7 @@ class CK16_Main : public IterativeRobot
 	// Robot will use CAN bus for motor control
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
 	CANJaguar *ShooterFeed,/* watman strikes again*/ *ShooterFire;
+    CANJaguar *Roller;
 	
 	// Digital Input pin for the pressure switch
 	DigitalInput *Pressure_SW;
@@ -32,8 +33,8 @@ class CK16_Main : public IterativeRobot
 	// Building the Trojan horse.
     Relay *Compressor;
     
-    // Pulling out Excalibers (2x)
-    Solenoid *Disc_Load_In, *Disc_Load_Out, *Disc_Fire_In, *Disc_Fire_Out;
+    // Pulling out Excalibers | May not need Disc in and outs for single sonlenoids
+    Solenoid *Disc_Load_In, *Disc_Load_Out, *Disc_Tilt_In, *Disc_Tilt_Out, *Disc_Fire;
 	
 	// Declare left and right encoder drive PIDControllers
 	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
@@ -97,6 +98,7 @@ public:
 		Rear_L = new CANJaguar((int)CAN_IDS_CSV->GetValue("RL_CAN_ID"));
 		ShooterFeed = new CANJaguar((int)CAN_IDS_CSV->GetValue("FEED_CAN_ID"));
 		ShooterFire = new CANJaguar((int)CAN_IDS_CSV->GetValue("FIRE_CAN_ID"));
+        Roller = new CANJaguar((int)CAN_IDS_CSV->GetValue("ROLLER_MOTOR_CAN_ID"));
 		printf("TEAM 79 FOR THE WIN!\n");
 		
 		// Initialize Robot Drive System Using Jaguars
@@ -141,8 +143,9 @@ public:
         // Sharpening Excalibur on the ye old grindstone in the centre of town.
         Disc_Load_In = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_IN_ID"));
         Disc_Load_Out = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_OUT_ID"));
-        Disc_Fire_In = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_IN_ID"));
-        Disc_Fire_Out = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_OUT_ID"));
+        Disc_Tilt_In = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_TILT_IN_ID"));
+        Disc_Tilt_Out = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_TILT_OUT_ID"));
+        Disc_Fire = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_ID"));
 
 		printf("CK16_Main Constructor Completed\n");
 	}
@@ -181,6 +184,7 @@ public:
         
         		
 		printf("RobotInit() completed.\n");
+        printf("Watman!\n");
 	}
 	
 	void DisabledInit(void) {
@@ -321,7 +325,9 @@ public:
 			
 //			m_ds_lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Gyro: %f", Yaw_Gyro->GetAngle());			
 			m_ds_lcd->UpdateLCD();
-			if(operatorGamepad->GetRawButton(2))
+        
+            // Shooting
+			if(operatorGamepad->GetRawButton(9))
 			{
 				ShooterFeed->Set(-0.75);
 				ShooterFire->Set(-0.75);
@@ -331,15 +337,22 @@ public:
 				ShooterFeed->Set(0.0);
 				ShooterFire->Set(0.0);
 			}
-			
+        
+            // Roller
+            if(operatorGamepad->GetRawButton(8)){
+                Roller->Set(0.8);
+            }
+            else{
+                Roller->Set(0.0);
+            }
+        
             // Excalibur was actually a horse and now its running away into the wild blue yonder.
             Disc_Load_In->Set(operatorGamepad->GetRawButton(3));
             Disc_Load_Out->Set(!operatorGamepad->GetRawButton(3));
         
             // Exaclibur's brother is a little sluggish, but has also escaped. This one was a goat.
-            Disc_Fire_In->Set(operatorGamepad->GetRawButton(4));
-            Disc_Fire_Out->Set(!operatorGamepad->GetRawButton(4));
-            
+            Disc_Fire->Set(operatorGamepad->GetRawButton(4));
+        
             
 			// Auto Align Button
 //			if(operatorGamepad->GetButton(Joystick::kTopButton) == 1)
