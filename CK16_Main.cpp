@@ -1,4 +1,3 @@
-
 #include "WPILib.h"
 #include "CANJaguar.h"
 #include "Joystick.h"
@@ -15,6 +14,8 @@
 
 class CK16_Main : public IterativeRobot
 {
+	void UpdatePreviousButtonStateVariables();
+	
     // Declare CSV readers
     CSVReader *PWM_CSV, *AnalogInputs_CSV, *DigitalIO_CSV, *CAN_IDS_CSV;
     
@@ -55,6 +56,9 @@ class CK16_Main : public IterativeRobot
 	// State boolean that represents if robot is driving with joystick input or using auto align
 	bool autoPilot;
 	
+	// State boolean to tell if shooter is tilted up
+	bool shooterTiltedUp;
+	
 	// Declare a variable to use to access the driver station object
 	DriverStation *m_ds;						// driver station object
 	DriverStationLCD *m_ds_lcd;
@@ -64,7 +68,9 @@ class CK16_Main : public IterativeRobot
 	// Declare variables for the two joysticks being used on port 1
 	Joystick *operatorGamepad;			// joystick 1 (arcade stick or right tank stick)
 	
-
+	// Declare variables for previous joystick button states
+	bool shooterTiltButtonWasDown;
+	
 	// Local variables to count the number of periodic loops performed
 	UINT32 m_autoPeriodicLoops;
 	UINT32 m_disabledPeriodicLoops;
@@ -136,7 +142,7 @@ public:
 		m_telePeriodicLoops = 0;
         
 		// Initialize pressure switch input channel
-		Pressure_SW = new DigitalInput((int)DigitalIO_CSV->GetValue("PRESSURE_SWITCH_ID"));
+		Pressure_SW = new DigitalInput(1);
 		
         // Filling the Trojan horse with people, then shipping it off to Troy.
         Compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
@@ -147,7 +153,6 @@ public:
         Disc_Fire = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_ID"));
         Shooter_Tilt_In = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_IN_ID"));
         Shooter_Tilt_Out = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_OUT_ID"));
-        
 
 		printf("CK16_Main Constructor Completed\n");
 	}
@@ -178,6 +183,8 @@ public:
         Shooter_Tilt_In->Set(false);
         Shooter_Tilt_Out->Set(true);
         
+        // Set shooter tilted to false
+        shooterTiltedUp = false;
         		
 		printf("RobotInit() completed.\n");
 	}
@@ -251,6 +258,7 @@ public:
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
         
+		// Print Pressure Switch for testing
         // Trojan horse has entered Troy
         Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
 
@@ -270,6 +278,7 @@ public:
 //		}
 //		else
 //		{
+			printf("Compressor Switch %d\n", Pressure_SW->Get());
 			// Map joystick position to speed value through a special equation
 			double leftOutput, rightOutput;
 			leftOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad->GetRawAxis(2));
@@ -294,8 +303,8 @@ public:
 			}
         
             // Roller
-            if(operatorGamepad->GetRawButton(8)){
-                Roller->Set(0.8);
+            if(operatorGamepad->GetRawButton(5)){
+                Roller->Set(0.5);
             }
             else{
                 Roller->Set(0.0);
@@ -309,9 +318,11 @@ public:
             Disc_Fire->Set(operatorGamepad->GetRawButton(4));
             
             // Excalibur has a cousin
-            Shooter_Tilt_In->Set(operatorGamepad->GetRawButton(1));
-            Shooter_Tilt_Out->Set(!operatorGamepad->GetRawButton(1));
-            
+            if(operatorGamepad->GetRawButton(1) && !shooterTiltButtonWasDown) // Only accept a button press (not hold)
+            	shooterTiltedUp = !shooterTiltedUp; // Toggle tilt solenoid
+            Shooter_Tilt_In->Set(!shooterTiltedUp);
+            Shooter_Tilt_Out->Set(shooterTiltedUp);
+            shooterTiltButtonWasDown = operatorGamepad->GetRawButton(1); // Update previous button value to current
             
 			// Auto Align Button
 //			if(operatorGamepad->GetRawButton(1))
@@ -330,3 +341,5 @@ public:
 	//TeleopPeriodic(void)
 			
 };
+
+START_ROBOT_CLASS(CK16_Main);
