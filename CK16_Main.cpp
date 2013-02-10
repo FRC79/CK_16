@@ -20,7 +20,7 @@ class CK16_Main : public IterativeRobot
     CSVReader *PWM_CSV, *AnalogInputs_CSV, *DigitalIO_CSV, *CAN_IDS_CSV;
     
 	// SmartDashboard Keys
-	std::string FOUND_KEY, AZIMUTH_KEY, RANGE_KEY, SHOOTER_ANGLE_KEY;
+	std::string FOUND_KEY, AZIMUTH_KEY, RANGE_KEY, SHOOTER_TILTED_KEY;
 	
 	// Declare variable for the robot drive system
 	RobotDrive *m_robotDrive;		// robot will use PWM 1-4 for drive motors	
@@ -99,7 +99,7 @@ public:
 		FOUND_KEY = "found";
 		AZIMUTH_KEY = "azimuth";
 		RANGE_KEY = "range";
-		SHOOTER_ANGLE_KEY = "shooter angle";
+		SHOOTER_TILTED_KEY = "shooter tilted";
 		
 		// Initialize the CAN Jaguars
 		Front_R = new CANJaguar((int)CAN_IDS_CSV->GetValue("FR_CAN_ID"));
@@ -185,6 +185,7 @@ public:
         
         // Set shooter tilted to false
         shooterTiltedUp = false;
+        shooterTiltButtonWasDown = false;
         		
 		printf("RobotInit() completed.\n");
 	}
@@ -319,10 +320,13 @@ public:
             
             // Excalibur has a cousin
             if(operatorGamepad->GetRawButton(1) && !shooterTiltButtonWasDown) // Only accept a button press (not hold)
+            {
             	shooterTiltedUp = !shooterTiltedUp; // Toggle tilt solenoid
+            } 
             Shooter_Tilt_In->Set(!shooterTiltedUp);
             Shooter_Tilt_Out->Set(shooterTiltedUp);
             shooterTiltButtonWasDown = operatorGamepad->GetRawButton(1); // Update previous button value to current
+            SmartDashboard::PutBoolean(SHOOTER_TILTED_KEY, shooterTiltedUp); // Output current state to SmartDashboard
             
 			// Auto Align Button
 //			if(operatorGamepad->GetRawButton(1))
