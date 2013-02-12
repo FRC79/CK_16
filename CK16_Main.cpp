@@ -30,6 +30,8 @@ class CK16_Main : public IterativeRobot
 	CANJaguar *ShooterFeed,/* watman strikes again*/ *ShooterFire;
     CANJaguar *Roller;
 
+    // Declare the IR sensors that facilitate the disc loading and firing process(es)															//wat
+    DigitalInput *Top_Beam, *Bottom_Beam;
 	
 	// Digital Input pin for the pressure switch
 	DigitalInput *Pressure_SW;
@@ -51,10 +53,17 @@ class CK16_Main : public IterativeRobot
 	RobotTurnPIDOutput *Robot_Turn;
 	
 	// Declare PID Controller that will handle aligning the robot with the goal
-	PIDController *Goal_Align_PID;
+	PIDController *Turn_PID;
 	
 	// State boolean that represents if robot is driving with joystick input or using auto align
 	bool autoPilot;
+	
+	// State boolean to enable and disable manual roller load
+	bool autoLoadEnabled, manualRollersEnabled, topBeamPrevState, bottomBeamPrevState;
+	bool discInPosition, discLoaded, discShot;
+	
+	static const bool BROKEN = true;
+	static const bool SOLID = false;
 	
 	// State boolean to tell if shooter is tilted up
 	bool shooterTiltedUp;
@@ -66,10 +75,11 @@ class CK16_Main : public IterativeRobot
 	UINT8 m_dsPacketsReceivedInCurrentSecond;	// keep track of the ds packets received in the current second
 	
 	// Declare variables for the two joysticks being used on port 1
-	Joystick *operatorGamepad;			// joystick 1 (arcade stick or right tank stick)
+	Joystick *operatorGamepad1;			// joystick 1 (arcade stick or right tank stick)
+	Joystick *operatorGamepad2;			// joystick 2 (manipulator joystick/misc. functions)
 	
 	// Declare variables for previous joystick button states
-	bool shooterTiltButtonWasDown;
+	bool shooterTiltButtonWasDown, autoLoadToggleButton;
 	
 	// Local variables to count the number of periodic loops performed
 	UINT32 m_autoPeriodicLoops;
@@ -115,7 +125,7 @@ public:
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
 		
 		// Initialize Gyro
-//		Yaw_Gyro = new Gyro((int)AnalogInputs_CSV->GetValue("YAW_GYRO_ID"));
+		Yaw_Gyro = new Gyro((int)AnalogInputs_CSV->GetValue("YAW_GYRO_ID"));
 
 		m_ds = DriverStation::GetInstance();
 		m_ds_lcd = DriverStationLCD::GetInstance();
@@ -127,14 +137,14 @@ public:
 		Robot_Turn = new RobotTurnPIDOutput(m_robotDrive);
 		
 		// Initialize Goal Alignment PID Controller
-//		Goal_Align_PID = new PIDController(1.0, 1.0, 1.0, Yaw_Gyro, Robot_Turn);
+//		Turn_PID = new PIDController(1.0, 1.0, 1.0, Yaw_Gyro, Robot_Turn);
 		
 		// Acquire the Driver Station object
 		m_priorPacketNumber = 0;
 		m_dsPacketsReceivedInCurrentSecond = 0;
 
 		// Define joysticks being used at USB port #1 on the Drivers Station
-		operatorGamepad = new Joystick(1);
+		operatorGamepad1 = new Joystick(1);
 
 		// Initialize counters to record the number of loops completed in autonomous and teleop modes
 		m_autoPeriodicLoops = 0;
@@ -142,7 +152,11 @@ public:
 		m_telePeriodicLoops = 0;
         
 		// Initialize pressure switch input channel
-		Pressure_SW = new DigitalInput(1);
+		Pressure_SW = new DigitalInput(RobotConfiguration::PRESSURE_SWITCH_CHANNEL);
+		
+		// Initialize IR beams for loading and firing discs
+		Top_Beam = new DigitalInput((int)DigitalIO_CSV->GetValue("TOP_BEAM_ID"));
+		Bottom_Beam = new DigitalInput((int)DigitalIO_CSV->GetValue("BOTTOM_BEAM_ID"));
 		
         // Filling the Trojan horse with people, then shipping it off to Troy.
         Compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
@@ -165,8 +179,8 @@ public:
 		// robot would be put here.
 		
 		// Initialize settings for RobotTurn
-//		Goal_Align_PID->SetOutputRange(-0.2, 0.2);
-//		Goal_Align_PID->SetTolerance(0.05);
+//		Turn_PID->SetOutputRange(-0.2, 0.2);
+//		Turn_PID->SetTolerance(0.05);
         
         // Set each drive motor to have an encoder to be its friend
         Front_R->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
@@ -185,7 +199,10 @@ public:
         
         // Set shooter tilted to false
         shooterTiltedUp = false;
+        
+        // Init Button Previous States
         shooterTiltButtonWasDown = false;
+        autoLoadToggleButton = false;
         		
 		printf("RobotInit() completed.\n");
 	}
@@ -194,7 +211,7 @@ public:
 		m_disabledPeriodicLoops = 0;			// Reset the loop counter for disabled mode
 		
 		// Reset and Disable Goal Alignment PID Controller
-//		Goal_Align_PID->Reset(); // The Disable method will not reset Integral term nor the error
+//		Turn_PID->Reset(); // The Disable method will not reset Integral term nor the error
 		autoPilot = false;
 		
 		// Move the cursor down a few, since we'll move it back up in periodic.
@@ -204,9 +221,6 @@ public:
 	void AutonomousInit(void) {
 		m_autoPeriodicLoops = 0;				// Reset the loop counter for autonomous mode
 		
-		// Enable Goal Align PID
-//		Goal_Align_PID->Enable();
-//		Goal_Align_PID->SetSetpoint(0.0);
 		printf("Auton Init Completed\n");
 	}
 
@@ -214,9 +228,13 @@ public:
 		m_telePeriodicLoops = 0;				// Reset the loop counter for teleop mode
 		m_dsPacketsReceivedInCurrentSecond = 0;	// Reset the number of dsPackets in current second
 		
-		// Enable Goal Align PID
-//		Goal_Align_PID->Enable();
-//		Goal_Align_PID->SetSetpoint(0.0);
+		autoLoadEnabled = true;
+		topBeamPrevState = false;
+		bottomBeamPrevState = false;
+		
+		discInPosition = false;
+		discLoaded = false;
+		
 		printf("Teleop Init Completed\n");
 	}
 
@@ -262,28 +280,22 @@ public:
 		// Print Pressure Switch for testing
         // Trojan horse has entered Troy
         Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
-
-		// Reset Gyro
-//        Yaw_Gyro->Reset();
         
-//		if(autoPilot == true)
-//		{
-//			// Auto Align Disable Button
-//			if(operatorGamepad->GetButton(Joystick::kTopButton) == 2)
-//			{
-//				Goal_Align_PID->Disable(); // Stop outputs
-//				Goal_Align_PID->Enable(); // Start PIDContoller up again
-//				Goal_Align_PID->SetSetpoint(0.0);
-//				autoPilot = false;
-//			}
-//		}
-//		else
-//		{
-			printf("Compressor Switch %d\n", Pressure_SW->Get());
+		if(autoPilot == true)
+		{
+			// Auto Align Disable Button
+			if(operatorGamepad1->GetRawButton(8))
+			{
+//				Turn_PID->Disable(); // Stop outputs
+				autoPilot = false;
+			}
+		}
+		else
+		{
 			// Map joystick position to speed value through a special equation
 			double leftOutput, rightOutput;
-			leftOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad->GetRawAxis(2));
-			rightOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad->GetRawAxis(5));
+			leftOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(2));
+			rightOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(5));
 			
 			// Joystick Driving
 			m_robotDrive->SetLeftRightMotorOutputs(leftOutput, rightOutput);
@@ -292,58 +304,106 @@ public:
 			
 //			m_ds_lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Gyro: %f", Yaw_Gyro->GetAngle());			
 			m_ds_lcd->UpdateLCD();
-			if(operatorGamepad->GetRawButton(2))
+			if(operatorGamepad1->GetRawButton(2))
 			{
-				ShooterFeed->Set(-0.75);
-				ShooterFire->Set(-0.75);
+				ShooterFeed->Set(-0.57);
+				ShooterFire->Set(-0.57);
+			}
+			else if(operatorGamepad1->GetRawButton(6))
+			{
+				ShooterFeed->Set(-0.80);
+				ShooterFire->Set(-0.80);
 			}
 			else
 			{
 				ShooterFeed->Set(0.0);
 				ShooterFire->Set(0.0);
 			}
-        
-            // Roller
-            if(operatorGamepad->GetRawButton(5)){
-                Roller->Set(0.5);
-            }
-            else{
-                Roller->Set(0.0);
-            }
-			
+            
             // Excalibur was actually a horse and now its running away into the wild blue yonder.
-            Disc_Load_In->Set(operatorGamepad->GetRawButton(3));
-            Disc_Load_Out->Set(!operatorGamepad->GetRawButton(3));
+            
         
             // Exaclibur's brother is a little sluggish, but has also escaped. This one was a goat.
-            Disc_Fire->Set(operatorGamepad->GetRawButton(4));
+            Disc_Fire->Set(operatorGamepad1->GetRawButton(4));
             
             // Excalibur has a cousin
-            if(operatorGamepad->GetRawButton(1) && !shooterTiltButtonWasDown) // Only accept a button press (not hold)
+            if(operatorGamepad1->GetRawButton(1) && !shooterTiltButtonWasDown) // Only accept a button press (not hold)
             {
             	shooterTiltedUp = !shooterTiltedUp; // Toggle tilt solenoid
             } 
             Shooter_Tilt_In->Set(!shooterTiltedUp);
             Shooter_Tilt_Out->Set(shooterTiltedUp);
-            shooterTiltButtonWasDown = operatorGamepad->GetRawButton(1); // Update previous button value to current
+            shooterTiltButtonWasDown = operatorGamepad1->GetRawButton(1); // Update previous button value to current
             SmartDashboard::PutBoolean(SHOOTER_TILTED_KEY, shooterTiltedUp); // Output current state to SmartDashboard
             
 			// Auto Align Button
-//			if(operatorGamepad->GetRawButton(1))
+//			if(operatorGamepad1->GetRawButton(7))
 //			{
-//				// Turn Auto Align on if we see a goal and we know the azimuth
+				// Turn Auto Align on if we see a goal and we know the azimuth
 //				if(SmartDashboard::GetBoolean(FOUND_KEY) == true)
 //				{
-//					Goal_Align_PID->SetSetpoint(SmartDashboard::GetNumber(AZIMUTH_KEY));
+//					Goal_Align_PID->Enable();
+//					Goal_Align_PID->SetSetpoint(0.0);
 //					autoPilot = true;
 //				}
 //			}
-//		}
-		
-	} 
-	
-	//TeleopPeriodic(void)
 			
+			// Enable and disable autoLoad
+			if(operatorGamepad1->GetRawButton(1) && !autoLoadToggleButton) // Only accept a button press (not hold)
+            {
+            	autoLoadEnabled = !autoLoadEnabled; // Toggle autoLoad
+            } 
+			
+			// Load stuff
+			if(autoLoadEnabled)
+			{
+				if(!discInPosition)
+				{
+					// Start rollers
+					Roller->Set(0.5);
+				}
+				
+				if(!discLoaded && discInPosition)
+				{
+					// Stop rollers
+					Roller->Set(0.0);
+					
+					// Piston down
+					Disc_Load_In->Set(true);
+					Disc_Load_Out->Set(false);
+				}
+				
+				// Update states
+				if(Top_Beam->Get() == BROKEN && topBeamPrevState == SOLID)
+				{
+					// Disc in position
+					discInPosition = true;
+					topBeamPrevState = BROKEN;
+				}
+				
+				if(Bottom_Beam->Get() == BROKEN && bottomBeamPrevState == SOLID)
+				{
+					// Disc moved from in position to loaded
+					discLoaded = true;
+					discInPosition = false;
+					topBeamPrevState = SOLID;
+					bottomBeamPrevState = BROKEN;
+				}
+				
+				if(Bottom_Beam->Get() == SOLID && bottomBeamPrevState == BROKEN)
+				{
+					// Disc moved from loaded to shot
+					discShot = true;
+					discLoaded = false;
+					bottomBeamPrevState = SOLID;
+				}
+			}
+			else
+			{
+				// shoot code
+			}
+		}
+	}
 };
 
 START_ROBOT_CLASS(CK16_Main);
