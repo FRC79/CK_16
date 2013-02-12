@@ -347,7 +347,24 @@ public:
 //					autoPilot = true;
 //				}
 //			}
-			
+            
+            /*
+             Batman Begins.
+             DEFINITIONS:
+             in position - at the top waiting to load
+             load disc - piston down that moves disc to fire posistion
+             fire position - waiting to be fired
+             
+             This section of code provides the means to automatically move discs into position and
+             load discs into the fire position. When the top beam is solid (not broken) the rollers
+             will be on until the top beam is broken. If the top beam is broken and the bottom beam
+             is solid the piston will move a disc into the fire position, then turn the rollers back
+             on to move a disc into position.
+             NOTE: This code is activated by a toggle button press. When toggled the code the above
+             comment describes will run. When the toggle is deactivated drivers manually roller, 
+             load, and fire.
+             */
+            
 			// Enable and disable autoLoad
 			if(operatorGamepad1->GetRawButton(1) && !autoLoadToggleButton) // Only accept a button press (not hold)
             {
