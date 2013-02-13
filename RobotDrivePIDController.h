@@ -71,6 +71,7 @@ private:
 
 	static void CallCalculate(void *controller);
 	void Calculate();
+	
 	DISALLOW_COPY_AND_ASSIGN(RobotDrivePIDController);
 };
 

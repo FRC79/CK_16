@@ -145,6 +145,7 @@ public:
 
 		// Define joysticks being used at USB port #1 on the Drivers Station
 		operatorGamepad1 = new Joystick(1);
+		operatorGamepad2 = new Joystick(2);
 
 		// Initialize counters to record the number of loops completed in autonomous and teleop modes
 		m_autoPeriodicLoops = 0;
@@ -228,7 +229,8 @@ public:
 		m_telePeriodicLoops = 0;				// Reset the loop counter for teleop mode
 		m_dsPacketsReceivedInCurrentSecond = 0;	// Reset the number of dsPackets in current second
 		
-		autoLoadEnabled = true;
+		autoLoadEnabled = false;
+		manualRollersEnabled = true;
 		topBeamPrevState = false;
 		bottomBeamPrevState = false;
 		
@@ -264,9 +266,9 @@ public:
 		{
 		case 1:
 			// Drive 2 feet
-			double encoderCounts;
-			encoderCounts = (2 * 12.0) * TICS_PER_REV / WHEEL_CIRCUMFERENCE;
-			break;
+//			double encoderCounts;
+//			encoderCounts = (2 * 12.0) * TICS_PER_REV / WHEEL_CIRCUMFERENCE;
+//			break;
 		default:
 			break;
 		}
@@ -417,7 +419,17 @@ public:
 			}
 			else
 			{
-				// shoot code
+				if(manualRollersEnabled)
+				{
+					if(operatorGamepad2->GetRawButton(5))
+					{
+						Roller->Set(0.5);
+					}
+					else
+					{
+						Roller->Set(0.0);
+					}
+				}
 			}
 		}
 	}
