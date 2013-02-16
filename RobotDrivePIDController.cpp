@@ -92,19 +92,18 @@ void RobotDrivePIDController::Calculate()
 	}
 	END_REGION;
 
-	if (enabled && m_setpoint != 0.0)
+	if (enabled)
 	{
 		// Store direction of motion
 		bool positiveDirection;
-		if(m_setpoint >= 0) positiveDirection = true;
-		else positiveDirection = false;
 		
 		// Get positions of the encoders on the robot (currently the front encoders)
-		float jagEncoderLeftPos = m_jagFL->GetPosition();
-		float jagEncoderRightPos = m_jagFR->GetPosition();
+		float jagEncoderLeftPos = -m_jagFL->GetPosition();
+		float jagEncoderRightPos = -m_jagFR->GetPosition();
 		{
 			Synchronized sync(m_semaphore);
 			m_error = m_setpoint - (jagEncoderLeftPos + jagEncoderRightPos)/2;
+			positiveDirection = (m_error >= 0 ? true : false);
 			
 			// Scale input
 			if (m_continuous)
