@@ -20,7 +20,7 @@
 //{
 //	m_semaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 //
-//	m_controlLoop = new Notifier(BangBang_Controller::CallCalculate, this);
+////	m_controlLoop = new Notifier(BangBang_Controller::CallCalculate, this);
 //
 //
 //	m_P = Kp;

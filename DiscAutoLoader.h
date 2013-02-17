@@ -57,13 +57,17 @@ private:
 	bool ready_to_shoot;
 	bool disc_in_position;
 	bool disc_loaded;
+	bool timer_running;
+	bool ready_to_load;
 	bool enabled;
+	double final_time;
 	CANJaguar *m_roller;
 	DualSolenoid *m_load_piston;
 	DigitalInput *m_top_disc_sensor;
 	DigitalInput *m_bottom_disc_sensor;
 	
 	void ResetVariables();
+	void SetFinalTime(double time_in_milliseconds);
 };
 
 #endif

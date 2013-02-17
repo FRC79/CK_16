@@ -7,8 +7,10 @@
 #include "PIDController.h"
 #include "RobotConfiguration.h"
 #include "TeleopHelper.h"
+#include "DualSolenoid.h"
+#include "DiscAutoLoader.h"
+#include "ButtonHelper.h"
 #include "SmartDashboard/SmartDashboard.h"
-#include "Timer.h"
 #include <string>
 #include <math.h>
 #include "CSVReader.h"
@@ -20,7 +22,6 @@ class CK16_Main: public IterativeRobot {
 	CSVReader *PWM_CSV, *AnalogInputs_CSV, *DigitalIO_CSV, *CAN_IDS_CSV;
 
 	// SmartDashboard Keys
-
 	std::string FOUND_KEY, AZIMUTH_KEY, RANGE_KEY, SHOOTER_TILTED_KEY;
 	
 	// Declare variable for the robot drive system
@@ -32,7 +33,7 @@ class CK16_Main: public IterativeRobot {
 	CANJaguar *Roller;
 
     // Declare the IR sensors that facilitate the disc loading and firing process(es)															//wat
-    DigitalInput *Front_Beam, *Top_Beam, *Bottom_Beam;
+    DigitalInput *Top_Beam, *Bottom_Beam;
 	
     // Declare the BangBang Controller
     
@@ -46,6 +47,9 @@ class CK16_Main: public IterativeRobot {
 	// Pulling out Excalibers (2x)
 	Solenoid *Disc_Load_In, *Disc_Load_Out, *Shooter_Tilt_In,
 			*Shooter_Tilt_Out, *Disc_Fire;
+	
+	// Declaring DualSolenoids
+	DualSolenoid *Disc_Load, *Shooter_Tilt;
 
 	// Declare left and right encoder drive PIDControllers
 	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
@@ -56,21 +60,24 @@ class CK16_Main: public IterativeRobot {
 	// Declare RobotTurnPIDOutput that will control the robot turning aspect of the goal alignment
 	RobotTurnPIDOutput *Robot_Turn;
 
-	// Declare PID Controller that will handle aligning the robot with the goal
-
+	// Declare PID Controller that will handle robot robot turning with gyro
 	PIDController *Turn_PID;
 	
 	// State boolean that represents if robot is driving with joystick input or using auto align
 	bool autoPilot;
 	
-	// State boolean to enable and disable manual roller load
-	bool autoLoadEnabled, autoLoadWasEnabled, manualRollersEnabled;
+	// Declare a DiscAutoLoader for use in teleop mode
+	DiscAutoLoader *Auto_Loader;
+	
+	// State booleans for auto loading and manual loading
+	bool autoLoadEnabled, loadWasHalted;
+	bool shooterWheelsSpinning;
 	bool discInPosition, discLoaded, discShot;
-	unsigned int topBeamPrevState, bottomBeamPrevState;
 	
 	static const unsigned int BROKEN = 0;
 	static const unsigned int SOLID = 1;
 	
+	// State boolean for shooter tilt funcitonality
 	bool shooterTiltedUp;
 
 	// Declare a variable to use to access the driver station object
@@ -82,8 +89,8 @@ class CK16_Main: public IterativeRobot {
 	Joystick *operatorGamepad1;			// joystick 1 (arcade stick or right tank stick)
 	Joystick *operatorGamepad2;			// joystick 2 (manipulator joystick/misc. functions)
 	
-	// Declare variables for previous joystick button states
-	bool shooterTiltButtonWasDown, autoLoadToggleButtonWasDown;
+	// Declare ButtonHelper for each gamepads
+	ButtonHelper *buttonHelper1, *buttonHelper2;
 	
 	// Local variables to count the number of periodic loops performed
 	UINT32 m_autoPeriodicLoops;
@@ -129,7 +136,6 @@ public:
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
 
 		// Initialize Gyro
-
 		Yaw_Gyro = new Gyro((int)AnalogInputs_CSV->GetValue("YAW_GYRO_ID"));
 
 		m_ds = DriverStation::GetInstance();
@@ -151,30 +157,39 @@ public:
 		// Define joysticks being used at USB port #1 on the Drivers Station
 		operatorGamepad1 = new Joystick(1);
 		operatorGamepad2 = new Joystick(2);
+		
+		// Initialize joystick button helpers
+		buttonHelper1 = new ButtonHelper(operatorGamepad1);
+		buttonHelper2 = new ButtonHelper(operatorGamepad2);
 
 		// Initialize counters to record the number of loops completed in autonomous and teleop modes
 		m_autoPeriodicLoops = 0;
 		m_disabledPeriodicLoops = 0;
 		m_telePeriodicLoops = 0;
 
+		// Filling the Trojan horse with people, then shipping it off to Troy.
+		Compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
+		
 		// Initialize pressure switch input channel
-
 		Pressure_SW = new DigitalInput(RobotConfiguration::PRESSURE_SWITCH_CHANNEL);
 		
-		// Initialize IR beams for loading and firing discs
-		Front_Beam = new DigitalInput(4);
-		Top_Beam = new DigitalInput(3);
-		Bottom_Beam = new DigitalInput(2);
-		
-        // Filling the Trojan horse with people, then shipping it off to Troy.
-        Compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
-        
-        // Sharpening Excalibur on the ye old grindstone in the centre of town.
+		// Sharpening Excalibur on the ye old grindstone in the centre of town.
         Disc_Load_In = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_IN_ID"));
         Disc_Load_Out = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_OUT_ID"));
         Disc_Fire = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_ID"));
         Shooter_Tilt_In = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_IN_ID"));
         Shooter_Tilt_Out = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_OUT_ID"));
+		
+        // Initialize DualSolenoids
+        Disc_Load = new DualSolenoid(Disc_Load_In, Disc_Load_Out, false, false);
+        Shooter_Tilt = new DualSolenoid(Shooter_Tilt_In, Shooter_Tilt_Out, true, false); // Inverted
+        
+        // Initialize IR beams for loading and firing discs
+		Top_Beam = new DigitalInput(3);
+		Bottom_Beam = new DigitalInput(2);
+        
+		// Initialize DiscAutoLoader
+		Auto_Loader = new DiscAutoLoader(Roller, Disc_Load, Top_Beam, Bottom_Beam);
         
 		printf("CK16_Main Constructor Completed\n");
 	}
@@ -204,18 +219,12 @@ public:
         Front_L->ConfigEncoderCodesPerRev(TICS_PER_REV);
         
         // Excalibur is sheathed
-        Disc_Load_In->Set(false);
-        Disc_Load_Out->Set(true);
+        Disc_Load->Set(false);
         Disc_Fire->Set(false);
-        Shooter_Tilt_In->Set(false);
-        Shooter_Tilt_Out->Set(true);
+        Shooter_Tilt->Set(false);
         
         // Set shooter tilted to false
         shooterTiltedUp = false;
-        
-        // Init Button Previous States
-        shooterTiltButtonWasDown = false;
-        autoLoadToggleButtonWasDown = false;
         		
 		printf("RobotInit() completed.\n");
 	}
@@ -223,10 +232,12 @@ public:
 	void DisabledInit(void) {
 		m_disabledPeriodicLoops = 0; // Reset the loop counter for disabled mode
 
-		// Reset and Disable Goal Alignment PID Controller
-
+		// Reset and Disable Turn PID
 //		Turn_PID->Reset(); // The Disable method will not reset Integral term nor the error
 		autoPilot = false;
+		
+		// Disable AutoLoader
+		Auto_Loader->Disable();
 
 		// Move the cursor down a few, since we'll move it back up in periodic.
 		printf("\x1b[2B");
@@ -247,14 +258,10 @@ public:
 		m_telePeriodicLoops = 0;				// Reset the loop counter for teleop mode
 		m_dsPacketsReceivedInCurrentSecond = 0;	// Reset the number of dsPackets in current second
 		
+		// Initialize all state variables
 		autoLoadEnabled = false;
-		autoLoadWasEnabled = false;
-		manualRollersEnabled = true;
-		topBeamPrevState = SOLID;
-		bottomBeamPrevState = SOLID;
-		
-		discInPosition = false;
-		discLoaded = false;
+		loadWasHalted = false;
+		shooterWheelsSpinning = false;
 		
 		printf("Teleop Init Completed\n");
 	}
@@ -295,10 +302,12 @@ public:
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
 
-		// Print Pressure Switch for testing
-
-        // Trojan horse has entered Troy
-        Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
+		// Keep filling up the compressor until it hits the desired psi
+		Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
+		
+		// Update the button helpers
+		buttonHelper1->Update();
+		buttonHelper2->Update();
         
 		if(autoPilot == true)
 		{
@@ -311,35 +320,6 @@ public:
 		}
 		else
 		{
-			// Map joystick position to speed value through a special equation
-			double leftOutput, rightOutput;
-			leftOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(2));
-			rightOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(5));
-			
-			// Joystick Driving
-			m_robotDrive->SetLeftRightMotorOutputs(leftOutput, rightOutput);
-			
-//			printf("Left Encoder Distance: %f\nRight Encoder Distance: %f\n", Front_L->GetPosition()*INCHES_PER_TIC, Front_R->GetPosition()*INCHES_PER_TIC);
-			
-//			m_ds_lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Gyro: %f", Yaw_Gyro->GetAngle());			
-			m_ds_lcd->UpdateLCD();
-            
-            // Excalibur was actually a horse and now its running away into the wild blue yonder.
-            
-        
-            // Exaclibur's brother is a little sluggish, but has also escaped. This one was a goat.
-            Disc_Fire->Set(operatorGamepad2->GetRawButton(4));
-            
-            // Excalibur has a cousin
-            if(operatorGamepad1->GetRawButton(1) && !shooterTiltButtonWasDown) // Only accept a button press (not hold)
-            {
-            	shooterTiltedUp = !shooterTiltedUp; // Toggle tilt solenoid
-            } 
-            Shooter_Tilt_In->Set(!shooterTiltedUp);
-            Shooter_Tilt_Out->Set(shooterTiltedUp);
-            shooterTiltButtonWasDown = operatorGamepad1->GetRawButton(1); // Update previous button value to current
-            SmartDashboard::PutBoolean(SHOOTER_TILTED_KEY, shooterTiltedUp); // Output current state to SmartDashboard
-            
 			// Auto Align Button
 //			if(operatorGamepad1->GetRawButton(7))
 //			{
@@ -351,94 +331,73 @@ public:
 //					autoPilot = true;
 //				}
 //			}
+			
+			// Map joystick position to speed value through a special equation
+			double leftOutput, rightOutput;
+			leftOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(2));
+			rightOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(5));
+			
+			// Joystick Driving
+			m_robotDrive->SetLeftRightMotorOutputs(leftOutput, rightOutput);
             
-            /*
-             Batman Begins.
-             DEFINITIONS:
-             in position - at the top waiting to load
-             load disc - piston down that moves disc to fire posistion
-             fire position - waiting to be fired
-             
-             This section of code provides the means to automatically move discs into position and
-             load discs into the fire position. When the top beam is solid (not broken) the rollers
-             will be on until the top beam is broken. If the top beam is broken and the bottom beam
-             is solid the piston will move a disc into the fire position, then turn the rollers back
-             on to move a disc into position.
-             NOTE: This code is activated by a toggle button press. When toggled the code the above
-             comment describes will run. When the toggle is deactivated drivers manually roller, 
-             load, and fire.
-             */
-            
-			// Enable and disable autoLoad
-			if(operatorGamepad2->GetRawButton(1) && !autoLoadToggleButtonWasDown) // Only accept a button press (not hold)
+            // Shooter tilt toggle
+            if(buttonHelper1->WasButtonToggled(1)) // Only accept a button press (not hold)
             {
-            	autoLoadEnabled = !autoLoadEnabled; // Toggle autoLoad
-            	autoLoadWasEnabled = !autoLoadWasEnabled;
-            	autoLoadToggleButtonWasDown = true;
-            }
-			else if(!operatorGamepad2->GetRawButton(1) && autoLoadToggleButtonWasDown)
+            	shooterTiltedUp = !shooterTiltedUp; // Toggle tilt solenoid
+            } 
+            Shooter_Tilt->Set(shooterTiltedUp);
+            SmartDashboard::PutBoolean(SHOOTER_TILTED_KEY, shooterTiltedUp); // Output current state to SmartDashboard
+            
+			// Enable and disable autoLoad (only if the autoload is not halted)
+			if(buttonHelper2->WasButtonToggled(1) && !loadWasHalted && autoLoadEnabled)
 			{
-				autoLoadToggleButtonWasDown = false;
+				Auto_Loader->Disable(); // Disable
+				autoLoadEnabled = false;
+			}
+			else if(buttonHelper2->WasButtonToggled(1) && !loadWasHalted && !autoLoadEnabled)
+			{
+				Auto_Loader->Reset(); // Enable
+				autoLoadEnabled = true;
 			}
 			
-			// Shooter code
-			if(operatorGamepad2->GetRawButton(2))
+			// Toggle Shooter Wheels on and off
+			if(buttonHelper2->WasButtonToggled(2))
 			{
-				ShooterFeed->Set(-0.57); // was 57
-				ShooterFire->Set(-0.57);
-				autoLoadEnabled = false;
+				shooterWheelsSpinning = !shooterWheelsSpinning;
+			}
+			
+			// Shooter wheel state changing
+			if(shooterWheelsSpinning)
+			{
+				ShooterFeed->Set(-0.65);
+				ShooterFire->Set(-0.65);
 			}
 			else
 			{
 				ShooterFeed->Set(0.0);
 				ShooterFire->Set(0.0);
-				autoLoadEnabled = autoLoadWasEnabled; // If it was enabled, reenable. Else keep it false.
 			}
 			
-			// Update disc position state variables
-			discInPosition = (Top_Beam->Get() == BROKEN ? true : false);
-			discLoaded = (Bottom_Beam->Get() == BROKEN ? true : false);
+			// Fire piston that shoots the disc and halt loading if the piston is fired.
+			Disc_Fire->Set(operatorGamepad2->GetRawButton(4));
+			loadWasHalted = operatorGamepad2->GetRawButton(4);
 			
-			// Load stuff
-			if(autoLoadEnabled)
+			// Auto and manual disc loading
+			if(autoLoadEnabled && !loadWasHalted)
 			{	
-				if(!discInPosition && !discLoaded)
-				{
-					Roller->Set(0.5);
-					Disc_Load_In->Set(false);
-					Disc_Load_Out->Set(true);
-				}
-				else if(discInPosition && !discLoaded)
-				{
-					Roller->Set(0.0);
-					Disc_Load_In->Set(true);
-					Disc_Load_Out->Set(false);
-				}
-				else if(!discInPosition && discLoaded)
-				{
-					Roller->Set(0.5);
-					Disc_Load_In->Set(false);
-					Disc_Load_Out->Set(true);
-				}
-				else if(discInPosition && discLoaded)
-				{
-					Roller->Set(0.0);
-					Disc_Load_In->Set(false);
-					Disc_Load_Out->Set(true);
-				}
+				// Autoloading
+				Auto_Loader->AutoLoad();
 			}
-			else
+			else if(!autoLoadEnabled && !loadWasHalted)
 			{
-				if(manualRollersEnabled)
+				// Manual Loading
+				if(operatorGamepad2->GetRawButton(5))
 				{
-					if(operatorGamepad2->GetRawButton(5))
-					{
-						Roller->Set(0.5);
-					}
-					else
-					{
-						Roller->Set(0.0);
-					}
+					Roller->Set(0.5);
+				}
+				else
+				{
+					Roller->Set(0.0);
 				}
 			}
 		}

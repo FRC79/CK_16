@@ -1,10 +1,13 @@
-////#include "Controller.h"
-////#include "LiveWindowSendable"
-////#include "ITableListener"
+//#include "Controller.h"
+////#include "LiveWindowSendable.h"
+////#include "ITableListener.h"
+//
+//#include "PIDSource.h"
+//#include "PIDOutput.h"
 //
 //// TODO: Clean out the functions that you don't actually define. 
 //
-//class BangBang_Controller : public LiveWindowSendable, public Controller, public ITableListener
+//class BangBang_Controller : /*public LiveWindowSendable,*/ public Controller/*, public ITableListener*/
 //{
 //public:
 //	BangBang_Controller(PIDSource *source, PIDOutput *output);
@@ -39,7 +42,7 @@
 //
 //    virtual void Reset();
 //
-//    virtual void InitTable(ITable* table);
+////    virtual void InitTable(ITable* table);
 //
 //private:
 //    float m_P;          // factor for "proportional" control
@@ -66,20 +69,20 @@
 //
 //    PIDSource *m_pidInput;
 //    PIDOutput *m_pidOutput;
-//    Notifier *m_controlLoop;
+////    Notifier *m_controlLoop;
 //
 //    void Initialize(PIDSource *source, PIDOutput *output);
 //    static void CallCalculate(void *controller);
 //    void Calculate();
 //
-//    virtual ITable* GetTable();
-//    virtual std::string GetSmartDashboardType();
-//    virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
+////    virtual ITable* GetTable();
+////    virtual std::string GetSmartDashboardType();
+////    virtual void ValueChanged(ITable* source, const std::string& key, EntryValue value, bool isNew);
 //    virtual void UpdateTable();
 //    virtual void StartLiveWindowMode();
 //    virtual void StopLiveWindowMode();
 //protected:
-//    ITable* m_table;
+////    ITable* m_table;
 //
 //    DISALLOW_COPY_AND_ASSIGN(BangBang_Controller);
 //};
