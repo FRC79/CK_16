@@ -4,6 +4,7 @@
 #include "CANJaguar.h"
 #include "DigitalInput.h"
 #include "DualSolenoid.h"
+#include "Task.h"
 
 /*
  * This class handles the autoloading features of
@@ -62,6 +63,7 @@ private:
 	DualSolenoid *m_load_piston;
 	DigitalInput *m_top_disc_sensor;
 	DigitalInput *m_bottom_disc_sensor;
+	Task *m_task
 	
 	void ResetVariables();
 };

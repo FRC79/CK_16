@@ -13,6 +13,9 @@
 #include <math.h>
 #include "CSVReader.h"
 
+#include "DiscAutoLoader.h"
+#include "Shooter.h"
+
 class CK16_Main: public IterativeRobot {
 	void UpdatePreviousButtonStateVariables();
 
@@ -89,6 +92,10 @@ class CK16_Main: public IterativeRobot {
 	UINT32 m_autoPeriodicLoops;
 	UINT32 m_disabledPeriodicLoops;
 	UINT32 m_telePeriodicLoops;
+
+
+	Shooter *m_shooter;
+	DiscAutoLoader *m_loader;
 
 public:
 	/**
@@ -176,6 +183,10 @@ public:
         Shooter_Tilt_In = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_IN_ID"));
         Shooter_Tilt_Out = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_OUT_ID"));
         
+// TODO initialize m_loader
+        // m_loader = new DiscAutoLoader(CANJaguar *roller, DualSolenoid *load_piston, DigitalInput *top_disc_sensor, DigitalInput *bottom_disc_sensor)
+        m_shooter = new Shooter(ShooterFeed,ShooterFire,Disc_Fire, m_loader;
+
 		printf("CK16_Main Constructor Completed\n");
 	}
 
