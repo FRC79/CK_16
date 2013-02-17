@@ -8,6 +8,7 @@
 #include "RobotConfiguration.h"
 #include "TeleopHelper.h"
 #include "SmartDashboard/SmartDashboard.h"
+#include "Timer.h"
 #include <string>
 #include <math.h>
 #include "CSVReader.h"
@@ -31,8 +32,11 @@ class CK16_Main: public IterativeRobot {
 	CANJaguar *Roller;
 
     // Declare the IR sensors that facilitate the disc loading and firing process(es)															//wat
-    DigitalInput *Top_Beam, *Bottom_Beam;
+    DigitalInput *Front_Beam, *Top_Beam, *Bottom_Beam;
 	
+    // Declare the BangBang Controller
+    
+    
 	// Digital Input pin for the pressure switch
 	DigitalInput *Pressure_SW;
 
@@ -60,13 +64,13 @@ class CK16_Main: public IterativeRobot {
 	bool autoPilot;
 	
 	// State boolean to enable and disable manual roller load
-	bool autoLoadEnabled, manualRollersEnabled, topBeamPrevState, bottomBeamPrevState;
+	bool autoLoadEnabled, autoLoadWasEnabled, manualRollersEnabled;
 	bool discInPosition, discLoaded, discShot;
+	unsigned int topBeamPrevState, bottomBeamPrevState;
 	
-	static const bool BROKEN = true;
-	static const bool SOLID = false;
+	static const unsigned int BROKEN = 0;
+	static const unsigned int SOLID = 1;
 	
-
 	bool shooterTiltedUp;
 
 	// Declare a variable to use to access the driver station object
@@ -79,8 +83,8 @@ class CK16_Main: public IterativeRobot {
 	Joystick *operatorGamepad2;			// joystick 2 (manipulator joystick/misc. functions)
 	
 	// Declare variables for previous joystick button states
-	bool shooterTiltButtonWasDown, autoLoadToggleButton;
-
+	bool shooterTiltButtonWasDown, autoLoadToggleButtonWasDown;
+	
 	// Local variables to count the number of periodic loops performed
 	UINT32 m_autoPeriodicLoops;
 	UINT32 m_disabledPeriodicLoops;
@@ -116,8 +120,7 @@ public:
 		Front_L = new CANJaguar((int) CAN_IDS_CSV->GetValue("FL_CAN_ID"));
 		Rear_R = new CANJaguar((int) CAN_IDS_CSV->GetValue("RR_CAN_ID"));
 		Rear_L = new CANJaguar((int) CAN_IDS_CSV->GetValue("RL_CAN_ID"));
-		Roller = new CANJaguar(
-				(int) CAN_IDS_CSV->GetValue("ROLLER_MOTOR_CAN_ID"));
+		Roller = new CANJaguar((int) CAN_IDS_CSV->GetValue("ROLLER_MOTOR_CAN_ID"));
 		ShooterFeed = new CANJaguar((int) CAN_IDS_CSV->GetValue("FEED_CAN_ID"));
 		ShooterFire = new CANJaguar((int) CAN_IDS_CSV->GetValue("FIRE_CAN_ID"));
 		printf("TEAM 79 FOR THE WIN!\n");
@@ -159,8 +162,9 @@ public:
 		Pressure_SW = new DigitalInput(RobotConfiguration::PRESSURE_SWITCH_CHANNEL);
 		
 		// Initialize IR beams for loading and firing discs
-		Top_Beam = new DigitalInput((int)DigitalIO_CSV->GetValue("TOP_BEAM_ID"));
-		Bottom_Beam = new DigitalInput((int)DigitalIO_CSV->GetValue("BOTTOM_BEAM_ID"));
+		Front_Beam = new DigitalInput(4);
+		Top_Beam = new DigitalInput(3);
+		Bottom_Beam = new DigitalInput(2);
 		
         // Filling the Trojan horse with people, then shipping it off to Troy.
         Compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
@@ -171,7 +175,7 @@ public:
         Disc_Fire = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_ID"));
         Shooter_Tilt_In = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_IN_ID"));
         Shooter_Tilt_Out = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_OUT_ID"));
-
+        
 		printf("CK16_Main Constructor Completed\n");
 	}
 
@@ -186,11 +190,16 @@ public:
 //		Turn_PID->SetOutputRange(-0.2, 0.2);
 //		Turn_PID->SetTolerance(0.05);
         
+		// Shooter wheel encoders (fire is front, feed is back)
+//		ShooterFeed->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+//		ShooterFire->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+//		ShooterFeed->ConfigEncoderCodesPerRev(TICS_PER_REV);
+//		ShooterFire->ConfigEncoderCodesPerRev(TICS_PER_REV);
+		
+		
         // Set each drive motor to have an encoder to be its friend
         Front_R->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
         Front_L->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
-        
-        // Set encoders
         Front_R->ConfigEncoderCodesPerRev(TICS_PER_REV); 
         Front_L->ConfigEncoderCodesPerRev(TICS_PER_REV);
         
@@ -206,7 +215,7 @@ public:
         
         // Init Button Previous States
         shooterTiltButtonWasDown = false;
-        autoLoadToggleButton = false;
+        autoLoadToggleButtonWasDown = false;
         		
 		printf("RobotInit() completed.\n");
 	}
@@ -229,13 +238,7 @@ public:
 		// Enable Goal Align PID
 		//		Goal_Align_PID->Enable();
 		//		Goal_Align_PID->SetSetpoint(0.0);
-		Front_L->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
-		Front_L->EnableControl(0.0);
-		Front_R->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
-		Front_R->EnableControl(0.0);
 		
-		printf("Encoders L/R: %f/%f\n", Front_L->GetPosition(), Front_R->GetPosition());
-
 		
 		printf("Auton Init Completed\n");
 	}
@@ -245,9 +248,10 @@ public:
 		m_dsPacketsReceivedInCurrentSecond = 0;	// Reset the number of dsPackets in current second
 		
 		autoLoadEnabled = false;
+		autoLoadWasEnabled = false;
 		manualRollersEnabled = true;
-		topBeamPrevState = false;
-		bottomBeamPrevState = false;
+		topBeamPrevState = SOLID;
+		bottomBeamPrevState = SOLID;
 		
 		discInPosition = false;
 		discLoaded = false;
@@ -276,15 +280,13 @@ public:
 	void AutonomousPeriodic(void) {
 		m_autoPeriodicLoops++;
 		printf("Auton Loops:%d\n", m_autoPeriodicLoops);
-
-		switch (m_autoPeriodicLoops) {
-		case 1:
-			// Drive 2 feet
-//			double encoderCounts;
-//			encoderCounts = (2 * 12.0) * TICS_PER_REV / WHEEL_CIRCUMFERENCE;
-//			break;
-		default:
-			break;
+		
+		Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
+		
+		if(m_autoPeriodicLoops % 100 == 0)
+		{
+			SmartDashboard::PutNumber("BACK ENCODER POS", ShooterFeed->GetPosition());
+			SmartDashboard::PutNumber("FRONT ENCODER POS", ShooterFire->GetPosition());
 		}
 	}
 
@@ -301,11 +303,11 @@ public:
 		if(autoPilot == true)
 		{
 			// Auto Align Disable Button
-			if(operatorGamepad1->GetRawButton(8))
-			{
+//			if(operatorGamepad1->GetRawButton(8))
+//			{
 //				Turn_PID->Disable(); // Stop outputs
-				autoPilot = false;
-			}
+//				autoPilot = false;
+//			}
 		}
 		else
 		{
@@ -321,27 +323,12 @@ public:
 			
 //			m_ds_lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Gyro: %f", Yaw_Gyro->GetAngle());			
 			m_ds_lcd->UpdateLCD();
-			if(operatorGamepad1->GetRawButton(2))
-			{
-				ShooterFeed->Set(-0.57);
-				ShooterFire->Set(-0.57);
-			}
-			else if(operatorGamepad1->GetRawButton(6))
-			{
-				ShooterFeed->Set(-0.80);
-				ShooterFire->Set(-0.80);
-			}
-			else
-			{
-				ShooterFeed->Set(0.0);
-				ShooterFire->Set(0.0);
-			}
             
             // Excalibur was actually a horse and now its running away into the wild blue yonder.
             
         
             // Exaclibur's brother is a little sluggish, but has also escaped. This one was a goat.
-            Disc_Fire->Set(operatorGamepad1->GetRawButton(4));
+            Disc_Fire->Set(operatorGamepad2->GetRawButton(4));
             
             // Excalibur has a cousin
             if(operatorGamepad1->GetRawButton(1) && !shooterTiltButtonWasDown) // Only accept a button press (not hold)
@@ -383,53 +370,61 @@ public:
              */
             
 			// Enable and disable autoLoad
-			if(operatorGamepad1->GetRawButton(1) && !autoLoadToggleButton) // Only accept a button press (not hold)
+			if(operatorGamepad2->GetRawButton(1) && !autoLoadToggleButtonWasDown) // Only accept a button press (not hold)
             {
             	autoLoadEnabled = !autoLoadEnabled; // Toggle autoLoad
-            } 
+            	autoLoadWasEnabled = !autoLoadWasEnabled;
+            	autoLoadToggleButtonWasDown = true;
+            }
+			else if(!operatorGamepad2->GetRawButton(1) && autoLoadToggleButtonWasDown)
+			{
+				autoLoadToggleButtonWasDown = false;
+			}
+			
+			// Shooter code
+			if(operatorGamepad2->GetRawButton(2))
+			{
+				ShooterFeed->Set(-0.57); // was 57
+				ShooterFire->Set(-0.57);
+				autoLoadEnabled = false;
+			}
+			else
+			{
+				ShooterFeed->Set(0.0);
+				ShooterFire->Set(0.0);
+				autoLoadEnabled = autoLoadWasEnabled; // If it was enabled, reenable. Else keep it false.
+			}
+			
+			// Update disc position state variables
+			discInPosition = (Top_Beam->Get() == BROKEN ? true : false);
+			discLoaded = (Bottom_Beam->Get() == BROKEN ? true : false);
 			
 			// Load stuff
 			if(autoLoadEnabled)
-			{
-				if(!discInPosition)
+			{	
+				if(!discInPosition && !discLoaded)
 				{
-					// Start rollers
 					Roller->Set(0.5);
+					Disc_Load_In->Set(false);
+					Disc_Load_Out->Set(true);
 				}
-				
-				if(!discLoaded && discInPosition)
+				else if(discInPosition && !discLoaded)
 				{
-					// Stop rollers
 					Roller->Set(0.0);
-					
-					// Piston down
 					Disc_Load_In->Set(true);
 					Disc_Load_Out->Set(false);
 				}
-				
-				// Update states
-				if(Top_Beam->Get() == BROKEN && topBeamPrevState == SOLID)
+				else if(!discInPosition && discLoaded)
 				{
-					// Disc in position
-					discInPosition = true;
-					topBeamPrevState = BROKEN;
+					Roller->Set(0.5);
+					Disc_Load_In->Set(false);
+					Disc_Load_Out->Set(true);
 				}
-				
-				if(Bottom_Beam->Get() == BROKEN && bottomBeamPrevState == SOLID)
+				else if(discInPosition && discLoaded)
 				{
-					// Disc moved from in position to loaded
-					discLoaded = true;
-					discInPosition = false;
-					topBeamPrevState = SOLID;
-					bottomBeamPrevState = BROKEN;
-				}
-				
-				if(Bottom_Beam->Get() == SOLID && bottomBeamPrevState == BROKEN)
-				{
-					// Disc moved from loaded to shot
-					discShot = true;
-					discLoaded = false;
-					bottomBeamPrevState = SOLID;
+					Roller->Set(0.0);
+					Disc_Load_In->Set(false);
+					Disc_Load_Out->Set(true);
 				}
 			}
 			else
@@ -450,5 +445,4 @@ public:
 	}
 };
 
-START_ROBOT_CLASS(CK16_Main)
-;
+START_ROBOT_CLASS(CK16_Main);

@@ -59,6 +59,8 @@ private:
 	float m_result;
 	float m_period;
 	bool m_InvertOutputs;
+	double m_distance_left;
+	double m_distance_right;
 	
 	
 	SEM_ID m_semaphore;

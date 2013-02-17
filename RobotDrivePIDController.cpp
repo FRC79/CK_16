@@ -40,6 +40,9 @@ RobotDrivePIDController::RobotDrivePIDController(float Kp, float Ki, float Kd,
 	m_totalError = 0;
 	m_tolerance = .05;
 
+	m_distance_left = 0.0;
+	m_distance_right = 0.0;
+	
 	m_result = 0;
 	
 	m_jagFR = FR_jag;
@@ -104,37 +107,10 @@ void RobotDrivePIDController::Calculate()
 			Synchronized sync(m_semaphore);
 			m_error = m_setpoint - (jagEncoderLeftPos + jagEncoderRightPos)/2;
 			positiveDirection = (m_error >= 0 ? true : false);
+			m_distance_left = m_setpoint - jagEncoderLeftPos;
 			
-			// Scale input
-			if (m_continuous)
-			{
-				if (fabs(m_error) > (m_maximumInput - m_minimumInput) / 2)
-				{
-					if (m_error > 0)
-					{
-						m_error = m_error - m_maximumInput + m_minimumInput;
-					}
-					else
-					{
-						m_error = m_error + m_maximumInput - m_minimumInput;
-					}
-				}
-			}
 
-			double potentialIGain = (m_totalError + m_error) * m_I;
-			if (potentialIGain < m_maximumOutput)
-			{
-				if (potentialIGain > m_minimumOutput)
-					m_totalError += m_error;
-				else
-					m_totalError = m_minimumOutput / m_I;
-			}
-			else
-			{
-				m_totalError = m_maximumOutput / m_I;
-			}
-
-			m_result = m_P * m_error + m_I * m_totalError + m_D * (m_error - m_prevError);
+			m_result = m_P * m_error;
 			m_prevError = m_error;
 
 			// Scale outputs
