@@ -7,6 +7,7 @@ Shooter::Shooter(CANJaguar* rear, CANJaguar* front, Solenoid *fireCylinder, Disc
 	m_loader = loader;
 	m_task = new Task("Shooter", (FUNCPTR)checkShooter);
 	auto_fire = m_fire = m_enable = false;
+	m_autoLoad = m_loader->IsEnabled();
 	m_fireCylinder = fireCylinder;
 }
 
@@ -20,8 +21,11 @@ static void checkShooter(Shooter *s)
 		if(m_loader->IsDiscLoaded() && m_fire)
 		{
 			m_fireCylinder->Set(true);
+			m_autoLoad = m_loader->IsEnabled(); // Store prev autoLoad value
+			m_loader->Disable();// Want to wait on the autoLoad until we're done firing 
 			Wait(SHOOTER_DELAY);// We wait to retract until we're done
 			m_fireCylinder->Set(false);
+			if(m_autoLoad){m_loader->Enable()} // Now we set it back to whatever it was
 			m_fire = auto_fire; // If auto_fire is enabled we keep firing
 		}
 	}

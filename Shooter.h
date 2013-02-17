@@ -29,6 +29,7 @@ private:
 	DiscAutoLoader *m_loader; // Ok, this is only here so I have access to the isLoaded property
 	bool m_fire;
 	bool m_enable;
+	bool m_auto
 	Solenoid m_fireCylinder;
 
 };

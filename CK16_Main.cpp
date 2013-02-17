@@ -94,6 +94,8 @@ class CK16_Main: public IterativeRobot {
 	UINT32 m_telePeriodicLoops;
 
 
+	DualSolenoid *m_disc_loader;
+
 	Shooter *m_shooter;
 	DiscAutoLoader *m_loader;
 
@@ -182,9 +184,11 @@ public:
         Disc_Fire = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_ID"));
         Shooter_Tilt_In = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_IN_ID"));
         Shooter_Tilt_Out = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_OUT_ID"));
-        
-// TODO initialize m_loader
-        // m_loader = new DiscAutoLoader(CANJaguar *roller, DualSolenoid *load_piston, DigitalInput *top_disc_sensor, DigitalInput *bottom_disc_sensor)
+       
+
+        m_disc_loader = new DualSolenoid(Disc_Load_In, Disc_Load_Out, false, false);
+
+        m_loader = new DiscAutoLoader(Roller, m_disc_loader, Top_Beam, Bottom_Beam);
         m_shooter = new Shooter(ShooterFeed,ShooterFire,Disc_Fire, m_loader;
 
 		printf("CK16_Main Constructor Completed\n");
@@ -363,23 +367,6 @@ public:
 //				}
 //			}
             
-            /*
-             Batman Begins.
-             DEFINITIONS:
-             in position - at the top waiting to load
-             load disc - piston down that moves disc to fire posistion
-             fire position - waiting to be fired
-             
-             This section of code provides the means to automatically move discs into position and
-             load discs into the fire position. When the top beam is solid (not broken) the rollers
-             will be on until the top beam is broken. If the top beam is broken and the bottom beam
-             is solid the piston will move a disc into the fire position, then turn the rollers back
-             on to move a disc into position.
-             NOTE: This code is activated by a toggle button press. When toggled the code the above
-             comment describes will run. When the toggle is deactivated drivers manually roller, 
-             load, and fire.
-             */
-            
 			// Enable and disable autoLoad
 			if(operatorGamepad2->GetRawButton(1) && !autoLoadToggleButtonWasDown) // Only accept a button press (not hold)
             {
@@ -397,60 +384,16 @@ public:
 			{
 				ShooterFeed->Set(-0.57); // was 57
 				ShooterFire->Set(-0.57);
-				autoLoadEnabled = false;
 			}
 			else
 			{
 				ShooterFeed->Set(0.0);
 				ShooterFire->Set(0.0);
-				autoLoadEnabled = autoLoadWasEnabled; // If it was enabled, reenable. Else keep it false.
 			}
 			
-			// Update disc position state variables
-			discInPosition = (Top_Beam->Get() == BROKEN ? true : false);
-			discLoaded = (Bottom_Beam->Get() == BROKEN ? true : false);
-			
-			// Load stuff
-			if(autoLoadEnabled)
-			{	
-				if(!discInPosition && !discLoaded)
-				{
-					Roller->Set(0.5);
-					Disc_Load_In->Set(false);
-					Disc_Load_Out->Set(true);
-				}
-				else if(discInPosition && !discLoaded)
-				{
-					Roller->Set(0.0);
-					Disc_Load_In->Set(true);
-					Disc_Load_Out->Set(false);
-				}
-				else if(!discInPosition && discLoaded)
-				{
-					Roller->Set(0.5);
-					Disc_Load_In->Set(false);
-					Disc_Load_Out->Set(true);
-				}
-				else if(discInPosition && discLoaded)
-				{
-					Roller->Set(0.0);
-					Disc_Load_In->Set(false);
-					Disc_Load_Out->Set(true);
-				}
-			}
-			else
+			if(operatorGamepad2->GetRawButton(3))
 			{
-				if(manualRollersEnabled)
-				{
-					if(operatorGamepad2->GetRawButton(5))
-					{
-						Roller->Set(0.5);
-					}
-					else
-					{
-						Roller->Set(0.0);
-					}
-				}
+				m_shooter->Fire();
 			}
 		}
 	}

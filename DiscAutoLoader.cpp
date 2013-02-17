@@ -63,12 +63,13 @@ bool DiscAutoLoader::IsDiscLoaded()
 
 void DiscAutoLoader::AutoLoad()
 {
+	// Update disc position state variables ALWAYS
+	disc_in_position = (m_top_disc_sensor->Get() == BROKEN ? true : false);
+	disc_loaded = (m_bottom_disc_sensor->Get() == BROKEN ? true : false);
+	
 	if(enabled)
 	{
-		// Update disc position state variables
-		disc_in_position = (m_top_disc_sensor->Get() == BROKEN ? true : false);
-		disc_loaded = (m_bottom_disc_sensor->Get() == BROKEN ? true : false);
-		
+
 		if(!disc_in_position && !disc_loaded)
 		{
 			// Run rollers until we have on to load
