@@ -71,7 +71,7 @@ class CK16_Main: public IterativeRobot {
 	
 	// State booleans for auto loading and manual loading
 	bool autoLoadEnabled, loadWasHalted;
-	bool shooterWheelsSpinning;
+	bool shooterWheelsSpinning, rollersRolling;
 	bool discInPosition, discLoaded, discShot;
 	
 	static const unsigned int BROKEN = 0;
@@ -262,6 +262,7 @@ public:
 		autoLoadEnabled = false;
 		loadWasHalted = false;
 		shooterWheelsSpinning = false;
+		rollersRolling = false;
 		
 		printf("Teleop Init Completed\n");
 	}
@@ -349,18 +350,18 @@ public:
             SmartDashboard::PutBoolean(SHOOTER_TILTED_KEY, shooterTiltedUp); // Output current state to SmartDashboard
             
 			// Enable and disable autoLoad (only if the autoload is not halted)
-			if(buttonHelper2->WasButtonToggled(1) && !loadWasHalted && autoLoadEnabled)
-			{
-				Auto_Loader->Disable(); // Disable
-				autoLoadEnabled = false;
-			}
-			else if(buttonHelper2->WasButtonToggled(1) && !loadWasHalted && !autoLoadEnabled)
-			{
-				Auto_Loader->Reset(); // Enable
-				autoLoadEnabled = true;
-			}
-			
-			// Toggle Shooter Wheels on and off
+//			if(buttonHelper2->WasButtonToggled(1) && !loadWasHalted && autoLoadEnabled)
+//			{
+//				Auto_Loader->Disable(); // Disable
+//				autoLoadEnabled = false;
+//			}
+//			else if(buttonHelper2->WasButtonToggled(1) && !loadWasHalted && !autoLoadEnabled)
+//			{
+//				Auto_Loader->Reset(); // Enable
+//				autoLoadEnabled = true;
+//			}
+//			
+//			// Toggle Shooter Wheels on and off
 			if(buttonHelper2->WasButtonToggled(2))
 			{
 				shooterWheelsSpinning = !shooterWheelsSpinning;
@@ -379,19 +380,28 @@ public:
 			}
 			
 			// Fire piston that shoots the disc and halt loading if the piston is fired.
-			Disc_Fire->Set(operatorGamepad2->GetRawButton(4));
-			loadWasHalted = operatorGamepad2->GetRawButton(4);
+			Disc_Fire->Set(operatorGamepad2->GetRawButton(6));
+			loadWasHalted = operatorGamepad2->GetRawButton(6);
+			
+			// Punch down (load) piston
+			Disc_Load->Set(operatorGamepad2->GetRawButton(3));
 			
 			// Auto and manual disc loading
-			if(autoLoadEnabled && !loadWasHalted)
-			{	
-				// Autoloading
-				Auto_Loader->AutoLoad();
-			}
-			else if(!autoLoadEnabled && !loadWasHalted)
-			{
+//			if(autoLoadEnabled && !loadWasHalted)
+//			{	
+//				// Autoloading
+//				Auto_Loader->AutoLoad();
+//			}
+//			else if(!autoLoadEnabled && !loadWasHalted)
+//			{
+				// Toggle Shooter Wheels on and off
+				if(buttonHelper2->WasButtonToggled(1))
+				{
+					rollersRolling = !rollersRolling;
+				}
+			
 				// Manual Loading
-				if(operatorGamepad2->GetRawButton(5))
+				if(rollersRolling)
 				{
 					Roller->Set(0.5);
 				}
@@ -399,7 +409,7 @@ public:
 				{
 					Roller->Set(0.0);
 				}
-			}
+//			}
 		}
 	}
 };
