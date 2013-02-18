@@ -5,35 +5,82 @@ Shooter::Shooter(CANJaguar* rear, CANJaguar* front, Solenoid *fireCylinder, Disc
 	m_rear = rear;
 	m_front = front;
 	m_loader = loader;
-	m_task = new Task("Shooter", (FUNCPTR)checkShooter);
+	m_task = new Task("Shooter", (FUNCPTR)CheckShooter);
 	auto_fire = m_fire = m_enable = false;
 	m_autoLoad = m_loader->IsEnabled();
 	m_fireCylinder = fireCylinder;
 }
 
-Shooter::~Shooter(); // I'm about 90% sure this is valid syntax
+Shooter::~Shooter(){}
 
-static void checkShooter(Shooter *s)
+void Shooter::CheckShooter(Shooter *s)
 {
-	if(m_enable)
-	{
+	DiscAutoLoader *loader;
+	loader = s->GetDiscAutoLoader();
+	
+	Solenoid *fireCylinder;
+	fireCylinder = s->GetFireCylinder();
+	
+	if(s->IsEnabled())
+	{	
 		// Fire Cylinder if I'm supposed to AND I'm loaded
-		if(m_loader->IsDiscLoaded() && m_fire)
+		if(loader->IsDiscLoaded() && s->IsReadyToFire())
 		{
-			m_fireCylinder->Set(true);
-			m_autoLoad = m_loader->IsEnabled(); // Store prev autoLoad value
-			m_loader->Disable();// Want to wait on the autoLoad until we're done firing 
+			fireCylinder->Set(true);
+			s->SetAutoLoad(loader->IsEnabled()); // Store prev autoLoad value
+			loader->Disable();// Want to wait on the autoLoad until we're done firing 
 			Wait(SHOOTER_DELAY);// We wait to retract until we're done
-			m_fireCylinder->Set(false);
-			if(m_autoLoad){m_loader->Enable()} // Now we set it back to whatever it was
-			m_fire = auto_fire; // If auto_fire is enabled we keep firing
+			fireCylinder->Set(false);
+			if(s->GetAutoLoad()){loader->Reset();} // Now we set it back to whatever it was
+			// WE MAY HAVE TO ADD AN Enable FUNCTION TO DiscAutoLoader
+			s->SetReadyToFire(s->GetAutoFire()); // If auto_fire is enabled we keep firing
 		}
 	}
 	else
 	{
-		m_fireCylinder->Set(false); // If shooter is disabled don't fire
+		fireCylinder->Set(false); // If shooter is disabled don't fire
 	}
-	Wait(0.01)
+	Wait(0.01);
+}
+
+bool Shooter::IsEnabled()
+{
+	return m_enable;
+}
+
+bool Shooter::IsReadyToFire()
+{
+	return m_fire;
+}
+
+void Shooter::SetReadyToFire(bool state)
+{
+	m_fire = state;
+}
+
+bool Shooter::GetAutoLoad()
+{
+	return m_autoLoad;
+}
+
+void Shooter::SetAutoLoad(bool state)
+{
+	m_autoLoad = state;
+}
+
+bool Shooter::GetAutoFire()
+{
+	return auto_fire;
+}
+
+DiscAutoLoader *Shooter::GetDiscAutoLoader()
+{
+	return m_loader;
+}
+
+Solenoid *Shooter::GetFireCylinder()
+{
+	return m_fireCylinder;
 }
 
 void Shooter::Enable()

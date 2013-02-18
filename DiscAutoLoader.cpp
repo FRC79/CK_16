@@ -1,4 +1,5 @@
 #include "DiscAutoLoader.h"
+#include "Timer.h"
 
 DiscAutoLoader::DiscAutoLoader(CANJaguar *roller, DualSolenoid *load_piston,
 		DigitalInput *top_disc_sensor, DigitalInput *bottom_disc_sensor)
@@ -9,11 +10,11 @@ DiscAutoLoader::DiscAutoLoader(CANJaguar *roller, DualSolenoid *load_piston,
 	m_bottom_disc_sensor = bottom_disc_sensor;
 	ResetVariables();
 	enabled = false;
-	m_task = new Task("AutoLoad", (FUNCPTR)autoLoaderChecker)
+	m_task = new Task("AutoLoad", (FUNCPTR)AutoLoaderChecker);
 }
 
 
-static void autoLoaderChecker(DiscAutoLoader *a)
+void DiscAutoLoader::AutoLoaderChecker(DiscAutoLoader *a)
 {
 	while(1)
 	{
@@ -81,7 +82,7 @@ void DiscAutoLoader::AutoLoad()
 			// Load it into the chamber
 			m_roller->Set(0.0);
 			m_load_piston->Set(true);
-			Wait(0.05)
+			Wait(0.05);
 		}
 		else if(!disc_in_position && disc_loaded)
 		{

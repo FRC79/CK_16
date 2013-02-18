@@ -52,6 +52,8 @@ public:
 	 * (should be called continuously in a loop) */
 	void AutoLoad();
 	
+	static void AutoLoaderChecker(DiscAutoLoader *a);
+	
 private:
 	static const unsigned int BROKEN = 0;
 	static const unsigned int SOLID = 1;
@@ -63,7 +65,7 @@ private:
 	DualSolenoid *m_load_piston;
 	DigitalInput *m_top_disc_sensor;
 	DigitalInput *m_bottom_disc_sensor;
-	Task *m_task
+	Task *m_task;
 	
 	void ResetVariables();
 };

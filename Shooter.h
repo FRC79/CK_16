@@ -20,7 +20,18 @@ public:
 	void EnableAutomaticFire();
 	void DisableAutomaticFire();
 	void Fire();
-	void StopFire()
+	void StopFire();
+	
+	bool IsEnabled();
+	bool IsReadyToFire();
+	void SetReadyToFire(bool state);
+	bool GetAutoLoad();
+	void SetAutoLoad(bool state);
+	bool GetAutoFire();
+	DiscAutoLoader *GetDiscAutoLoader();
+	Solenoid *GetFireCylinder();
+	
+	static void CheckShooter(Shooter *s);
 
 private:
 	Task *m_task;
@@ -29,8 +40,8 @@ private:
 	DiscAutoLoader *m_loader; // Ok, this is only here so I have access to the isLoaded property
 	bool m_fire;
 	bool m_enable;
-	bool m_auto
-	Solenoid m_fireCylinder;
+	bool m_autoLoad;
+	Solenoid *m_fireCylinder;
 
 };
 

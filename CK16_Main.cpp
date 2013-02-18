@@ -7,6 +7,7 @@
 #include "PIDController.h"
 #include "RobotConfiguration.h"
 #include "TeleopHelper.h"
+#include "ButtonHelper.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "Timer.h"
 #include <string>
@@ -85,6 +86,9 @@ class CK16_Main: public IterativeRobot {
 	Joystick *operatorGamepad1;			// joystick 1 (arcade stick or right tank stick)
 	Joystick *operatorGamepad2;			// joystick 2 (manipulator joystick/misc. functions)
 	
+	// Declare Button Helper Variables
+	ButtonHelper *buttonHelper1, *buttonHelper2;
+	
 	// Declare variables for previous joystick button states
 	bool shooterTiltButtonWasDown, autoLoadToggleButtonWasDown;
 	
@@ -161,6 +165,10 @@ public:
 		operatorGamepad1 = new Joystick(1);
 		operatorGamepad2 = new Joystick(2);
 
+		// Initialize ButtonHelpers
+		buttonHelper1 = new ButtonHelper(operatorGamepad1);
+		buttonHelper2 = new ButtonHelper(operatorGamepad2);
+		
 		// Initialize counters to record the number of loops completed in autonomous and teleop modes
 		m_autoPeriodicLoops = 0;
 		m_disabledPeriodicLoops = 0;
@@ -189,7 +197,7 @@ public:
         m_disc_loader = new DualSolenoid(Disc_Load_In, Disc_Load_Out, false, false);
 
         m_loader = new DiscAutoLoader(Roller, m_disc_loader, Top_Beam, Bottom_Beam);
-        m_shooter = new Shooter(ShooterFeed,ShooterFire,Disc_Fire, m_loader;
+        m_shooter = new Shooter(ShooterFeed,ShooterFire,Disc_Fire, m_loader);
 
 		printf("CK16_Main Constructor Completed\n");
 	}
@@ -310,7 +318,9 @@ public:
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
 
-		// Print Pressure Switch for testing
+		// Update ButtonHelpers
+		buttonHelper1->Update();
+		buttonHelper2->Update();
 
         // Trojan horse has entered Troy
         Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
