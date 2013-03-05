@@ -5,6 +5,7 @@
 #include "Gyro.h"
 #include "RobotTurnPIDOutput.h"
 #include "PIDController.h"
+#include "CAN_VPID_Controller.h"
 #include "RobotConfiguration.h"
 #include "TeleopHelper.h"
 #include "DualSolenoid.h"
@@ -32,42 +33,42 @@ class CK16_Main: public IterativeRobot {
 	CANJaguar *ShooterFeed,/* watman strikes again*/*ShooterFire;
 	CANJaguar *Roller;
 
-    // Declare the IR sensors that facilitate the disc loading and firing process(es)															//wat
-    DigitalInput *Top_Beam, *Bottom_Beam;
+	// Shooter Velocity controller
+	CAN_VPID_Controller *ShooterFeedSpeed, *ShooterFireSpeed;
 	
-    // Declare the BangBang Controller
-    
+    // Declare the IR sensors that facilitate the disc loading and firing process(es)															//wat
+//    DigitalInput *Top_Beam, *Bottom_Beam;
     
 	// Digital Input pin for the pressure switch
-	DigitalInput *Pressure_SW;
+//	DigitalInput *Pressure_SW;
 
 	// Building the Trojan horse.
-	Relay *Compressor;
+//	Relay *Compressor;
 
 	// Pulling out Excalibers (2x)
-	Solenoid *Disc_Load_In, *Disc_Load_Out, *Shooter_Tilt_In,
-			*Shooter_Tilt_Out, *Disc_Fire;
+//	Solenoid *Disc_Load_In, *Disc_Load_Out, *Shooter_Tilt_In,
+//			*Shooter_Tilt_Out, *Disc_Fire;
 	
 	// Declaring DualSolenoids
-	DualSolenoid *Disc_Load, *Shooter_Tilt;
+//	DualSolenoid *Disc_Load, *Shooter_Tilt;
 
 	// Declare left and right encoder drive PIDControllers
-	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
+//	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
 
 	// Declare Gyro that will be used to determine left and right robot rotation
-	Gyro *Yaw_Gyro;
+//	Gyro *Yaw_Gyro;
 
 	// Declare RobotTurnPIDOutput that will control the robot turning aspect of the goal alignment
-	RobotTurnPIDOutput *Robot_Turn;
+//	RobotTurnPIDOutput *Robot_Turn;
 
 	// Declare PID Controller that will handle robot robot turning with gyro
-	PIDController *Turn_PID;
+//	PIDController *Turn_PID;
 	
 	// State boolean that represents if robot is driving with joystick input or using auto align
 	bool autoPilot;
 	
 	// Declare a DiscAutoLoader for use in teleop mode
-	DiscAutoLoader *Auto_Loader;
+//	DiscAutoLoader *Auto_Loader;
 	
 	// State booleans for auto loading and manual loading
 	bool autoLoadEnabled, loadWasHalted;
@@ -131,12 +132,16 @@ public:
 		ShooterFeed = new CANJaguar((int) CAN_IDS_CSV->GetValue("FEED_CAN_ID"));
 		ShooterFire = new CANJaguar((int) CAN_IDS_CSV->GetValue("FIRE_CAN_ID"));
 		printf("TEAM 79 FOR THE WIN!\n");
+		
+		// Shooter Velocity Controller
+		ShooterFeedSpeed = new CAN_VPID_Controller(0.5, 1.0, 0.0, ShooterFeed, ShooterFeed);
+		ShooterFireSpeed = new CAN_VPID_Controller(0.5, 1.0, 0.0, ShooterFire, ShooterFire);
 
 		// Initialize Robot Drive System Using Jaguars
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
 
 		// Initialize Gyro
-		Yaw_Gyro = new Gyro((int)AnalogInputs_CSV->GetValue("YAW_GYRO_ID"));
+//		Yaw_Gyro = new Gyro((int)AnalogInputs_CSV->GetValue("YAW_GYRO_ID"));
 
 		m_ds = DriverStation::GetInstance();
 		m_ds_lcd = DriverStationLCD::GetInstance();
@@ -146,7 +151,7 @@ public:
 		m_ds_lcd->UpdateLCD();
 
 		// Initialize the RobotTurnPIDOutput
-		Robot_Turn = new RobotTurnPIDOutput(m_robotDrive);
+//		Robot_Turn = new RobotTurnPIDOutput(m_robotDrive);
 
 		// Initialize Goal Alignment PID Controller
 
@@ -168,28 +173,28 @@ public:
 		m_telePeriodicLoops = 0;
 
 		// Filling the Trojan horse with people, then shipping it off to Troy.
-		Compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
+//		Compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
 		
 		// Initialize pressure switch input channel
-		Pressure_SW = new DigitalInput(RobotConfiguration::PRESSURE_SWITCH_CHANNEL);
+//		Pressure_SW = new DigitalInput(RobotConfiguration::PRESSURE_SWITCH_CHANNEL);
 		
 		// Sharpening Excalibur on the ye old grindstone in the centre of town.
-        Disc_Load_In = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_IN_ID"));
-        Disc_Load_Out = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_OUT_ID"));
-        Disc_Fire = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_ID"));
-        Shooter_Tilt_In = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_IN_ID"));
-        Shooter_Tilt_Out = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_OUT_ID"));
+//        Disc_Load_In = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_IN_ID"));
+//        Disc_Load_Out = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_OUT_ID"));
+//        Disc_Fire = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_ID"));
+//        Shooter_Tilt_In = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_IN_ID"));
+//        Shooter_Tilt_Out = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_OUT_ID"));
 		
         // Initialize DualSolenoids
-        Disc_Load = new DualSolenoid(Disc_Load_In, Disc_Load_Out, false, false);
-        Shooter_Tilt = new DualSolenoid(Shooter_Tilt_In, Shooter_Tilt_Out, true, false); // Inverted
+//        Disc_Load = new DualSolenoid(Disc_Load_In, Disc_Load_Out, false, false);
+//        Shooter_Tilt = new DualSolenoid(Shooter_Tilt_In, Shooter_Tilt_Out, true, false); // Inverted
         
         // Initialize IR beams for loading and firing discs
-		Top_Beam = new DigitalInput(3);
-		Bottom_Beam = new DigitalInput(2);
+//		Top_Beam = new DigitalInput(3);
+//		Bottom_Beam = new DigitalInput(2);
         
 		// Initialize DiscAutoLoader
-		Auto_Loader = new DiscAutoLoader(Roller, Disc_Load, Top_Beam, Bottom_Beam);
+//		Auto_Loader = new DiscAutoLoader(Roller, Disc_Load, Top_Beam, Bottom_Beam);
         
 		printf("CK16_Main Constructor Completed\n");
 	}
@@ -206,11 +211,14 @@ public:
 //		Turn_PID->SetTolerance(0.05);
         
 		// Shooter wheel encoders (fire is front, feed is back)
-//		ShooterFeed->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
-//		ShooterFire->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
-//		ShooterFeed->ConfigEncoderCodesPerRev(TICS_PER_REV);
-//		ShooterFire->ConfigEncoderCodesPerRev(TICS_PER_REV);
+		ShooterFeed->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+		ShooterFire->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+		ShooterFeed->ConfigEncoderCodesPerRev(TICS_PER_SHOOTER_REV);
+		ShooterFire->ConfigEncoderCodesPerRev(TICS_PER_SHOOTER_REV);
 		
+		// Shooter Velocity Controller
+		ShooterFeedSpeed->SetOutputRange(0.0, 0.7);
+		ShooterFireSpeed->SetOutputRange(0.0, 0.7);
 		
         // Set each drive motor to have an encoder to be its friend
         Front_R->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
@@ -219,9 +227,9 @@ public:
         Front_L->ConfigEncoderCodesPerRev(TICS_PER_REV);
         
         // Excalibur is sheathed
-        Disc_Load->Set(false);
-        Disc_Fire->Set(false);
-        Shooter_Tilt->Set(false);
+//        Disc_Load->Set(false);
+//        Disc_Fire->Set(false);
+//        Shooter_Tilt->Set(false);
         
         // Set shooter tilted to false
         shooterTiltedUp = false;
@@ -237,7 +245,11 @@ public:
 		autoPilot = false;
 		
 		// Disable AutoLoader
-		Auto_Loader->Disable();
+//		Auto_Loader->Disable();
+		
+		// Disable Shooter speed controller
+		ShooterFeedSpeed->Disable();
+		ShooterFireSpeed->Disable();
 
 		// Move the cursor down a few, since we'll move it back up in periodic.
 		printf("\x1b[2B");
@@ -264,6 +276,12 @@ public:
 		shooterWheelsSpinning = false;
 		rollersRolling = false;
 		
+		// Shooter Velocity Controller
+		ShooterFeedSpeed->Enable();
+		ShooterFeedSpeed->SetSetpoint(0.0);
+		ShooterFireSpeed->Enable();
+		ShooterFireSpeed->SetSetpoint(0.0);
+		
 		printf("Teleop Init Completed\n");
 	}
 
@@ -289,7 +307,7 @@ public:
 		m_autoPeriodicLoops++;
 		printf("Auton Loops:%d\n", m_autoPeriodicLoops);
 		
-		Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
+//		Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
 		
 		if(m_autoPeriodicLoops % 100 == 0)
 		{
@@ -303,8 +321,24 @@ public:
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
 
+		printf("FEED SPEED: %f\n", ShooterFeed->GetSpeed());
+		printf("FIRE SPEED: %f\n", ShooterFire->GetSpeed());
+		
+		if(operatorGamepad2->GetRawButton(8))
+		{
+			printf("ENABLING BB\n");
+			ShooterFeedSpeed->SetSetpoint(4.0);
+			ShooterFireSpeed->SetSetpoint(4.0);
+		}
+		else
+		{
+			// Ya, andrew is yelling at this point
+			ShooterFeedSpeed->SetSetpoint(0.0);
+			ShooterFireSpeed->SetSetpoint(0.0);
+		}
+		
 		// Keep filling up the compressor until it hits the desired psi
-		Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
+//		Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
 		
 		// Update the button helpers
 		buttonHelper1->Update();
@@ -346,7 +380,7 @@ public:
             {
             	shooterTiltedUp = !shooterTiltedUp; // Toggle tilt solenoid
             } 
-            Shooter_Tilt->Set(shooterTiltedUp);
+//            Shooter_Tilt->Set(shooterTiltedUp);
             SmartDashboard::PutBoolean(SHOOTER_TILTED_KEY, shooterTiltedUp); // Output current state to SmartDashboard
             
 			// Enable and disable autoLoad (only if the autoload is not halted)
@@ -368,23 +402,24 @@ public:
 			}
 			
 			// Shooter wheel state changing
-			if(shooterWheelsSpinning)
-			{
-				ShooterFeed->Set(-0.65);
-				ShooterFire->Set(-0.65);
-			}
-			else
-			{
-				ShooterFeed->Set(0.0);
-				ShooterFire->Set(0.0);
-			}
+//			if(shooterWheelsSpinning)
+//			{
+//				printf("BRING IT AROUND TOWN\n");
+//				ShooterFeed->Set(-0.30);
+//				ShooterFire->Set(-0.30);
+//			}
+//			else
+//			{
+//				ShooterFeed->Set(0.0);
+//				ShooterFire->Set(0.0);
+//			}
 			
 			// Fire piston that shoots the disc and halt loading if the piston is fired.
-			Disc_Fire->Set(operatorGamepad2->GetRawButton(6));
+//			Disc_Fire->Set(operatorGamepad2->GetRawButton(6));
 			loadWasHalted = operatorGamepad2->GetRawButton(6);
 			
 			// Punch down (load) piston
-			Disc_Load->Set(operatorGamepad2->GetRawButton(3));
+//			Disc_Load->Set(operatorGamepad2->GetRawButton(3));
 			
 			// Auto and manual disc loading
 //			if(autoLoadEnabled && !loadWasHalted)
