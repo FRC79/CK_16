@@ -12,15 +12,15 @@ double TeleopHelper::mapJoystickToSpeedOutput(double input)
 	{
 		double mapping;
 
-		if(fabs(input) <= 0.7)
+		if(fabs(input) <= 0.75)
 		{
-			mapping = 0.33 * pow(fabs(input), 2) + 0.2;
+			mapping = 0.95 * ((0.5 * pow(fabs(input), 2)) + 0.2);
 			mapping = (input >= 0) ? mapping : -mapping; // Change to negative if the input was negative
 			return mapping;
 		}
 		else
 		{
-			mapping = 3.57 * fabs(input) - 2.14;
+			mapping = 2.16 * fabs(input) - 1.16;
 			mapping = (input >= 0) ? mapping : -mapping; // Change to negative if the input was negative
 			return mapping;
 		}

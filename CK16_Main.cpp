@@ -142,7 +142,7 @@ public:
 		
 		// Shooter Power
 		shooterSpeed = 4.0;
-		shooterPower = 0.8;
+		shooterPower = 0.6;
 		
 		// Shooter Velocity Controller
 //		ShooterFeedSpeed = new CAN_VPID_Controller(0.5, 1.0, 0.0, ShooterFeed, ShooterFeed);
@@ -279,12 +279,12 @@ public:
 		// Excalibur is sheathed
         Disc_Load->Set(false);
         Disc_Fire->Set(false);
-        Shooter_Tilt->Set(false);
+        Shooter_Tilt->Set(true);
         Hang_A->Set(false);
         Hang_B->Set(true);
         
         // Set shooter tilted to false
-        shooterTiltedUp = false;
+        shooterTiltedUp = true;
         
         
         //MAKE SURE TO KEEP THIS
@@ -300,12 +300,12 @@ public:
 		// Excalibur is sheathed
         Disc_Load->Set(false);
         Disc_Fire->Set(false);
-        Shooter_Tilt->Set(false);
+        Shooter_Tilt->Set(true);
         Hang_A->Set(false);
         Hang_B->Set(true);
         
         // Set shooter tilted to false
-        shooterTiltedUp = false;
+        shooterTiltedUp = true;
 		
 		// Initialize all state variables
 		autoLoadEnabled = false;
@@ -348,59 +348,41 @@ public:
 		
 		if(autonEnabled)
 		{
-				Wait(0.25);
-			
-				ShooterFeed->Set(-0.8);
-				ShooterFire->Set(-0.8);
-				
-				Wait(4.0); // Wait 4 secs
-				
-				Disc_Fire->Set(true); // fire
-				
-				Wait(1.0); // Hold it out
-				
-				Disc_Fire->Set(false); // close
-				
-				Wait(1.0); // Wait to avoid clashing of pistons
-				
-				Disc_Load->Set(true);
-				
-				Wait(1.0); // Load it
-				
-				Disc_Load->Set(false);
-				
-				Wait(1.0); // Wait for it to come up
-				
-				Roller->Set(0.5); // Reel in disc
-				
-				Disc_Fire->Set(true); // fire
+			Wait(0.25);
 						
-				Wait(1.0); // Hold it out
-				
-				Disc_Fire->Set(false); // close
-				
-				Wait(1.0); // Wait to avoid clashing of pistons
-				
-				Disc_Load->Set(true);
-				
-				Wait(1.0); // Load it
-				
-				Disc_Load->Set(false);
-				
-				Wait(1.0); // Wait to avoid damage
-				
-				Disc_Fire->Set(true); // fire
-								
-				Wait(1.0); // Hold it out
-				
-				Disc_Fire->Set(false); // close
-				
-				
-				
-				ShooterFeed->Set(0.0);
-				ShooterFire->Set(0.0);
-				
-				autonEnabled = false;
+			ShooterFeed->Set(-0.6);
+			ShooterFire->Set(-0.6);
+			
+			Wait(4.0); // Wait 4 secs
+			
+			Disc_Fire->Set(true); // fire
+			
+			Wait(1.0); // Hold it out
+			
+			Disc_Fire->Set(false); // close
+			
+			Wait(1.0); // Wait to avoid clashing of pistons
+			
+			Disc_Load->Set(true);
+			
+			Wait(1.0); // Load it
+			
+			Disc_Load->Set(false);
+			
+			Wait(1.0); // Wait for it to come up
+			
+			Disc_Fire->Set(true); // fire
+					
+			Wait(1.0); // Hold it out
+			
+			Disc_Fire->Set(false); // close
+			
+			Wait(1.0);
+			
+			ShooterFeed->Set(0.0);
+			ShooterFire->Set(0.0);
+			
+			autonEnabled = false;
 		}
 	}
 
@@ -462,7 +444,7 @@ public:
 			m_robotDrive->SetLeftRightMotorOutputs(leftOutput, rightOutput);
             
             // Shooter tilt toggle
-            if(buttonHelper2->WasButtonToggled(5)) // Only accept a button press (not hold)
+            if(buttonHelper2->WasButtonToggled(5) || buttonHelper1->WasButtonToggled(5)) // Only accept a button press (not hold)
             {
             	shooterTiltedUp = !shooterTiltedUp; // Toggle tilt solenoid
             } 
@@ -475,7 +457,7 @@ public:
 //				Auto_Loader->Disable(); // Disable
 //				autoLoadEnabled = false;
 //			}
-//			else if(buttonHelper1->WasButtonToggled(5) && !loadWasHalted && !autoLoadEnabled)
+//			else if(buttonHelper1->WasButtonToggled(CAN'T BE 5) && !loadWasHalted && !autoLoadEnabled)
 //			{
 //				Auto_Loader->Reset(); // Enable
 //				autoLoadEnabled = true;
