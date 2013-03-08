@@ -33,12 +33,15 @@ class CK16_Main: public IterativeRobot {
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
 	CANJaguar *ShooterFeed,/* watman strikes again*/*ShooterFire;
 	CANJaguar *Roller;
-
+	
 	// Shooter Velocity controller
 //	CAN_VPID_Controller *ShooterFeedSpeed, *ShooterFireSpeed;
 	
 	// Shooter Power setting
 	float shooterSpeed, shooterPower;
+	
+	// Roller Power setting
+	float rollerPower;
 	
     // Declare the IR sensors that facilitate the disc loading and firing process(es)															//wat
     DigitalInput *Top_Beam, *Bottom_Beam;
@@ -77,7 +80,7 @@ class CK16_Main: public IterativeRobot {
 	// State booleans for auto loading and manual loading
 	bool hangClawsOut;
 	bool autoLoadEnabled, loadWasHalted;
-	bool shooterWheelsSpinning, rollersRolling;
+	bool shooterWheelsSpinning;
 	
 	// State boolean for shooter tilt funcitonality
 	bool shooterTiltedUp;
@@ -124,7 +127,6 @@ public:
 		RANGE_KEY = "range";
 		SHOOTER_POWER_KEY = "shooter power";
 		SHOOTER_SPEED_KEY = "shooter speed";
-
 		SHOOTER_TILTED_KEY = "shooter tilted";
 
 		// Initialize the CAN Jaguars
@@ -142,8 +144,8 @@ public:
 		shooterPower = 60.0;
 		
 		// Shooter Velocity Controller
-//		ShooterFeedSpeed = new CAN_VPID_Controller(0.0, 0.0, 0.0, ShooterFeed, ShooterFeed);
-//		ShooterFireSpeed = new CAN_VPID_Controller(0.0, 0.0, 0.0, ShooterFire, ShooterFire);
+//		ShooterFeedSpeed = new CAN_VPID_Controller(0.5, 1.0, 0.0, ShooterFeed, ShooterFeed);
+//		ShooterFireSpeed = new CAN_VPID_Controller(0.5, 1.0, 0.0, ShooterFire, ShooterFire);
 
 		// Initialize Robot Drive System Using Jaguars
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
@@ -303,7 +305,6 @@ public:
 		autoLoadEnabled = false;
 		loadWasHalted = false;
 		shooterWheelsSpinning = false;
-		rollersRolling = false;
 		hangClawsOut = false;
 		
 		// Shooter Velocity Controller
@@ -355,24 +356,10 @@ public:
 		buttonHelper1->Update();
 		buttonHelper2->Update();
 		
-//		if(operatorGamepad1->GetRawButton(8))
-//		{
-//			printf("ENABLING BB\n");
-//			ShooterFeedSpeed->SetSetpoint(4.0);
-//			ShooterFireSpeed->SetSetpoint(4.0);
-//		}
-//		else
-//		{
-//			// Ya, andrew is yelling at this point
-//			ShooterFeedSpeed->SetSetpoint(0.0);
-//			ShooterFireSpeed->SetSetpoint(0.0);
-//		}
-		
 		// Hang Code
 		if(buttonHelper1->WasButtonToggled(1))
 		{
 			hangClawsOut = !hangClawsOut;
-			printf("HANG--------------------\n");
 		}
 		Hang_A->Set(hangClawsOut);
 		Hang_B->Set(!hangClawsOut);
@@ -392,7 +379,7 @@ public:
 		else
 		{
 			// Auto Align Button
-//			if(operatorGamepad1->GetRawButton(7))
+//			if(operatorGamepad1->GetRawButton(CAN'T BE 7))
 //			{
 				// Turn Auto Align on if we see a goal and we know the azimuth
 //				if(SmartDashboard::GetBoolean(FOUND_KEY) == true)
@@ -477,19 +464,19 @@ public:
 			}
 			else if(!autoLoadEnabled && !loadWasHalted)
 			{
-				// Toggle Shooter Wheels on and off
-				if(buttonHelper2->WasButtonToggled(3))
+				if(operatorGamepad2->GetRawButton(7))
 				{
-					rollersRolling = !rollersRolling;
+					// Roll out (reverse)
+					Roller->Set(-0.5);
 				}
-			
-				// Manual Loading
-				if(rollersRolling)
+				else if(operatorGamepad2->GetRawButton(3))
 				{
+					// Roll in
 					Roller->Set(0.5);
 				}
 				else
 				{
+					// Stop
 					Roller->Set(0.0);
 				}
 			}
