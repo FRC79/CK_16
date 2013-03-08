@@ -23,7 +23,8 @@ class CK16_Main: public IterativeRobot {
 	CSVReader *PWM_CSV, *AnalogInputs_CSV, *DigitalIO_CSV, *Solenoid_CSV, *CAN_IDS_CSV;
 
 	// SmartDashboard Keys
-	std::string FOUND_KEY, AZIMUTH_KEY, RANGE_KEY, SHOOTER_TILTED_KEY, SHOOTER_POWER_KEY;
+	std::string FOUND_KEY, AZIMUTH_KEY, RANGE_KEY, SHOOTER_TILTED_KEY, SHOOTER_POWER_KEY,
+		SHOOTER_SPEED_KEY;
 	
 	// Declare variable for the robot drive system
 	RobotDrive *m_robotDrive; // robot will use PWM 1-4 for drive motors	
@@ -34,10 +35,10 @@ class CK16_Main: public IterativeRobot {
 	CANJaguar *Roller;
 
 	// Shooter Velocity controller
-	CAN_VPID_Controller *ShooterFeedSpeed, *ShooterFireSpeed;
+//	CAN_VPID_Controller *ShooterFeedSpeed, *ShooterFireSpeed;
 	
 	// Shooter Power setting
-	float shooterSpeed;
+	float shooterSpeed, shooterPower;
 	
     // Declare the IR sensors that facilitate the disc loading and firing process(es)															//wat
     DigitalInput *Top_Beam, *Bottom_Beam;
@@ -122,6 +123,7 @@ public:
 		AZIMUTH_KEY = "azimuth";
 		RANGE_KEY = "range";
 		SHOOTER_POWER_KEY = "shooter power";
+		SHOOTER_SPEED_KEY = "shooter speed";
 
 		SHOOTER_TILTED_KEY = "shooter tilted";
 
@@ -137,10 +139,11 @@ public:
 		
 		// Shooter Power
 		shooterSpeed = 4.0;
+		shooterPower = 60.0;
 		
 		// Shooter Velocity Controller
-		ShooterFeedSpeed = new CAN_VPID_Controller(0.0, 0.0, 0.0, ShooterFeed, ShooterFeed);
-		ShooterFireSpeed = new CAN_VPID_Controller(0.0, 0.0, 0.0, ShooterFire, ShooterFire);
+//		ShooterFeedSpeed = new CAN_VPID_Controller(0.0, 0.0, 0.0, ShooterFeed, ShooterFeed);
+//		ShooterFireSpeed = new CAN_VPID_Controller(0.0, 0.0, 0.0, ShooterFire, ShooterFire);
 
 		// Initialize Robot Drive System Using Jaguars
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
@@ -229,8 +232,8 @@ public:
 		SmartDashboard::PutNumber(SHOOTER_POWER_KEY, shooterSpeed);
 		
 		// Shooter Velocity Controller
-		ShooterFeedSpeed->SetOutputRange(0.0, 1.0);
-		ShooterFireSpeed->SetOutputRange(0.0, 1.0);
+//		ShooterFeedSpeed->SetOutputRange(0.0, 1.0);
+//		ShooterFireSpeed->SetOutputRange(0.0, 1.0);
 		
         // Set each drive motor to have an encoder to be its friend
         Front_R->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
@@ -256,8 +259,8 @@ public:
 //		Auto_Loader->Disable();
 		
 		// Disable Shooter speed controller
-		ShooterFeedSpeed->Disable();
-		ShooterFireSpeed->Disable();
+//		ShooterFeedSpeed->Disable();
+//		ShooterFireSpeed->Disable();
 
 		// Move the cursor down a few, since we'll move it back up in periodic.
 		printf("\x1b[2B");
@@ -291,7 +294,7 @@ public:
         Disc_Fire->Set(false);
         Shooter_Tilt->Set(false);
         Hang_A->Set(false);
-        Hang_B->Set(false);
+        Hang_B->Set(true);
         
         // Set shooter tilted to false
         shooterTiltedUp = false;
@@ -301,13 +304,13 @@ public:
 		loadWasHalted = false;
 		shooterWheelsSpinning = false;
 		rollersRolling = false;
-//		hangClawsOut = false;
+		hangClawsOut = false;
 		
 		// Shooter Velocity Controller
 //		ShooterFeedSpeed->Enable();
-		ShooterFeedSpeed->SetSetpoint(0.0);
+//		ShooterFeedSpeed->SetSetpoint(0.0);
 //		ShooterFireSpeed->Enable();
-		ShooterFireSpeed->SetSetpoint(0.0);
+//		ShooterFireSpeed->SetSetpoint(0.0);
 		
 		printf("Teleop Init Completed\n");
 	}
@@ -366,11 +369,13 @@ public:
 //		}
 		
 		// Hang Code
-//		if(buttonHelper1->WasButtonToggled(1))
-//		{
-//			hangClawsOut = !hangClawsOut;
-//		}
-//		Hang->Set(hangClawsOut);
+		if(buttonHelper1->WasButtonToggled(1))
+		{
+			hangClawsOut = !hangClawsOut;
+			printf("HANG--------------------\n");
+		}
+		Hang_A->Set(hangClawsOut);
+		Hang_B->Set(!hangClawsOut);
 		
 		// Keep filling up the compressor until it hits the desired psi
 		Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
@@ -406,7 +411,7 @@ public:
 			// Update value for power to shooter
 			if(buttonHelper1->WasButtonToggled(3))
 			{
-				shooterSpeed = SmartDashboard::GetNumber(SHOOTER_POWER_KEY);
+				shooterPower = SmartDashboard::GetNumber(SHOOTER_POWER_KEY);
 			}
 			
 			// Joystick Driving
@@ -441,17 +446,21 @@ public:
 			// Shooter wheel state changing
 			if(shooterWheelsSpinning)
 			{
-				ShooterFeedSpeed->SetSetpoint(-shooterSpeed);
-				ShooterFireSpeed->SetSetpoint(shooterSpeed);
+//				ShooterFeedSpeed->SetSetpoint(-shooterSpeed);
+//				ShooterFireSpeed->SetSetpoint(shooterSpeed);
+				ShooterFeed->Set(-shooterPower);
+				ShooterFire->Set(-shooterPower);
 			}
 			else
 			{
-				ShooterFeedSpeed->SetSetpoint(0.0);
-				ShooterFireSpeed->SetSetpoint(0.0);
+//				ShooterFeedSpeed->SetSetpoint(0.0);
+//				ShooterFireSpeed->SetSetpoint(0.0);
+				ShooterFeed->Set(0.0);
+				ShooterFire->Set(0.0);
 			}
 			
-			printf("SHOOTER FRONT ENCODER: %d\n", ShooterFire->GetPosition());
-			printf("SHOOTER BACK ENCODER: %d\n", ShooterFeed->GetPosition());
+//			printf("SHOOTER FRONT ENCODER: %d\n", ShooterFire->GetPosition());
+//			printf("SHOOTER BACK ENCODER: %d\n", ShooterFeed->GetPosition());
 			
 			// Fire piston that shoots the disc and halt loading if the piston is fired.
 			Disc_Fire->Set(operatorGamepad2->GetRawButton(6));
