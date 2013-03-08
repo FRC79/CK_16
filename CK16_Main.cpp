@@ -20,10 +20,10 @@ class CK16_Main: public IterativeRobot {
 	void UpdatePreviousButtonStateVariables();
 
 	// Declare CSV readers
-	CSVReader *PWM_CSV, *AnalogInputs_CSV, *DigitalIO_CSV, *CAN_IDS_CSV;
+	CSVReader *PWM_CSV, *AnalogInputs_CSV, *DigitalIO_CSV, *Solenoid_CSV, *CAN_IDS_CSV;
 
 	// SmartDashboard Keys
-	std::string FOUND_KEY, AZIMUTH_KEY, RANGE_KEY, SHOOTER_TILTED_KEY;
+	std::string FOUND_KEY, AZIMUTH_KEY, RANGE_KEY, SHOOTER_TILTED_KEY, SHOOTER_POWER_KEY;
 	
 	// Declare variable for the robot drive system
 	RobotDrive *m_robotDrive; // robot will use PWM 1-4 for drive motors	
@@ -36,27 +36,30 @@ class CK16_Main: public IterativeRobot {
 	// Shooter Velocity controller
 	CAN_VPID_Controller *ShooterFeedSpeed, *ShooterFireSpeed;
 	
+	// Shooter Power setting
+	float shooterSpeed;
+	
     // Declare the IR sensors that facilitate the disc loading and firing process(es)															//wat
-//    DigitalInput *Top_Beam, *Bottom_Beam;
+    DigitalInput *Top_Beam, *Bottom_Beam;
     
 	// Digital Input pin for the pressure switch
-//	DigitalInput *Pressure_SW;
+	DigitalInput *Pressure_SW;
 
 	// Building the Trojan horse.
-//	Relay *Compressor;
+	Relay *Compressor;
 
 	// Pulling out Excalibers (2x)
-//	Solenoid *Disc_Load_In, *Disc_Load_Out, *Shooter_Tilt_In,
-//			*Shooter_Tilt_Out, *Disc_Fire;
+	Solenoid *Hang_A_In, *Hang_A_Out, *Hang_B_In, *Hang_B_Out, *Shooter_Tilt_In, *Disc_Load,
+			*Shooter_Tilt_Out, *Disc_Fire;
 	
 	// Declaring DualSolenoids
-//	DualSolenoid *Disc_Load, *Shooter_Tilt;
+	DualSolenoid *Shooter_Tilt, *Hang_A, *Hang_B;
 
 	// Declare left and right encoder drive PIDControllers
-//	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
+	CAN_PID_Controller *Left_Drive_PID, *Right_Drive_PID;
 
 	// Declare Gyro that will be used to determine left and right robot rotation
-//	Gyro *Yaw_Gyro;
+	Gyro *Yaw_Gyro;
 
 	// Declare RobotTurnPIDOutput that will control the robot turning aspect of the goal alignment
 //	RobotTurnPIDOutput *Robot_Turn;
@@ -71,12 +74,9 @@ class CK16_Main: public IterativeRobot {
 //	DiscAutoLoader *Auto_Loader;
 	
 	// State booleans for auto loading and manual loading
+	bool hangClawsOut;
 	bool autoLoadEnabled, loadWasHalted;
 	bool shooterWheelsSpinning, rollersRolling;
-	bool discInPosition, discLoaded, discShot;
-	
-	static const unsigned int BROKEN = 0;
-	static const unsigned int SOLID = 1;
 	
 	// State boolean for shooter tilt funcitonality
 	bool shooterTiltedUp;
@@ -114,12 +114,14 @@ public:
 		AnalogInputs_CSV = new CSVReader("AnalogInputs.csv");
 		CAN_IDS_CSV = new CSVReader("CAN_IDs.csv");
 		DigitalIO_CSV = new CSVReader("DigitalIO.csv");
+		Solenoid_CSV = new CSVReader("Solenoid.csv");
 		PWM_CSV = new CSVReader("PWM.csv");
 
 		// Initialize SmartDashboard Keys
 		FOUND_KEY = "found";
 		AZIMUTH_KEY = "azimuth";
 		RANGE_KEY = "range";
+		SHOOTER_POWER_KEY = "shooter power";
 
 		SHOOTER_TILTED_KEY = "shooter tilted";
 
@@ -133,9 +135,12 @@ public:
 		ShooterFire = new CANJaguar((int) CAN_IDS_CSV->GetValue("FIRE_CAN_ID"));
 		printf("TEAM 79 FOR THE WIN!\n");
 		
+		// Shooter Power
+		shooterSpeed = 4.0;
+		
 		// Shooter Velocity Controller
-		ShooterFeedSpeed = new CAN_VPID_Controller(0.5, 1.0, 0.0, ShooterFeed, ShooterFeed);
-		ShooterFireSpeed = new CAN_VPID_Controller(0.5, 1.0, 0.0, ShooterFire, ShooterFire);
+		ShooterFeedSpeed = new CAN_VPID_Controller(0.0, 0.0, 0.0, ShooterFeed, ShooterFeed);
+		ShooterFireSpeed = new CAN_VPID_Controller(0.0, 0.0, 0.0, ShooterFire, ShooterFire);
 
 		// Initialize Robot Drive System Using Jaguars
 		m_robotDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
@@ -173,25 +178,29 @@ public:
 		m_telePeriodicLoops = 0;
 
 		// Filling the Trojan horse with people, then shipping it off to Troy.
-//		Compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
+		Compressor = new Relay(RobotConfiguration::COMPRESSOR_RELAY_CHANNEL);
 		
 		// Initialize pressure switch input channel
-//		Pressure_SW = new DigitalInput(RobotConfiguration::PRESSURE_SWITCH_CHANNEL);
+		Pressure_SW = new DigitalInput(RobotConfiguration::PRESSURE_SWITCH_CHANNEL);
 		
 		// Sharpening Excalibur on the ye old grindstone in the centre of town.
-//        Disc_Load_In = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_IN_ID"));
-//        Disc_Load_Out = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_LOAD_OUT_ID"));
-//        Disc_Fire = new Solenoid((int)DigitalIO_CSV->GetValue("DISC_FIRE_ID"));
-//        Shooter_Tilt_In = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_IN_ID"));
-//        Shooter_Tilt_Out = new Solenoid((int)DigitalIO_CSV->GetValue("SHOOTER_TILT_OUT_ID"));
-		
+        Disc_Load = new Solenoid((int)Solenoid_CSV->GetValue("DISC_LOAD_ID"));
+        Disc_Fire = new Solenoid((int)Solenoid_CSV->GetValue("DISC_FIRE_ID"));
+        Shooter_Tilt_In = new Solenoid((int)Solenoid_CSV->GetValue("SHOOTER_TILT_IN_ID"));
+        Shooter_Tilt_Out = new Solenoid((int)Solenoid_CSV->GetValue("SHOOTER_TILT_OUT_ID"));
+        Hang_A_In = new Solenoid((int)Solenoid_CSV->GetValue("HANG_A_IN_ID"));
+        Hang_A_Out = new Solenoid((int)Solenoid_CSV->GetValue("HANG_A_OUT_ID"));
+        Hang_B_In = new Solenoid((int)Solenoid_CSV->GetValue("HANG_B_IN_ID"));
+        Hang_B_Out = new Solenoid((int)Solenoid_CSV->GetValue("HANG_B_OUT_ID"));
+        
         // Initialize DualSolenoids
-//        Disc_Load = new DualSolenoid(Disc_Load_In, Disc_Load_Out, false, false);
-//        Shooter_Tilt = new DualSolenoid(Shooter_Tilt_In, Shooter_Tilt_Out, true, false); // Inverted
+        Shooter_Tilt = new DualSolenoid(Shooter_Tilt_In, Shooter_Tilt_Out, false, false);
+        Hang_A = new DualSolenoid(Hang_A_In, Hang_A_Out, false, false);
+        Hang_B = new DualSolenoid(Hang_B_In, Hang_B_Out, false, false);
         
         // Initialize IR beams for loading and firing discs
-//		Top_Beam = new DigitalInput(3);
-//		Bottom_Beam = new DigitalInput(2);
+		Top_Beam = new DigitalInput((int)DigitalIO_CSV->GetValue("TOP_BEAM_ID"));
+		Bottom_Beam = new DigitalInput((int)DigitalIO_CSV->GetValue("BOTTOM_BEAM_ID"));
         
 		// Initialize DiscAutoLoader
 //		Auto_Loader = new DiscAutoLoader(Roller, Disc_Load, Top_Beam, Bottom_Beam);
@@ -216,9 +225,12 @@ public:
 		ShooterFeed->ConfigEncoderCodesPerRev(TICS_PER_SHOOTER_REV);
 		ShooterFire->ConfigEncoderCodesPerRev(TICS_PER_SHOOTER_REV);
 		
+		// Init shooter power on NetworkTable
+		SmartDashboard::PutNumber(SHOOTER_POWER_KEY, shooterSpeed);
+		
 		// Shooter Velocity Controller
-		ShooterFeedSpeed->SetOutputRange(0.0, 0.7);
-		ShooterFireSpeed->SetOutputRange(0.0, 0.7);
+		ShooterFeedSpeed->SetOutputRange(0.0, 1.0);
+		ShooterFireSpeed->SetOutputRange(0.0, 1.0);
 		
         // Set each drive motor to have an encoder to be its friend
         Front_R->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
@@ -226,13 +238,9 @@ public:
         Front_R->ConfigEncoderCodesPerRev(TICS_PER_REV); 
         Front_L->ConfigEncoderCodesPerRev(TICS_PER_REV);
         
-        // Excalibur is sheathed
-//        Disc_Load->Set(false);
-//        Disc_Fire->Set(false);
-//        Shooter_Tilt->Set(false);
-        
         // Set shooter tilted to false
-        shooterTiltedUp = false;
+        shooterTiltedUp = true;
+        
         		
 		printf("RobotInit() completed.\n");
 	}
@@ -259,9 +267,17 @@ public:
 		m_autoPeriodicLoops = 0; // Reset the loop counter for autonomous mode
 
 		// Enable Goal Align PID
-		//		Goal_Align_PID->Enable();
-		//		Goal_Align_PID->SetSetpoint(0.0);
+//		Goal_Align_PID->Enable();
+//		Goal_Align_PID->SetSetpoint(0.0);
 		
+		// Excalibur is sheathed
+        Disc_Load->Set(false);
+        Disc_Fire->Set(false);
+        Shooter_Tilt->Set(false);
+        Hang_A->Set(false);
+        
+        // Set shooter tilted to false
+        shooterTiltedUp = false;
 		
 		printf("Auton Init Completed\n");
 	}
@@ -270,16 +286,27 @@ public:
 		m_telePeriodicLoops = 0;				// Reset the loop counter for teleop mode
 		m_dsPacketsReceivedInCurrentSecond = 0;	// Reset the number of dsPackets in current second
 		
+		// Excalibur is sheathed
+        Disc_Load->Set(false);
+        Disc_Fire->Set(false);
+        Shooter_Tilt->Set(false);
+        Hang_A->Set(false);
+        Hang_B->Set(false);
+        
+        // Set shooter tilted to false
+        shooterTiltedUp = false;
+		
 		// Initialize all state variables
 		autoLoadEnabled = false;
 		loadWasHalted = false;
 		shooterWheelsSpinning = false;
 		rollersRolling = false;
+//		hangClawsOut = false;
 		
 		// Shooter Velocity Controller
-		ShooterFeedSpeed->Enable();
+//		ShooterFeedSpeed->Enable();
 		ShooterFeedSpeed->SetSetpoint(0.0);
-		ShooterFireSpeed->Enable();
+//		ShooterFireSpeed->Enable();
 		ShooterFireSpeed->SetSetpoint(0.0);
 		
 		printf("Teleop Init Completed\n");
@@ -307,7 +334,7 @@ public:
 		m_autoPeriodicLoops++;
 		printf("Auton Loops:%d\n", m_autoPeriodicLoops);
 		
-//		Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
+		Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
 		
 		if(m_autoPeriodicLoops % 100 == 0)
 		{
@@ -321,28 +348,32 @@ public:
 		m_telePeriodicLoops++;
 		GetWatchdog().Feed();
 
-		printf("FEED SPEED: %f\n", ShooterFeed->GetSpeed());
-		printf("FIRE SPEED: %f\n", ShooterFire->GetSpeed());
-		
-		if(operatorGamepad2->GetRawButton(8))
-		{
-			printf("ENABLING BB\n");
-			ShooterFeedSpeed->SetSetpoint(4.0);
-			ShooterFireSpeed->SetSetpoint(4.0);
-		}
-		else
-		{
-			// Ya, andrew is yelling at this point
-			ShooterFeedSpeed->SetSetpoint(0.0);
-			ShooterFireSpeed->SetSetpoint(0.0);
-		}
-		
-		// Keep filling up the compressor until it hits the desired psi
-//		Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
-		
 		// Update the button helpers
 		buttonHelper1->Update();
 		buttonHelper2->Update();
+		
+//		if(operatorGamepad1->GetRawButton(8))
+//		{
+//			printf("ENABLING BB\n");
+//			ShooterFeedSpeed->SetSetpoint(4.0);
+//			ShooterFireSpeed->SetSetpoint(4.0);
+//		}
+//		else
+//		{
+//			// Ya, andrew is yelling at this point
+//			ShooterFeedSpeed->SetSetpoint(0.0);
+//			ShooterFireSpeed->SetSetpoint(0.0);
+//		}
+		
+		// Hang Code
+//		if(buttonHelper1->WasButtonToggled(1))
+//		{
+//			hangClawsOut = !hangClawsOut;
+//		}
+//		Hang->Set(hangClawsOut);
+		
+		// Keep filling up the compressor until it hits the desired psi
+		Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
         
 		if(autoPilot == true)
 		{
@@ -372,65 +403,73 @@ public:
 			leftOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(2));
 			rightOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(5));
 			
+			// Update value for power to shooter
+			if(buttonHelper1->WasButtonToggled(3))
+			{
+				shooterSpeed = SmartDashboard::GetNumber(SHOOTER_POWER_KEY);
+			}
+			
 			// Joystick Driving
 			m_robotDrive->SetLeftRightMotorOutputs(leftOutput, rightOutput);
             
             // Shooter tilt toggle
-            if(buttonHelper1->WasButtonToggled(1)) // Only accept a button press (not hold)
+            if(buttonHelper2->WasButtonToggled(5)) // Only accept a button press (not hold)
             {
             	shooterTiltedUp = !shooterTiltedUp; // Toggle tilt solenoid
             } 
-//            Shooter_Tilt->Set(shooterTiltedUp);
+            Shooter_Tilt->Set(shooterTiltedUp);
             SmartDashboard::PutBoolean(SHOOTER_TILTED_KEY, shooterTiltedUp); // Output current state to SmartDashboard
             
 			// Enable and disable autoLoad (only if the autoload is not halted)
-//			if(buttonHelper2->WasButtonToggled(1) && !loadWasHalted && autoLoadEnabled)
+//			if(buttonHelper1->WasButtonToggled(5) && !loadWasHalted && autoLoadEnabled)
 //			{
 //				Auto_Loader->Disable(); // Disable
 //				autoLoadEnabled = false;
 //			}
-//			else if(buttonHelper2->WasButtonToggled(1) && !loadWasHalted && !autoLoadEnabled)
+//			else if(buttonHelper1->WasButtonToggled(5) && !loadWasHalted && !autoLoadEnabled)
 //			{
 //				Auto_Loader->Reset(); // Enable
 //				autoLoadEnabled = true;
 //			}
-//			
-//			// Toggle Shooter Wheels on and off
+			
+			// Toggle Shooter Wheels on and off
 			if(buttonHelper2->WasButtonToggled(2))
 			{
 				shooterWheelsSpinning = !shooterWheelsSpinning;
 			}
 			
 			// Shooter wheel state changing
-//			if(shooterWheelsSpinning)
-//			{
-//				printf("BRING IT AROUND TOWN\n");
-//				ShooterFeed->Set(-0.30);
-//				ShooterFire->Set(-0.30);
-//			}
-//			else
-//			{
-//				ShooterFeed->Set(0.0);
-//				ShooterFire->Set(0.0);
-//			}
+			if(shooterWheelsSpinning)
+			{
+				ShooterFeedSpeed->SetSetpoint(-shooterSpeed);
+				ShooterFireSpeed->SetSetpoint(shooterSpeed);
+			}
+			else
+			{
+				ShooterFeedSpeed->SetSetpoint(0.0);
+				ShooterFireSpeed->SetSetpoint(0.0);
+			}
+			
+			printf("SHOOTER FRONT ENCODER: %d\n", ShooterFire->GetPosition());
+			printf("SHOOTER BACK ENCODER: %d\n", ShooterFeed->GetPosition());
 			
 			// Fire piston that shoots the disc and halt loading if the piston is fired.
-//			Disc_Fire->Set(operatorGamepad2->GetRawButton(6));
-			loadWasHalted = operatorGamepad2->GetRawButton(6);
+			Disc_Fire->Set(operatorGamepad2->GetRawButton(6));
+			loadWasHalted = operatorGamepad1->GetRawButton(7);
 			
 			// Punch down (load) piston
-//			Disc_Load->Set(operatorGamepad2->GetRawButton(3));
+			Disc_Load->Set(operatorGamepad2->GetRawButton(1));
 			
 			// Auto and manual disc loading
-//			if(autoLoadEnabled && !loadWasHalted)
-//			{	
-//				// Autoloading
+			if(autoLoadEnabled && !loadWasHalted)
+			{	
+				// Autoloading
 //				Auto_Loader->AutoLoad();
-//			}
-//			else if(!autoLoadEnabled && !loadWasHalted)
-//			{
+			}
+			else if(!autoLoadEnabled && !loadWasHalted)
+			{
 				// Toggle Shooter Wheels on and off
-				if(buttonHelper2->WasButtonToggled(1))
+				if(buttonHelper2->WasButtonToggled(3))
 				{
 					rollersRolling = !rollersRolling;
 				}
@@ -444,7 +483,7 @@ public:
 				{
 					Roller->Set(0.0);
 				}
-//			}
+			}
 		}
 	}
 };
