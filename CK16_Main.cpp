@@ -81,6 +81,7 @@ class CK16_Main: public IterativeRobot {
 	bool hangClawsOut;
 	bool autoLoadEnabled, loadWasHalted;
 	bool shooterWheelsSpinning;
+	bool autonEnabled;
 	
 	// State boolean for shooter tilt funcitonality
 	bool shooterTiltedUp;
@@ -141,7 +142,7 @@ public:
 		
 		// Shooter Power
 		shooterSpeed = 4.0;
-		shooterPower = 60.0;
+		shooterPower = 0.8;
 		
 		// Shooter Velocity Controller
 //		ShooterFeedSpeed = new CAN_VPID_Controller(0.5, 1.0, 0.0, ShooterFeed, ShooterFeed);
@@ -209,7 +210,7 @@ public:
         
 		// Initialize DiscAutoLoader
 //		Auto_Loader = new DiscAutoLoader(Roller, Disc_Load, Top_Beam, Bottom_Beam);
-        
+		
 		printf("CK16_Main Constructor Completed\n");
 	}
 
@@ -280,9 +281,14 @@ public:
         Disc_Fire->Set(false);
         Shooter_Tilt->Set(false);
         Hang_A->Set(false);
+        Hang_B->Set(true);
         
         // Set shooter tilted to false
         shooterTiltedUp = false;
+        
+        
+        //MAKE SURE TO KEEP THIS
+        autonEnabled = true;
 		
 		printf("Auton Init Completed\n");
 	}
@@ -340,10 +346,61 @@ public:
 		
 		Compressor->Set((!Pressure_SW->Get() ? Relay::kForward : Relay::kOff));
 		
-		if(m_autoPeriodicLoops % 100 == 0)
+		if(autonEnabled)
 		{
-			SmartDashboard::PutNumber("BACK ENCODER POS", ShooterFeed->GetPosition());
-			SmartDashboard::PutNumber("FRONT ENCODER POS", ShooterFire->GetPosition());
+				Wait(0.25);
+			
+				ShooterFeed->Set(-0.8);
+				ShooterFire->Set(-0.8);
+				
+				Wait(4.0); // Wait 4 secs
+				
+				Disc_Fire->Set(true); // fire
+				
+				Wait(1.0); // Hold it out
+				
+				Disc_Fire->Set(false); // close
+				
+				Wait(1.0); // Wait to avoid clashing of pistons
+				
+				Disc_Load->Set(true);
+				
+				Wait(1.0); // Load it
+				
+				Disc_Load->Set(false);
+				
+				Wait(1.0); // Wait for it to come up
+				
+				Roller->Set(0.5); // Reel in disc
+				
+				Disc_Fire->Set(true); // fire
+						
+				Wait(1.0); // Hold it out
+				
+				Disc_Fire->Set(false); // close
+				
+				Wait(1.0); // Wait to avoid clashing of pistons
+				
+				Disc_Load->Set(true);
+				
+				Wait(1.0); // Load it
+				
+				Disc_Load->Set(false);
+				
+				Wait(1.0); // Wait to avoid damage
+				
+				Disc_Fire->Set(true); // fire
+								
+				Wait(1.0); // Hold it out
+				
+				Disc_Fire->Set(false); // close
+				
+				
+				
+				ShooterFeed->Set(0.0);
+				ShooterFire->Set(0.0);
+				
+				autonEnabled = false;
 		}
 	}
 
