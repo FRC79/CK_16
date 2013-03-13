@@ -3,7 +3,6 @@
 
 #include "Commands/Command.h"
 
-
 #include "Subsystems/DiscShooter.h"
 #include "Subsystems/Drivetrain.h"
 #include "Subsystems/Hopper.h"
@@ -13,7 +12,7 @@
 
 
 /**
- * The base for all commands. All atomic commands should subclass CommandBase.
+ * The base for all commands. All [atomic] commands should subclass CommandBase.
  * CommandBase stores, creates, and stores each control system. To access a
  * subsystem elsewhere in your code in your code use CommandBase.subsystem
  */

@@ -1,25 +1,27 @@
 #include "WPILib.h"
 #include "Commands/Command.h"
-#include "Commands/ExampleCommand.h"
+#include "Commands/AlignWithGoal.h"
+#include "RobotMap.h"
 #include "CommandBase.h"
 
 class CK16_Main : public IterativeRobot {
 private:
-	Command *autonomousCommand;
+	Command *autonomousCommand, *teleopCommand;
 	LiveWindow *lw;
 	
 	virtual void RobotInit() {
+		RobotMap::init(); // Load CSV values into RobotMap
 		CommandBase::init();
 //		autonomousCommand = new ExampleCommand();
-		lw = LiveWindow::GetInstance();
+//		lw = LiveWindow::GetInstance();
 	}
 	
 	virtual void AutonomousInit() {
-		autonomousCommand->Start();
+//		autonomousCommand->Start();
 	}
 	
 	virtual void AutonomousPeriodic() {
-		Scheduler::GetInstance()->Run();
+//		Scheduler::GetInstance()->Run();
 	}
 	
 	virtual void TeleopInit() {
@@ -27,15 +29,15 @@ private:
 		// teleop starts running. If you want the autonomous to 
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
-		autonomousCommand->Cancel();
+//		autonomousCommand->Cancel();
 	}
 	
 	virtual void TeleopPeriodic() {
-		Scheduler::GetInstance()->Run();
+//		Scheduler::GetInstance()->Run();
 	}
 	
 	virtual void TestPeriodic() {
-		lw->Run();
+//		lw->Run();
 	}
 };
 

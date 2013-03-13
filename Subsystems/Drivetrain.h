@@ -15,7 +15,7 @@ public:
 	void InitDefaultCommand();
 	
 private:
-	CANJaguar *FrontR_Wheel, *FrontL_Wheel, *RearR_Wheel, *RearL_Wheel;
+	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
 	Gyro *TurnGyro;
 	RobotDrive *RoboDrive;
 };
