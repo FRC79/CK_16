@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <wrxml>
     <properties platform="VxWorks" platform_name="vxworks-6.3" root="1" type="DownloadableKernelModuleProject"/>
     <attributes>
@@ -12,6 +12,7 @@
             <stringAttribute key="BLD::Info|GlobalMacro|EXPAND_DBG" value="0"/>
             <stringAttribute key="BLD::Info|GlobalMacro|PROJECT_TYPE" value="DKM"/>
             <listAttribute key="BLD::Info|Incl|PPC32diab">
+                <stringAttribute value="-I$(WIND_BASE)/target/h/WPILib"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h/wrn/coreip"/>
             </listAttribute>
@@ -24,9 +25,12 @@
                 <stringAttribute value="-I$(WIND_BASE)/target/h/wrn/coreip"/>
             </listAttribute>
             <listAttribute key="BLD::Info|Incl|PPC603gnu">
-                <stringAttribute value="-I$(WIND_BASE)/target/h/WPILib"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h"/>
+                <stringAttribute value="-I$(WIND_BASE)/target/h/WPILib"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h/wrn/coreip"/>
+            </listAttribute>
+            <listAttribute key="BLD::Info|Libs|PPC32diab">
+                <stringAttribute value="$(WIND_BASE)/target/lib/WPILib.a"/>
             </listAttribute>
             <listAttribute key="BLD::Info|Libs|PPC603gnu">
                 <stringAttribute value="$(WIND_BASE)/target/lib/WPILib.a"/>
@@ -44,7 +48,7 @@
             <stringAttribute key="BLD::Info|Macro|CC_ARCH_SPEC|value|PPC32diab" value="-tPPCFH:vxworks63 -Xstmw-slow -DPPC32_fp60x"/>
             <stringAttribute key="BLD::Info|Macro|CC_ARCH_SPEC|value|PPC32gnu" value="-mhard-float -mstrict-align -mno-implicit-fp -DPPC32_fp60x"/>
             <stringAttribute key="BLD::Info|Macro|CC_ARCH_SPEC|value|PPC603diab" value="-tPPC603FH:vxworks63"/>
-            <stringAttribute key="BLD::Info|Macro|CC_ARCH_SPEC|value|PPC603gnu" value="-mcpu=603 -mstrict-align -mno-implicit-fp  -mlongcall"/>
+            <stringAttribute key="BLD::Info|Macro|CC_ARCH_SPEC|value|PPC603gnu" value="-mcpu=603 -mstrict-align -mno-implicit-fp -mlongcall"/>
             <stringAttribute key="BLD::Info|Macro|CPU|value|PPC32diab" value="PPC32"/>
             <stringAttribute key="BLD::Info|Macro|CPU|value|PPC32gnu" value="PPC32"/>
             <stringAttribute key="BLD::Info|Macro|CPU|value|PPC603diab" value="PPC603"/>
@@ -142,7 +146,7 @@
             <stringAttribute key="BLD::Info|Tool|C-Compiler|flags|PPC32diab" value="$(CC_ARCH_SPEC) -W:c:,-Xclib-optim-off -Xansi -Xlocal-data-area-static-only -Xforce-declarations  -Xmake-dependency=0xd"/>
             <stringAttribute key="BLD::Info|Tool|C-Compiler|flags|PPC32gnu" value="$(CC_ARCH_SPEC) -ansi  -Wall  -MD -MP"/>
             <stringAttribute key="BLD::Info|Tool|C-Compiler|flags|PPC603diab" value="$(CC_ARCH_SPEC) -W:c:,-Xclib-optim-off -Xansi -Xlocal-data-area-static-only -Xforce-declarations  -Xmake-dependency=0xd"/>
-            <stringAttribute key="BLD::Info|Tool|C-Compiler|flags|PPC603gnu" value="$(CC_ARCH_SPEC) -ansi  -Wall  -MD -MP"/>
+            <stringAttribute key="BLD::Info|Tool|C-Compiler|flags|PPC603gnu" value="$(CC_ARCH_SPEC) -ansi  -Wall  -MD -MP -mlongcall"/>
             <stringAttribute key="BLD::Info|Tool|C-Compiler|nonDbgFlags|PPC32diab" value="-XO -Xsize-opt"/>
             <stringAttribute key="BLD::Info|Tool|C-Compiler|nonDbgFlags|PPC32gnu" value="-O2 -fstrength-reduce -fno-builtin"/>
             <stringAttribute key="BLD::Info|Tool|C-Compiler|nonDbgFlags|PPC603diab" value="-XO -Xsize-opt"/>
@@ -240,7 +244,12 @@
         </mapAttribute>
     </attributes>
     <buildtargets>
-        <buildtarget buildtool="Linker" name="CK_16" passed="false" targetname="CK_16">
+        <buildtarget buildtool="Linker" name="CommandBasedRobotTemplate" passed="false" targetname="CommandBasedRobotTemplate">
+            <contents>
+                <folder name="/CK_16" recursive="true"/>
+            </contents>
+        </buildtarget>
+        <buildtarget buildtool="Partial Image Linker" name="CommandBasedRobotTemplate_partialImage" passed="true" targetname="CommandBasedRobotTemplate_partialImage">
             <contents>
                 <folder name="/CK_16" recursive="true"/>
             </contents>

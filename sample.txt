@@ -1,10 +1,4 @@
-FRC Default Program (Original factory image)
+FRC Command Based Robot Template
 --------------------------------
 
-This sample implements the "default program" that was preloaded on
-your cRIO when it came from the factory. This program has both Autonomous
-and Operator Control code as described in the "Out of the box" directions.
-
-You can use this as a slightly more advanced template as a starting point
-for your own robot projects, or just to see how some more advanced programming
-works.
+This program is the basis for a command based robot program. You should look at all the files in this template and make edits where indicated in the source code.
