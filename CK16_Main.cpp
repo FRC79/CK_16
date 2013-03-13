@@ -44,7 +44,7 @@ class CK16_Main: public IterativeRobot {
 	float rollerPower;
 	
     // Declare the IR sensors that facilitate the disc loading and firing process(es)															//wat
-    DigitalInput *Top_Beam, *Bottom_Beam;
+    DigitalInput *Top_Beam, *Bottom_Beam, *Front_Beam;
     
 	// Digital Input pin for the pressure switch
 	DigitalInput *Pressure_SW;
@@ -86,6 +86,10 @@ class CK16_Main: public IterativeRobot {
 	// State boolean for shooter tilt funcitonality
 	bool shooterTiltedUp;
 
+	// Beam Constants
+	static const unsigned int BROKEN = 0;
+	static const unsigned int SOLID = 1;
+	
 	// Declare a variable to use to access the driver station object
 	DriverStation *m_ds; // driver station object
 	DriverStationLCD *m_ds_lcd;
@@ -207,6 +211,7 @@ public:
         // Initialize IR beams for loading and firing discs
 		Top_Beam = new DigitalInput((int)DigitalIO_CSV->GetValue("TOP_BEAM_ID"));
 		Bottom_Beam = new DigitalInput((int)DigitalIO_CSV->GetValue("BOTTOM_BEAM_ID"));
+		Front_Beam = new DigitalInput((int)DigitalIO_CSV->GetValue("FRONT_BEAM_ID"));
         
 		// Initialize DiscAutoLoader
 //		Auto_Loader = new DiscAutoLoader(Roller, Disc_Load, Top_Beam, Bottom_Beam);
@@ -243,6 +248,12 @@ public:
         Front_L->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
         Front_R->ConfigEncoderCodesPerRev(TICS_PER_REV); 
         Front_L->ConfigEncoderCodesPerRev(TICS_PER_REV);
+        
+        // Inverting RobotDrive motors
+        m_robotDrive->SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);
+        m_robotDrive->SetInvertedMotor(RobotDrive::kFrontRightMotor, true);
+        m_robotDrive->SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
+        m_robotDrive->SetInvertedMotor(RobotDrive::kRearRightMotor, true);
         
         // Set shooter tilted to false
         shooterTiltedUp = true;
@@ -429,19 +440,27 @@ public:
 //				}
 //			}
 			
+//			// Map joystick position to speed value through a special equation
+//			double leftOutput, rightOutput;
+//			leftOutput = TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(2));
+//			rightOutput = TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(5));
+//			
+//			// Joystick Driving
+//			m_robotDrive->SetLeftRightMotorOutputs(leftOutput, rightOutput);
+			
 			// Map joystick position to speed value through a special equation
-			double leftOutput, rightOutput;
-			leftOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(2));
-			rightOutput = -TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(5));
+			double transOutput, rotOutput;
+			transOutput = TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(5));
+			rotOutput = TeleopHelper::mapJoystickToSpeedOutput(operatorGamepad1->GetRawAxis(4));
+			
+			// Joystick arcade driving on right joystick
+			m_robotDrive->ArcadeDrive(transOutput, rotOutput, false);
 			
 			// Update value for power to shooter
 			if(buttonHelper1->WasButtonToggled(3))
 			{
 				shooterPower = SmartDashboard::GetNumber(SHOOTER_POWER_KEY);
 			}
-			
-			// Joystick Driving
-			m_robotDrive->SetLeftRightMotorOutputs(leftOutput, rightOutput);
             
             // Shooter tilt toggle
             if(buttonHelper2->WasButtonToggled(5) || buttonHelper1->WasButtonToggled(5)) // Only accept a button press (not hold)
@@ -472,25 +491,18 @@ public:
 			// Shooter wheel state changing
 			if(shooterWheelsSpinning)
 			{
-//				ShooterFeedSpeed->SetSetpoint(-shooterSpeed);
-//				ShooterFireSpeed->SetSetpoint(shooterSpeed);
 				ShooterFeed->Set(-shooterPower);
 				ShooterFire->Set(-shooterPower);
 			}
 			else
 			{
-//				ShooterFeedSpeed->SetSetpoint(0.0);
-//				ShooterFireSpeed->SetSetpoint(0.0);
 				ShooterFeed->Set(0.0);
 				ShooterFire->Set(0.0);
 			}
 			
-//			printf("SHOOTER FRONT ENCODER: %d\n", ShooterFire->GetPosition());
-//			printf("SHOOTER BACK ENCODER: %d\n", ShooterFeed->GetPosition());
-			
 			// Fire piston that shoots the disc and halt loading if the piston is fired.
 			Disc_Fire->Set(operatorGamepad2->GetRawButton(6));
-			loadWasHalted = operatorGamepad1->GetRawButton(7);
+//			loadWasHalted = operatorGamepad1->GetRawButton(7);
 			
 			// Punch down (load) piston
 			Disc_Load->Set(operatorGamepad2->GetRawButton(1));
@@ -510,8 +522,16 @@ public:
 				}
 				else if(operatorGamepad2->GetRawButton(3))
 				{
-					// Roll in
-					Roller->Set(0.5);
+					if(Top_Beam->Get() == SOLID || Front_Beam->Get() == SOLID)
+					{
+						// Run rollers
+						Roller->Set(0.5);
+					}
+					else
+					{
+						// Stop rollers
+						Roller->Set(0.0);
+					}
 				}
 				else
 				{
