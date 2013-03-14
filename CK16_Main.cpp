@@ -2,6 +2,7 @@
 #include "Commands/Command.h"
 
 #include "Commands/OperatorArcadeDrive.h"
+#include "Commands/OperatorToggleTilt.h"
 #include "Commands/OperatorToggleHanger.h"
 
 #include "RobotMap.h"
@@ -9,7 +10,8 @@
 
 class CK16_Main : public IterativeRobot {
 private:
-	Command *autonomousCommand, *operatorArcadeDriving, *operatorToggleHanger;
+	Command *autonomousCommand, *operatorArcadeDriving, *operatorToggleHanger,
+		*operatorToggleTilt;
 	LiveWindow *lw;
 	
 	virtual void RobotInit() {
@@ -19,6 +21,7 @@ private:
 		// Init Commands
 		operatorArcadeDriving = new OperatorArcadeDrive();
 		operatorToggleHanger = new OperatorToggleHanger();
+		operatorToggleTilt = new OperatorToggleTilt();
 //		autonomousCommand = new ExampleCommand();
 //		lw = LiveWindow::GetInstance();
 	}
@@ -43,6 +46,7 @@ private:
 		// this line or comment it out.
 //		autonomousCommand->Cancel();
 		Scheduler::GetInstance()->AddCommand(operatorArcadeDriving);
+		Scheduler::GetInstance()->AddCommand(operatorToggleTilt);
 		Scheduler::GetInstance()->AddCommand(operatorToggleHanger);
 	}
 	
@@ -52,12 +56,8 @@ private:
 		CommandBase::oi->GetButtonHelper1()->Update();
 		CommandBase::oi->GetButtonHelper2()->Update();
 		
-		Scheduler::GetInstance()->Run();
+		Scheduler::GetInstance()->Run(); // Periodically run the Scheduler
 		
-		if(operatorArcadeDriving->IsRunning())
-		{
-			printf("RUNNING\n");
-		}
 	}
 	
 	virtual void TestPeriodic() {

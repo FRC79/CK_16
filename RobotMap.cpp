@@ -20,8 +20,8 @@ CSVReader* RobotMap::PWM_CSV = NULL;
 // Solenoids
 // UINT8 RobotMap::HOPPER_LOAD_PISTON_ID = 0;
 // UINT8 RobotMap::SHOOTER_FIRE_PISTON_ID = 0;
-// UINT8 RobotMap::TILT_PISTON_IN_ID = 0;
-// UINT8 RobotMap::TILT_PISTON_OUT_ID = 0;
+ UINT8 RobotMap::TILT_PISTON_IN_ID = 0;
+ UINT8 RobotMap::TILT_PISTON_OUT_ID = 0;
  UINT8 RobotMap::HANG_PISTON_A_IN_ID = 0;
  UINT8 RobotMap::HANG_PISTON_A_OUT_ID = 0;
  UINT8 RobotMap::HANG_PISTON_B_IN_ID = 0;
@@ -58,8 +58,8 @@ void RobotMap::init()
 	// Solenoids
 //	HOPPER_LOAD_PISTON_ID = (UINT8)Solenoid_CSV->GetValue("DISC_LOAD_ID");
 //	SHOOTER_FIRE_PISTON_ID = (UINT8)Solenoid_CSV->GetValue("DISC_FIRE_ID");
-//	TILT_PISTON_IN_ID = (UINT8)Solenoid_CSV->GetValue("SHOOTER_TILT_IN_ID");
-//	TILT_PISTON_OUT_ID = (UINT8)Solenoid_CSV->GetValue("SHOOTER_TILT_OUT_ID");
+	TILT_PISTON_IN_ID = (UINT8)Solenoid_CSV->GetValue("SHOOTER_TILT_IN_ID");
+	TILT_PISTON_OUT_ID = (UINT8)Solenoid_CSV->GetValue("SHOOTER_TILT_OUT_ID");
 	HANG_PISTON_A_IN_ID = (UINT8)Solenoid_CSV->GetValue("HANG_A_IN_ID");
 	HANG_PISTON_A_OUT_ID = (UINT8)Solenoid_CSV->GetValue("HANG_A_OUT_ID");
 	HANG_PISTON_B_IN_ID = (UINT8)Solenoid_CSV->GetValue("HANG_B_IN_ID");

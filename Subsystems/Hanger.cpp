@@ -18,6 +18,10 @@ Hanger::Hanger() : Subsystem("Hanger")
 
 Hanger::~Hanger()
 {
+	delete HangPiston_A_In;
+	delete HangPiston_A_Out;
+	delete HangPiston_B_In;
+	delete HangPiston_B_Out;
 	delete HangPiston_A;
 	delete HangPiston_B;
 }

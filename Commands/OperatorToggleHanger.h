@@ -4,9 +4,9 @@
 #include "../CommandBase.h"
 
 /*
- * This command is used to talk to the camera, interface
- * with the gyro, and get the robot to turn the appropriate
- * amount to line up with the goal we are tracking.
+ * This command is allows for toggling of the hanging
+ * hooks to be retracted and extended in the teleop
+ * period.
  */
 
 class OperatorToggleHanger : public CommandBase 

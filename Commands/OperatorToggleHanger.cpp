@@ -11,7 +11,8 @@ void OperatorToggleHanger::Initialize(){}
 // Called repeatedly when this Command is scheduled to run
 void OperatorToggleHanger::Execute()
 {
-	// If the user toggled the hang button, change the state of the piston
+	// If the user toggled the hang button, the hang pistons change
+	// to the opposite position.
 	if(oi->GetButtonHelper1()->WasButtonToggled(1))
 	{
 		hanger->InverseCurrentState();
