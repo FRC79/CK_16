@@ -6,7 +6,7 @@
 #include "Solenoid.h"
 #include "DigitalInput.h"
 
-class Hopper : Subsystem
+class Hopper : public Subsystem
 {
 public:
 	Hopper();

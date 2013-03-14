@@ -4,7 +4,7 @@
 #include "Commands/Subsystem.h"
 #include "../Actuators/DualSolenoid.h"
 
-class Tilt : Subsystem
+class Tilt : public Subsystem
 {
 public:
 	Tilt();

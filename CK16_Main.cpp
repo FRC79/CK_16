@@ -1,19 +1,24 @@
 #include "WPILib.h"
 #include "Commands/Command.h"
-#include "Commands/AlignWithGoal.h"
+
 #include "Commands/OperatorArcadeDrive.h"
+#include "Commands/OperatorToggleHanger.h"
+
 #include "RobotMap.h"
 #include "CommandBase.h"
 
 class CK16_Main : public IterativeRobot {
 private:
-	Command *autonomousCommand, *operatorDriving;
+	Command *autonomousCommand, *operatorArcadeDriving, *operatorToggleHanger;
 	LiveWindow *lw;
 	
 	virtual void RobotInit() {
 		RobotMap::init(); // Load CSV values into RobotMap
-		CommandBase::init();
-		operatorDriving = new OperatorArcadeDrive();
+		CommandBase::init(); // Init subsystems and values in CommandBase
+		
+		// Init Commands
+		operatorArcadeDriving = new OperatorArcadeDrive();
+		operatorToggleHanger = new OperatorToggleHanger();
 //		autonomousCommand = new ExampleCommand();
 //		lw = LiveWindow::GetInstance();
 	}
@@ -37,13 +42,19 @@ private:
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
 //		autonomousCommand->Cancel();
-		Scheduler::GetInstance()->AddCommand(operatorDriving);
+		Scheduler::GetInstance()->AddCommand(operatorArcadeDriving);
+		Scheduler::GetInstance()->AddCommand(operatorToggleHanger);
 	}
 	
-	virtual void TeleopPeriodic() {
+	virtual void TeleopPeriodic() 
+	{
+		// Update ButtonHelpers
+		CommandBase::oi->GetButtonHelper1()->Update();
+		CommandBase::oi->GetButtonHelper2()->Update();
+		
 		Scheduler::GetInstance()->Run();
 		
-		if(operatorDriving->IsRunning())
+		if(operatorArcadeDriving->IsRunning())
 		{
 			printf("RUNNING\n");
 		}

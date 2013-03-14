@@ -5,7 +5,7 @@
 #include "CANJaguar.h"
 #include "Solenoid.h"
 
-class DiscShooter : Subsystem
+class DiscShooter : public Subsystem
 {
 public:
 	DiscShooter();

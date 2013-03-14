@@ -24,6 +24,11 @@ void Drivetrain::ArcadeDrive(float power, float rot)
 	RoboDrive->ArcadeDrive(power, rot, false); // Power and rotation
 }
 
+void Drivetrain::SetLeftAndRightMotorOutputs(float left_power, float right_power)
+{
+	RoboDrive->SetLeftRightMotorOutputs(left_power, right_power); // Left and right sides
+}
+
 void Drivetrain::InitDefaultCommand()
 {
 	

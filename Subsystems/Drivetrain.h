@@ -15,6 +15,7 @@ public:
 	void InitDefaultCommand();
 	
 	void ArcadeDrive(float power, float rot);
+	void SetLeftAndRightMotorOutputs(float left_power, float right_power);
 	
 private:
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;

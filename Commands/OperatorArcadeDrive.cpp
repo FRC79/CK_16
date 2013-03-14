@@ -4,13 +4,11 @@
 OperatorArcadeDrive::OperatorArcadeDrive()
 {
 	Requires(drive);
+	driveJoystick = oi->GetOperatorGamepad1();
 }
 
 // Called just before this Command runs the first time
-void OperatorArcadeDrive::Initialize()
-{
-	driveJoystick = oi->GetOperatorGamepad1();
-}
+void OperatorArcadeDrive::Initialize(){}
 
 // Called repeatedly when this Command is scheduled to run
 void OperatorArcadeDrive::Execute()
