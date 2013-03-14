@@ -14,6 +14,8 @@ public:
 	
 	void InitDefaultCommand();
 	
+	void ArcadeDrive(float power, float rot);
+	
 private:
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
 	Gyro *TurnGyro;

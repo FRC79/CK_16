@@ -1,6 +1,7 @@
 #include "WPILib.h"
 #include "Commands/Command.h"
 #include "Commands/AlignWithGoal.h"
+#include "Commands/OperatorArcadeDrive.h"
 #include "RobotMap.h"
 #include "CommandBase.h"
 
