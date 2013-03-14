@@ -18,19 +18,19 @@ CSVReader* RobotMap::PWM_CSV = NULL;
  UINT8 RobotMap::BACK_SHOOTER_WHEEL_ID = 0;
 
 // Solenoids
- UINT8 RobotMap::HOPPER_LOAD_PISTON_ID = 0;
- UINT8 RobotMap::SHOOTER_FIRE_PISTON_ID = 0;
- UINT8 RobotMap::TILT_PISTON_IN_ID = 0;
- UINT8 RobotMap::TILT_PISTON_OUT_ID = 0;
- UINT8 RobotMap::HANG_PISTON_A_IN_ID = 0;
- UINT8 RobotMap::HANG_PISTON_A_OUT_ID = 0;
- UINT8 RobotMap::HANG_PISTON_B_IN_ID = 0;
- UINT8 RobotMap::HANG_PISTON_B_OUT_ID = 0;
-
-// Digital Inputs
- UINT8 RobotMap::LOAD_BEAM_SENSOR_ID = 0;
- UINT8 RobotMap::FIRE_BEAM_SENSOR_ID = 0;
- UINT8 RobotMap::CHECKER_BEAM_SENSOR_ID = 0;
+// UINT8 RobotMap::HOPPER_LOAD_PISTON_ID = 0;
+// UINT8 RobotMap::SHOOTER_FIRE_PISTON_ID = 0;
+// UINT8 RobotMap::TILT_PISTON_IN_ID = 0;
+// UINT8 RobotMap::TILT_PISTON_OUT_ID = 0;
+// UINT8 RobotMap::HANG_PISTON_A_IN_ID = 0;
+// UINT8 RobotMap::HANG_PISTON_A_OUT_ID = 0;
+// UINT8 RobotMap::HANG_PISTON_B_IN_ID = 0;
+// UINT8 RobotMap::HANG_PISTON_B_OUT_ID = 0;
+//
+//// Digital Inputs
+// UINT8 RobotMap::LOAD_BEAM_SENSOR_ID = 0;
+// UINT8 RobotMap::FIRE_BEAM_SENSOR_ID = 0;
+// UINT8 RobotMap::CHECKER_BEAM_SENSOR_ID = 0;
 	
 // Analog Inputs
 	
@@ -56,19 +56,19 @@ void RobotMap::init()
 	BACK_SHOOTER_WHEEL_ID = (UINT8)CAN_IDS_CSV->GetValue("FIRE_CAN_ID");
 	
 	// Solenoids
-	HOPPER_LOAD_PISTON_ID = (UINT8)Solenoid_CSV->GetValue("DISC_LOAD_ID");
-	SHOOTER_FIRE_PISTON_ID = (UINT8)Solenoid_CSV->GetValue("DISC_FIRE_ID");
-	TILT_PISTON_IN_ID = (UINT8)Solenoid_CSV->GetValue("SHOOTER_TILT_IN_ID");
-	TILT_PISTON_OUT_ID = (UINT8)Solenoid_CSV->GetValue("SHOOTER_TILT_OUT_ID");
-	HANG_PISTON_A_IN_ID = (UINT8)Solenoid_CSV->GetValue("HANG_A_IN_ID");
-	HANG_PISTON_A_OUT_ID = (UINT8)Solenoid_CSV->GetValue("HANG_A_OUT_ID");
-	HANG_PISTON_B_IN_ID = (UINT8)Solenoid_CSV->GetValue("HANG_B_IN_ID");
-	HANG_PISTON_B_OUT_ID = (UINT8)Solenoid_CSV->GetValue("HANG_B_OUT_ID");
-	
-	// Digital Inputs
-	LOAD_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("TOP_BEAM_ID");
-	FIRE_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("BOTTOM_BEAM_ID");
-	CHECKER_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("FRONT_BEAM_ID");
+//	HOPPER_LOAD_PISTON_ID = (UINT8)Solenoid_CSV->GetValue("DISC_LOAD_ID");
+//	SHOOTER_FIRE_PISTON_ID = (UINT8)Solenoid_CSV->GetValue("DISC_FIRE_ID");
+//	TILT_PISTON_IN_ID = (UINT8)Solenoid_CSV->GetValue("SHOOTER_TILT_IN_ID");
+//	TILT_PISTON_OUT_ID = (UINT8)Solenoid_CSV->GetValue("SHOOTER_TILT_OUT_ID");
+//	HANG_PISTON_A_IN_ID = (UINT8)Solenoid_CSV->GetValue("HANG_A_IN_ID");
+//	HANG_PISTON_A_OUT_ID = (UINT8)Solenoid_CSV->GetValue("HANG_A_OUT_ID");
+//	HANG_PISTON_B_IN_ID = (UINT8)Solenoid_CSV->GetValue("HANG_B_IN_ID");
+//	HANG_PISTON_B_OUT_ID = (UINT8)Solenoid_CSV->GetValue("HANG_B_OUT_ID");
+//	
+//	// Digital Inputs
+//	LOAD_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("TOP_BEAM_ID");
+//	FIRE_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("BOTTOM_BEAM_ID");
+//	CHECKER_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("FRONT_BEAM_ID");
 	
 	// Analog Inputs
 		
