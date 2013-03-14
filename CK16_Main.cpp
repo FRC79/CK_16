@@ -7,14 +7,20 @@
 
 class CK16_Main : public IterativeRobot {
 private:
-	Command *autonomousCommand, *teleopCommand;
+	Command *autonomousCommand, *operatorDriving;
 	LiveWindow *lw;
 	
 	virtual void RobotInit() {
 		RobotMap::init(); // Load CSV values into RobotMap
 		CommandBase::init();
+		operatorDriving = new OperatorArcadeDrive();
 //		autonomousCommand = new ExampleCommand();
 //		lw = LiveWindow::GetInstance();
+	}
+	
+	virtual void DisabledInit()
+	{
+		
 	}
 	
 	virtual void AutonomousInit() {
@@ -31,10 +37,16 @@ private:
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
 //		autonomousCommand->Cancel();
+		Scheduler::GetInstance()->AddCommand(operatorDriving);
 	}
 	
 	virtual void TeleopPeriodic() {
-//		Scheduler::GetInstance()->Run();
+		Scheduler::GetInstance()->Run();
+		
+		if(operatorDriving->IsRunning())
+		{
+			printf("RUNNING\n");
+		}
 	}
 	
 	virtual void TestPeriodic() {

@@ -6,7 +6,7 @@
 #include "Gyro.h"
 #include "RobotDrive.h"
 
-class Drivetrain : Subsystem
+class Drivetrain : public Subsystem
 {
 public:
 	Drivetrain();
