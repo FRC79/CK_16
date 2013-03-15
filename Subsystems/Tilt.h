@@ -2,7 +2,7 @@
 #define TILT_H
 
 #include "Commands/Subsystem.h"
-#include "../Actuators/DualSolenoid.h"
+#include "DoubleSolenoid.h"
 
 class Tilt : public Subsystem
 {
@@ -19,8 +19,7 @@ public:
 	
 private:
 	bool is_tilted_up;
-	Solenoid *TiltPiston_In, *TiltPiston_Out;
-	DualSolenoid *TiltPiston;
+	DoubleSolenoid *TiltPiston;
 };
 
 #endif

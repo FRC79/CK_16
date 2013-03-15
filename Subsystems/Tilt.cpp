@@ -3,20 +3,15 @@
 
 Tilt::Tilt() : Subsystem("Tilt")
 {
-	// Instantiate individual solenoid components
-	TiltPiston_In = new Solenoid(RobotMap::TILT_PISTON_IN_ID);
-	TiltPiston_Out = new Solenoid(RobotMap::TILT_PISTON_OUT_ID);
-	
 	// Instantiate corresponding components into DualSolenoids
-	TiltPiston = new DualSolenoid(TiltPiston_In, TiltPiston_Out, false, false);
+	TiltPiston = new DoubleSolenoid(RobotMap::TILT_PISTON_IN_ID, 
+			RobotMap::TILT_PISTON_OUT_ID);
 	
 	is_tilted_up = false;
 }
 
 Tilt::~Tilt()
 {
-	delete TiltPiston_In;
-	delete TiltPiston_Out;
 	delete TiltPiston;
 }
 
@@ -27,7 +22,7 @@ bool Tilt::IsTiltedUp()
 
 void Tilt::Set(bool tilted_up)
 {
-	TiltPiston->Set(tilted_up);
+	TiltPiston->Set(tilted_up ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
 	is_tilted_up = tilted_up;
 }
 

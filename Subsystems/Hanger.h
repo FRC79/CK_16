@@ -2,7 +2,7 @@
 #define HANGER_H
 
 #include "Commands/Subsystem.h"
-#include "../Actuators/DualSolenoid.h"
+#include "DoubleSolenoid.h"
 
 class Hanger : public Subsystem
 {
@@ -19,9 +19,7 @@ public:
 	
 private:
 	bool is_extended;
-	Solenoid *HangPiston_A_In, *HangPiston_A_Out;
-	Solenoid *HangPiston_B_In, *HangPiston_B_Out;
-	DualSolenoid *HangPiston_A, *HangPiston_B; // A is in, B is out
+	DoubleSolenoid *HangPiston_A, *HangPiston_B; // A is in, B is out
 };
 
 #endif

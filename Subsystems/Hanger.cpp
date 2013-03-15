@@ -3,25 +3,17 @@
 
 Hanger::Hanger() : Subsystem("Hanger")
 {
-	// Instantiate the individual solenoid components
-	HangPiston_A_In = new Solenoid(RobotMap::HANG_PISTON_A_IN_ID);
-	HangPiston_A_Out = new Solenoid(RobotMap::HANG_PISTON_A_OUT_ID);
-	HangPiston_B_In = new Solenoid(RobotMap::HANG_PISTON_B_IN_ID);
-	HangPiston_B_Out = new Solenoid(RobotMap::HANG_PISTON_B_OUT_ID);
-	
-	// Instantiate the matching solenoid components as DualSolenoids
-	HangPiston_A = new DualSolenoid(HangPiston_A_In, HangPiston_A_Out, false, false);
-	HangPiston_B = new DualSolenoid(HangPiston_B_In, HangPiston_B_Out, false, false);
+	// Instantiate the matching solenoid components as DoubleSolenoids
+	HangPiston_A = new DoubleSolenoid(RobotMap::HANG_PISTON_A_IN_ID, 
+			RobotMap::HANG_PISTON_A_OUT_ID);
+	HangPiston_B = new DoubleSolenoid(RobotMap::HANG_PISTON_B_IN_ID,
+			RobotMap::HANG_PISTON_B_OUT_ID);
 	
 	is_extended = false;
 }
 
 Hanger::~Hanger()
 {
-	delete HangPiston_A_In;
-	delete HangPiston_A_Out;
-	delete HangPiston_B_In;
-	delete HangPiston_B_Out;
 	delete HangPiston_A;
 	delete HangPiston_B;
 }
@@ -33,8 +25,8 @@ bool Hanger::IsHangerExtended()
 
 void Hanger::Set(bool extend_state)
 {
-	HangPiston_A->Set(extend_state);
-	HangPiston_B->Set(!extend_state);
+	HangPiston_A->Set(extend_state ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
+	HangPiston_B->Set(!extend_state ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
 	// PROBABLY NEED TO ADD A DELAY IN HERE SINCE
 	// IT TAKES SOME TIME TO CHANGE POSTION.
 	is_extended = extend_state;
