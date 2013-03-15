@@ -2,6 +2,7 @@
 #include "Commands/Command.h"
 
 #include "Commands/OperatorArcadeDrive.h"
+#include "Commands/OperatorShooterControl.h"
 #include "Commands/OperatorToggleTilt.h"
 #include "Commands/OperatorToggleHanger.h"
 
@@ -11,7 +12,7 @@
 class CK16_Main : public IterativeRobot {
 private:
 	Command *autonomousCommand, *operatorArcadeDriving, *operatorToggleHanger,
-		*operatorToggleTilt;
+		*operatorToggleTilt, *operatorShooterControl;
 	LiveWindow *lw;
 	
 	virtual void RobotInit() {
@@ -22,6 +23,7 @@ private:
 		operatorArcadeDriving = new OperatorArcadeDrive();
 		operatorToggleHanger = new OperatorToggleHanger();
 		operatorToggleTilt = new OperatorToggleTilt();
+		operatorShooterControl = new OperatorShooterControl();
 //		autonomousCommand = new ExampleCommand();
 //		lw = LiveWindow::GetInstance();
 	}
@@ -46,6 +48,7 @@ private:
 		// this line or comment it out.
 //		autonomousCommand->Cancel();
 		Scheduler::GetInstance()->AddCommand(operatorArcadeDriving);
+		Scheduler::GetInstance()->AddCommand(operatorShooterControl);
 		Scheduler::GetInstance()->AddCommand(operatorToggleTilt);
 		Scheduler::GetInstance()->AddCommand(operatorToggleHanger);
 	}
