@@ -33,7 +33,7 @@ public:
 	static UINT8 BACK_SHOOTER_WHEEL_ID;
 	
 	// Solenoids
-//	static UINT8 HOPPER_LOAD_PISTON_ID;
+	static UINT8 HOPPER_LOAD_PISTON_ID;
 	static UINT8 SHOOTER_FIRE_PISTON_ID;
 	static UINT8 TILT_PISTON_IN_ID;
 	static UINT8 TILT_PISTON_OUT_ID;
@@ -43,9 +43,9 @@ public:
 	static UINT8 HANG_PISTON_B_OUT_ID;
 //
 //	// Digital Inputs
-//	static UINT8 LOAD_BEAM_SENSOR_ID;
-//	static UINT8 FIRE_BEAM_SENSOR_ID;
-//	static UINT8 CHECKER_BEAM_SENSOR_ID;
+	static UINT8 LOAD_BEAM_SENSOR_ID;
+	static UINT8 FIRE_BEAM_SENSOR_ID;
+	static UINT8 CHECKER_BEAM_SENSOR_ID;
 		
 	// Analog Inputs
 		
