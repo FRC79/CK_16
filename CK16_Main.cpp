@@ -1,14 +1,16 @@
 #include "WPILib.h"
 #include "Commands/Command.h"
 
-#include "Commands/OperatorControl.h"
+#include "Commands/Auto/FrontPyrShoot.h"
+#include "Commands/Teleop/OperatorControl.h"
+#include "Commands/FillAirTanks.h"
 
 #include "RobotMap.h"
 #include "CommandBase.h"
 
 class CK16_Main : public IterativeRobot {
 private:
-	Command *teleopCommand;
+	Command *autonCommand, *teleopCommand, *compressorCommand;
 	LiveWindow *lw;
 	
 	virtual void RobotInit() {
@@ -16,30 +18,64 @@ private:
 		CommandBase::init(); // Init subsystems and values in CommandBase
 		
 		// Init Commands
+		autonCommand = new FrontPyrShoot();
 		teleopCommand = new OperatorControl();
+		compressorCommand = new FillAirTanks();
 //		lw = LiveWindow::GetInstance();
+		
+		printf("RobotInit() completed.\n");
+		printf("TEAM 79 FOR THE WIN!\n");
 	}
 	
-	virtual void DisabledInit()
-	{
+	void CancelAllCommands(){
+		autonCommand->Cancel();
+		teleopCommand->Cancel();
+//		compressorCommand->Cancel();  // I don't think we need to cancel this.
+	}
+	
+	virtual void DisabledInit(){
+		CommandBase::disabledPeriodicLoops = 0; // Reset loop counter for disabled periodic.
 		
+		CancelAllCommands();	// Cancel all previously running commmands.
+		
+		// Move the cursor down a few, since we'll move it back up in periodic.
+		printf("\x1b[2B");
+	}
+	
+	virtual void DisabledPeriodic(){
+		static INT32 printSec = (INT32) GetClock() + 1;
+		static const INT32 startSec = (INT32) GetClock();
+		
+		// increment the number of disabled periodic loops completed
+		CommandBase::disabledPeriodicLoops++;
+
+		// while disabled, printout the duration of current disabled mode in seconds
+		if (GetClock() > printSec) {
+			// Move the cursor back to the previous line and clear it.
+			printf("\x1b[1A\x1b[2K");
+			printf("Disabled seconds: %d\r\n", printSec - startSec);
+			printSec++;
+		}
 	}
 	
 	virtual void AutonomousInit() {
-//		autonomousCommand->Start();
+		CancelAllCommands();	// Cancel all previously running commmands.
+		compressorCommand->Start();
+		autonCommand->Start();
+		
+		printf("Auton Init Completed\n");
 	}
 	
 	virtual void AutonomousPeriodic() {
-//		Scheduler::GetInstance()->Run();
+		Scheduler::GetInstance()->Run(); // Periodically runs auton command group
 	}
 	
 	virtual void TeleopInit() {
-		// This makes sure that the autonomous stops running when
-		// teleop starts running. If you want the autonomous to 
-		// continue until interrupted by another command, remove
-		// this line or comment it out.
-//		autonomousCommand->Cancel();
+		CancelAllCommands();	// Cancel all previously running commmands.
+		compressorCommand->Start();
 		teleopCommand->Start();
+		
+		printf("Teleop Init Completed\n");
 	}
 	
 	virtual void TeleopPeriodic() 
@@ -49,6 +85,12 @@ private:
 		CommandBase::oi->GetButtonHelper2()->Update();
 		
 		Scheduler::GetInstance()->Run(); // Periodically runs teleop command group
+	}
+	
+	virtual void TestInit(){
+		CancelAllCommands();	// Cancel all previously running commmands.
+		
+		printf("Test Init Completed\n");
 	}
 	
 	virtual void TestPeriodic() {

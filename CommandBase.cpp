@@ -19,6 +19,18 @@ Hopper* CommandBase::hopper = NULL;
 Tilt* CommandBase::tilt = NULL;
 OI* CommandBase::oi = NULL;
 
+// Initialize DriverStation variables
+DriverStation* CommandBase::ds = NULL;
+DriverStationLCD* CommandBase::ds_lcd = NULL;
+UINT32 CommandBase::priorPacketNumber = 0;
+UINT8 CommandBase::dsPacketsReceivedInCurrentSecond = 0;
+
+// Initialize periodic loop variables
+UINT32 CommandBase::autoPeriodicLoops = 0;
+UINT32 CommandBase::disabledPeriodicLoops = 0;
+UINT32 CommandBase::telePeriodicLoops = 0;
+UINT32 CommandBase::testPeriodicLoops = 0;
+
 void CommandBase::init() {
     // Init single static instance of all of our subsystems.
 	shooter = new DiscShooter();
@@ -27,4 +39,11 @@ void CommandBase::init() {
 	hopper = new Hopper();
 	tilt = new Tilt();
 	oi = new OI();
+	
+	// Init static instances of our Driverstation variables.
+	ds = DriverStation::GetInstance();
+	ds_lcd = DriverStationLCD::GetInstance();
+	
+//	ds_lcd->PrintfLine(DriverStationLCD::kUser_Line1, "Gyro Done Initializing");
+//	ds_lcd->UpdateLCD();
 }

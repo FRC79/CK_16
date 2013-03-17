@@ -1,5 +1,6 @@
 #include "Tilt.h"
 #include "../RobotMap.h"
+#include "SmartDashboard/SmartDashboard.h"
 
 Tilt::Tilt() : Subsystem("Tilt")
 {
@@ -23,6 +24,7 @@ bool Tilt::IsTiltedUp()
 void Tilt::Set(bool tilted_up)
 {
 	TiltPiston->Set(tilted_up ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
+	SmartDashboard::PutBoolean(RobotMap::SHOOTER_TILTED_KEY, tilted_up); // send state to SmartDashboard
 	is_tilted_up = tilted_up;
 }
 

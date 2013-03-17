@@ -1,7 +1,7 @@
 #ifndef OPERATORTOGGLEHANGER_H
 #define OPERATORTOGGLEHANGER_H
 
-#include "../CommandBase.h"
+#include "../../CommandBase.h"
 
 /*
  * This command is allows for toggling of the hanging

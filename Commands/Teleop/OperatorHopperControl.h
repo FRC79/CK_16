@@ -1,7 +1,7 @@
 #ifndef OPERATORHOPPERCONTROL_H
 #define OPERATORHOPPERCONTROL_H
 
-#include "../CommandBase.h"
+#include "../../CommandBase.h"
 
 /* 
  * This class allows for hopper conrol during teleop

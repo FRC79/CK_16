@@ -35,6 +35,13 @@ CSVReader* RobotMap::PWM_CSV = NULL;
 // Analog Inputs
 	
 // PWMs
+ 
+// SmartDashboard Keys
+ std::string RobotMap::FOUND_KEY = ""; 
+ std::string RobotMap::AZIMUTH_KEY = ""; 
+ std::string RobotMap::RANGE_KEY = ""; 
+ std::string RobotMap::SHOOTER_TILTED_KEY = "";
+ 
 
 void RobotMap::init()
 {
@@ -72,7 +79,13 @@ void RobotMap::init()
 	
 	// Analog Inputs
 		
-	// PWMs suck
+	// PWMs
+	
+	// SmartDashboard Keys
+	FOUND_KEY = "found";
+	AZIMUTH_KEY = "azimuth";
+	RANGE_KEY = "range";
+	SHOOTER_TILTED_KEY = "shooter tilted";
 }
 
 

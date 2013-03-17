@@ -19,10 +19,10 @@
 
 class RobotMap
 {	
+public:
 	static const int PRESSURE_SWITCH_CHANNEL = 1;
 	static const int COMPRESSOR_RELAY_CHANNEL = 1;
 	
-public:
 	// Speed Controllers
 	static UINT8 FRONT_RIGHT_DRIVE_ID;
 	static UINT8 FRONT_LEFT_DRIVE_ID;
@@ -50,6 +50,12 @@ public:
 	// Analog Inputs
 		
 	// PWMs
+	
+	// SmartDashboard Keys
+	static std::string FOUND_KEY; 
+	static std::string AZIMUTH_KEY; 
+	static std::string RANGE_KEY; 
+	static std::string SHOOTER_TILTED_KEY;
 	
 	static void init();
 	

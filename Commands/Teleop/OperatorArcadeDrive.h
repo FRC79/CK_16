@@ -1,7 +1,7 @@
 #ifndef OPERATORARCADEDRIVE_H
 #define OPERATORARCADEDRIVE_H
 
-#include "../CommandBase.h"
+#include "../../CommandBase.h"
 
 /*
  * This command allows for Arcade Driving with the joystick.

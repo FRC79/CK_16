@@ -1,7 +1,7 @@
 #ifndef OPERATORTOGGLETILT_H
 #define OPERATORTOGGLETILT_H
 
-#include "../CommandBase.h"
+#include "../../CommandBase.h"
 
 /*
  * This command allows for toggling of the tilt piston

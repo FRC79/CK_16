@@ -1,7 +1,7 @@
 #ifndef OPERATORSHOOTERCONTROL_H
 #define OPERATORSHOOTERCONTROL_H
 
-#include "../CommandBase.h"
+#include "../../CommandBase.h"
 
 /*
  * This command allows for the control of the shooter
