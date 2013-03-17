@@ -30,7 +30,7 @@ CSVReader* RobotMap::PWM_CSV = NULL;
 //// Digital Inputs
  UINT8 RobotMap::LOAD_BEAM_SENSOR_ID = 0;
  UINT8 RobotMap::FIRE_BEAM_SENSOR_ID = 0;
- UINT8 RobotMap::CHECKER_BEAM_SENSOR_ID = 0;
+ UINT8 RobotMap::ROLLER_BEAM_SENSOR_ID = 0;
 	
 // Analog Inputs
 	
@@ -68,7 +68,7 @@ void RobotMap::init()
 //	// Digital Inputs
 	LOAD_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("TOP_BEAM_ID");
 	FIRE_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("BOTTOM_BEAM_ID");
-	CHECKER_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("FRONT_BEAM_ID");
+	ROLLER_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("FRONT_BEAM_ID");
 	
 	// Analog Inputs
 		

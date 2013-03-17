@@ -3,6 +3,12 @@
 
 #include "../CommandBase.h"
 
+/* 
+ * This class allows for hopper conrol during teleop
+ * including the use of the roller motor, the load piston,
+ * and the beam sensors to let us know if our hopper is full.
+ */
+
 class OperatorHopperControl : public CommandBase
 {
 public:
@@ -14,7 +20,7 @@ public:
 	virtual void Interrupted();
 
 private:
-	
+	static const float ROLLER_POWER = 0.5;
 };
 
 #endif

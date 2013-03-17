@@ -3,6 +3,12 @@
 
 #include "../CommandBase.h"
 
+/*
+ * This command allows for the control of the shooter
+ * during teleop mode. The user can control the fire piston
+ * and the shooter wheels.
+ */
+
 class OperatorShooterControl : public CommandBase
 {
 public:

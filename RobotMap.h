@@ -45,7 +45,7 @@ public:
 //	// Digital Inputs
 	static UINT8 LOAD_BEAM_SENSOR_ID;
 	static UINT8 FIRE_BEAM_SENSOR_ID;
-	static UINT8 CHECKER_BEAM_SENSOR_ID;
+	static UINT8 ROLLER_BEAM_SENSOR_ID;
 		
 	// Analog Inputs
 		

@@ -8,9 +8,9 @@ Hopper::Hopper() : Subsystem("Hopper")
 	Roller = new CANJaguar(RobotMap::ROLLER_MOTOR_ID);
 	LoadPiston = new Solenoid(RobotMap::HOPPER_LOAD_PISTON_ID);
 	LoadBeam = new DigitalInput(RobotMap::LOAD_BEAM_SENSOR_ID);
-	CheckerBeam = new DigitalInput(RobotMap::CHECKER_BEAM_SENSOR_ID);
+	RollerBeam = new DigitalInput(RobotMap::ROLLER_BEAM_SENSOR_ID);
 	
-	Is_Extended = false; // Prevent explosions
+	is_extended = false; // Prevent explosions
 }
 
 Hopper::~Hopper()
@@ -18,16 +18,24 @@ Hopper::~Hopper()
 	delete Roller;
 	delete LoadPiston;
 	delete LoadBeam;
-	delete CheckerBeam;
+	delete RollerBeam;
+}
+
+void Hopper::SetRollerMotor(float power){
+	Roller->Set(power);
+}
+
+void Hopper::StopRollerMotor(){
+	Roller->Set(0.0);
 }
 
 bool Hopper::IsLoadPistonExtended() {
-	return Is_Extended;
+	return is_extended;
 }
 
 void Hopper::SetLoadPiston(bool piston_state) {
 	LoadPiston->Set(piston_state);
-	Is_Extended = piston_state;
+	is_extended = piston_state;
 }
 
 void Hopper::InvertCurrentLoadPistonState() {
@@ -44,24 +52,24 @@ void Hopper::RetractLoadPiston() {
 
 /* Extends and then retracts the load piston after a 
  * certain period of time. */
-void Hopper::FireThenRetract(double wait_time = PISTON_DELAY_TIME) {
+void Hopper::FireThenRetractLoadPiston(double wait_time = PISTON_DELAY_TIME) {
 	ExtendLoadPiston();
 	Wait(wait_time);
 	RetractLoadPiston();
 }
 
-bool Hopper::IsDiscReadyToBePunched() {
+bool Hopper::IsDiscReadyToBePunchedDown() {
 	return (LoadBeam->Get() == BROKEN);
 }
 
 
-bool Hopper::IsDiscReadyToBeRolledIn() {
-	return (CheckerBeam->Get() == SOLID);
+bool Hopper::IsDiscUnderneathRollers() {
+	return (RollerBeam->Get() == BROKEN);
 }
 
 
-bool Hopper::IsHopperFull() {
-	return (IsDiscReadyToBePunched() && IsDiscReadyToBeRolledIn());
+bool Hopper::IsFull() {
+	return (IsDiscReadyToBePunchedDown() && IsDiscUnderneathRollers());
 }
 
 

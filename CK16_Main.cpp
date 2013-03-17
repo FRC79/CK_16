@@ -1,18 +1,14 @@
 #include "WPILib.h"
 #include "Commands/Command.h"
 
-#include "Commands/OperatorArcadeDrive.h"
-#include "Commands/OperatorShooterControl.h"
-#include "Commands/OperatorToggleTilt.h"
-#include "Commands/OperatorToggleHanger.h"
+#include "Commands/OperatorControl.h"
 
 #include "RobotMap.h"
 #include "CommandBase.h"
 
 class CK16_Main : public IterativeRobot {
 private:
-	Command *autonomousCommand, *operatorArcadeDriving, *operatorToggleHanger,
-		*operatorToggleTilt, *operatorShooterControl;
+	Command *teleopCommand;
 	LiveWindow *lw;
 	
 	virtual void RobotInit() {
@@ -20,11 +16,7 @@ private:
 		CommandBase::init(); // Init subsystems and values in CommandBase
 		
 		// Init Commands
-		operatorArcadeDriving = new OperatorArcadeDrive();
-		operatorToggleHanger = new OperatorToggleHanger();
-		operatorToggleTilt = new OperatorToggleTilt();
-		operatorShooterControl = new OperatorShooterControl();
-//		autonomousCommand = new ExampleCommand();
+		teleopCommand = new OperatorControl();
 //		lw = LiveWindow::GetInstance();
 	}
 	
@@ -47,10 +39,7 @@ private:
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
 //		autonomousCommand->Cancel();
-		Scheduler::GetInstance()->AddCommand(operatorArcadeDriving);
-		Scheduler::GetInstance()->AddCommand(operatorShooterControl);
-		Scheduler::GetInstance()->AddCommand(operatorToggleTilt);
-		Scheduler::GetInstance()->AddCommand(operatorToggleHanger);
+		teleopCommand->Start();
 	}
 	
 	virtual void TeleopPeriodic() 
@@ -59,8 +48,7 @@ private:
 		CommandBase::oi->GetButtonHelper1()->Update();
 		CommandBase::oi->GetButtonHelper2()->Update();
 		
-		Scheduler::GetInstance()->Run(); // Periodically run the Scheduler
-		
+		Scheduler::GetInstance()->Run(); // Periodically runs teleop command group
 	}
 	
 	virtual void TestPeriodic() {
