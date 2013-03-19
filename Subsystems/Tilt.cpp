@@ -8,7 +8,7 @@ Tilt::Tilt() : Subsystem("Tilt")
 	TiltPiston = new DoubleSolenoid(RobotMap::TILT_PISTON_IN_ID, 
 			RobotMap::TILT_PISTON_OUT_ID);
 	
-	is_tilted_up = false;
+	is_tilted_up = true;
 }
 
 Tilt::~Tilt()

@@ -20,7 +20,7 @@ public:
 	virtual void Interrupted();
 
 private:
-	static const float ROLLER_POWER = 0.5;
+	float roller_power;
 };
 
 #endif

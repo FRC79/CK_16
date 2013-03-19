@@ -1,7 +1,7 @@
 #include "WPILib.h"
 #include "Commands/Command.h"
 
-#include "Commands/Auto/FrontPyrShoot.h"
+#include "Commands/Auto/TestDrive.h"
 #include "Commands/Teleop/OperatorControl.h"
 #include "Commands/FillAirTanks.h"
 
@@ -18,7 +18,7 @@ private:
 		CommandBase::init(); // Init subsystems and values in CommandBase
 		
 		// Init Commands
-		autonCommand = new FrontPyrShoot();
+		autonCommand = new TestDrive();
 		teleopCommand = new OperatorControl();
 		compressorCommand = new FillAirTanks();
 //		lw = LiveWindow::GetInstance();
@@ -30,7 +30,7 @@ private:
 	void CancelAllCommands(){
 		autonCommand->Cancel();
 		teleopCommand->Cancel();
-//		compressorCommand->Cancel();  // I don't think we need to cancel this.
+		compressorCommand->Cancel();  // I don't think we need to cancel this.
 	}
 	
 	virtual void DisabledInit(){

@@ -20,7 +20,7 @@ public:
 	virtual void Interrupted();
 	
 private:
-	static float shooter_power;
+	float shooter_power;
 	bool wheels_spinning;
 };
 

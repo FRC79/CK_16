@@ -3,6 +3,8 @@
 OperatorHopperControl::OperatorHopperControl()
 {
 	Requires(hopper);
+	
+	roller_power = 0.5;
 }
 
 // Called just before this Command runs the first time
@@ -17,12 +19,12 @@ void OperatorHopperControl::Execute()
 	if(oi->GetOperatorGamepad2()->GetRawButton(7))
 	{
 		// Roll out (reverse) rollers and push out discs.
-		hopper->SetRollerMotor(-ROLLER_POWER);
+		hopper->SetRollerMotor(-roller_power);
 	}
 	else if(oi->GetOperatorGamepad2()->GetRawButton(3) && !hopper->IsFull())
 	{
 		// Pull in discs until the hopper is full.
-		hopper->SetRollerMotor(ROLLER_POWER);
+		hopper->SetRollerMotor(roller_power);
 	}
 	else
 	{
