@@ -1,7 +1,7 @@
 #include "WPILib.h"
 #include "Commands/Command.h"
 
-#include "Commands/Auto/TestDrive.h"
+#include "Commands/Auto/DriveToFrontAndShoot.h"
 #include "Commands/Teleop/OperatorControl.h"
 #include "Commands/FillAirTanks.h"
 
@@ -18,7 +18,7 @@ private:
 		CommandBase::init(); // Init subsystems and values in CommandBase
 		
 		// Init Commands
-		autonCommand = new TestDrive();
+		autonCommand = new DriveToFrontAndShoot();
 		teleopCommand = new OperatorControl();
 		compressorCommand = new FillAirTanks();
 //		lw = LiveWindow::GetInstance();

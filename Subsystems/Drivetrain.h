@@ -12,13 +12,15 @@ public:
 	Drivetrain();
 	~Drivetrain();
 	
-	typedef enum {kForward = 1, kReverse = -1} Direction;
+	typedef enum {kFrontRight, kFrontLeft, kRearRight, kRearLeft} Motor;
 	
 	void InitDefaultCommand();
 	
 	void ArcadeDrive(float power, float rot);
+	
 	void SetLeftAndRightMotorOutputs(float left_power, float right_power);
-	void DriveDistance(double distance_in_inches, Direction direction);
+	void SetMotorOutputs(float power);
+	double GetPosition(Motor encoder_motor);
 	
 private:
 	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;

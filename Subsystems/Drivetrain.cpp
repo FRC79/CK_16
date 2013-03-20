@@ -29,16 +29,31 @@ void Drivetrain::SetLeftAndRightMotorOutputs(float left_power, float right_power
 	RoboDrive->SetLeftRightMotorOutputs(left_power, right_power); // Left and right sides
 }
 
-/* Drives straight until encoder tics are reached. */
-void Drivetrain::DriveDistance(double distance_in_inches, Direction direction)
+void Drivetrain::SetMotorOutputs(float power)
 {
-	double directionCoeff , revs, tics, motorOut;
-	directionCoeff = direction;
-	revs = /*distance_in_inches*/ 12.0 / WHEEL_CIRCUMFERENCE;
-	tics = revs * TICS_PER_REV;
-	motorOut = /*Front_L->GetPosition()*/ 100.0 /* * directionCoeff*/ / tics;
-	printf("Motor Ouput: %f\n", motorOut);
-//	SetLeftAndRightMotorOutputs(motorOut, motorOut);
+	SetLeftAndRightMotorOutputs(power, power);
+}
+
+/* Get encoder value for the specified motor */
+double Drivetrain::GetPosition(Motor encoder_motor)
+{
+	switch(encoder_motor){
+	case kFrontRight:
+		return Front_R->GetPosition();
+		break;
+	case kFrontLeft:
+		return Front_L->GetPosition();
+		break;
+	case kRearRight:
+		return Rear_R->GetPosition();
+		break;
+	case kRearLeft:
+		return Rear_L->GetPosition();
+		break;
+	default:
+		return 0.0;
+		break;
+	}
 }
 
 void Drivetrain::InitDefaultCommand()
