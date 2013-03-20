@@ -4,7 +4,7 @@
 #include "../CommandBase.h"
 
 /* This command handles turning the robot's base around
- * its center of rotation using feedback from encoders
+ * its center of rotation using feedback from gyro
  * to tell how much the robot has turned. */
 
 class PointTurn : public CommandBase 
@@ -22,9 +22,7 @@ public:
 	
 private:
 	float directionCoeff;
-	double distInInches;
-	double revs;
-	double tics;
+	float finalAngle;
 	float motorOut;
 	bool finished_turning;
 };

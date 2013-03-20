@@ -33,6 +33,7 @@ CSVReader* RobotMap::PWM_CSV = NULL;
  UINT8 RobotMap::ROLLER_BEAM_SENSOR_ID = 0;
 	
 // Analog Inputs
+ UINT8 RobotMap::TURN_GYRO_ID = 0;
 	
 // PWMs
  
@@ -78,6 +79,7 @@ void RobotMap::init()
 	ROLLER_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("FRONT_BEAM_ID");
 	
 	// Analog Inputs
+	TURN_GYRO_ID = (UINT8)AnalogInputs_CSV->GetValue("YAW_GYRO_ID");
 		
 	// PWMs
 	

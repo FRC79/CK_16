@@ -9,6 +9,7 @@ Drivetrain::Drivetrain() : Subsystem("Drivetrain")
 	Rear_L = new CANJaguar(RobotMap::REAR_LEFT_DRIVE_ID);
 	
 	RoboDrive = new RobotDrive(Front_R, Front_L, Rear_R, Rear_L);
+	TurnGyro = new Gyro(RobotMap::TURN_GYRO_ID);
 }
 
 Drivetrain::~Drivetrain()
@@ -22,6 +23,11 @@ Drivetrain::~Drivetrain()
 void Drivetrain::ArcadeDrive(float power, float rot)
 {
 	RoboDrive->ArcadeDrive(power, rot, false); // Power and rotation
+}
+
+Gyro* Drivetrain::GetTurnGyro()
+{
+	return TurnGyro;
 }
 
 void Drivetrain::SetLeftAndRightMotorOutputs(float left_power, float right_power)

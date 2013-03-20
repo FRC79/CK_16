@@ -16,8 +16,6 @@
 #define TICS_PER_SHOOTER_REV 250
 #define WHEEL_CIRCUMFERENCE (6.0 * PI)
 #define INCHES_PER_TIC (-WHEEL_CIRCUMFERENCE)
-#define TURN_RADIUS 20.0							// THIS IS A DUMMIE VAL. NEEDS TO BE UPDATED.
-#define TURN_CIRCUMFERENCE (TURN_RADIUS * 2 * PI)
 
 class RobotMap
 {	
@@ -50,6 +48,7 @@ public:
 	static UINT8 ROLLER_BEAM_SENSOR_ID;
 		
 	// Analog Inputs
+	static UINT8 TURN_GYRO_ID;
 		
 	// PWMs
 	

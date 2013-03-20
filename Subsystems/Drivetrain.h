@@ -18,6 +18,7 @@ public:
 	
 	void ArcadeDrive(float power, float rot);
 	
+	Gyro* GetTurnGyro();
 	void SetLeftAndRightMotorOutputs(float left_power, float right_power);
 	void SetMotorOutputs(float power);
 	double GetPosition(Motor encoder_motor);

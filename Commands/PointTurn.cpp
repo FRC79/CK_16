@@ -7,9 +7,7 @@ PointTurn::PointTurn(float angle, TurnDirection direction)
 	Requires(drive);
 	
 	directionCoeff = (float)direction;
-	distInInches = TURN_CIRCUMFERENCE * angle / 360.0;
-	revs = distInInches / WHEEL_CIRCUMFERENCE;
-	tics = revs * TICS_PER_REV;
+	finalAngle = fabs(angle);
 	motorOut = 0.0;
 }
 
@@ -17,19 +15,22 @@ PointTurn::PointTurn(float angle, TurnDirection direction)
 void PointTurn::Initialize()
 {
 	finished_turning = false;
+	drive->GetTurnGyro()->Reset(); // Reset gyro to 0.0 heading
 }
 
 // Called repeatedly when this Command is scheduled to run
 void PointTurn::Execute()
 {
-	// Store the encoder tic readings from the encoders (absolute value only).
-	double encoderPos = fabs(drive->GetPosition(Drivetrain::kFrontLeft));
+	// Store the gyro current angle readings (absolute value only).
+	double gyroCurrentAngle = fabs(drive->GetTurnGyro()->GetAngle());
 	
-	// Check to see if we have turned enough.
-	if(encoderPos < tics)
+	// Check to see if we have reached our desired angle.
+	if(gyroCurrentAngle < finalAngle)
 	{
 		// Use P Loop to set our motor output according to how far we are.
-		motorOut = encoderPos * directionCoeff / tics;
+		// First, we figure out how far we've turned and inverse the amount
+		// since motor output is inversely proportional to degrees already turned.
+		motorOut = directionCoeff - (gyroCurrentAngle * directionCoeff / finalAngle);
 		drive->SetLeftAndRightMotorOutputs(motorOut, -motorOut);
 	}
 	else

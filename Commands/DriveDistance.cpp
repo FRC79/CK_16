@@ -7,7 +7,7 @@ DriveDistance::DriveDistance(double distance_in_inches, Direction direction)
 	Requires(drive);
 	
 	directionCoeff = (float)direction;
-	revs = distance_in_inches / WHEEL_CIRCUMFERENCE;
+	revs = fabs(distance_in_inches) / WHEEL_CIRCUMFERENCE;
 	tics = revs * TICS_PER_REV;
 	motorOut = 0.0;
 }
@@ -28,7 +28,9 @@ void DriveDistance::Execute()
 	if(encoderPos < tics)
 	{
 		// Use P Loop to set our motor output according to how far we are.
-		motorOut = encoderPos * directionCoeff / tics;
+		// For this, we find out how far we have driven and feed the inverse value to
+		// the motors because velocity is inversely proportional to the distance driven.
+		motorOut = directionCoeff - (encoderPos * directionCoeff / tics);
 		drive->SetMotorOutputs(motorOut);
 	}
 	else
