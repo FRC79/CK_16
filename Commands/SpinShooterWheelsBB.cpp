@@ -23,7 +23,12 @@ void SpinShooterWheelsBB::Initialize()
 }
 
 // Called repeatedly when this Command is scheduled to run
-void SpinShooterWheelsBB::Execute(){}
+void SpinShooterWheelsBB::Execute()
+{
+	// Calculate the motor outputs for the shooter wheels.
+	frontSpeed->Calculate();
+	backSpeed->Calculate();
+}
 
 // Make this return true when this Command no longer needs to run execute()
 bool SpinShooterWheelsBB::IsFinished()

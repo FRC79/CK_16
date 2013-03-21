@@ -26,17 +26,11 @@ void FrontPyrShoot::Execute()
 	
 	Wait(4.0);
 	
-	shooter->FireThenRetract(1.0); // Fire disc
+	shooter->FireThenRetract(); // Fire disc
 	
-	Wait(1.0); // wait for piston to retract
+	hopper->FireThenRetractLoadPiston(); // Load disc into chamber
 	
-	hopper->FireThenRetractLoadPiston(1.0); // Load disc into chamber
-	
-	Wait(1.0); // wait for piston to retract
-	
-	shooter->FireThenRetract(1.0); // Fire disc
-	
-	Wait(1.0); // wait for piston to retract
+	shooter->FireThenRetract(); // Fire disc
 	
 	shooter->StopMotors(); // Stop wheels
 	

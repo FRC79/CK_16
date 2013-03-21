@@ -30,8 +30,7 @@ void AutoLoad::Execute()
 		// If the fire piston isn't locked, punch the next disc into the fire chamber.
 		if(!RobotState::auto_load_piston_locked)
 		{
-			hopper->FireThenRetractLoadPiston(0.15);
-			Wait(0.15); // Wait for piston to retract.
+			hopper->FireThenRetractLoadPiston();
 		}
 	}
 }

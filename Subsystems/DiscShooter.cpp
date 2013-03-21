@@ -86,11 +86,12 @@ void DiscShooter::RetractFirePiston()
 
 /* Extends and then retracts the fire piston after a 
  * certain period of time. */
-void DiscShooter::FireThenRetract(double wait_time = PISTON_DELAY_TIME)
+void DiscShooter::FireThenRetract()
 {
 	ExtendFirePiston();
-	Wait(wait_time);
+	Wait(PISTON_DELAY_TIME);
 	RetractFirePiston();
+	Wait(PISTON_DELAY_TIME);
 }
 
 void DiscShooter::InitDefaultCommand()

@@ -52,10 +52,11 @@ void Hopper::RetractLoadPiston() {
 
 /* Extends and then retracts the load piston after a 
  * certain period of time. */
-void Hopper::FireThenRetractLoadPiston(double wait_time = PISTON_DELAY_TIME) {
+void Hopper::FireThenRetractLoadPiston() {
 	ExtendLoadPiston();
-	Wait(wait_time);
+	Wait(PISTON_DELAY_TIME);
 	RetractLoadPiston();
+	Wait(PISTON_DELAY_TIME);
 }
 
 bool Hopper::IsDiscReadyToBePunchedDown() {

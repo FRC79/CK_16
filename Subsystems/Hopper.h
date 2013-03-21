@@ -11,14 +11,17 @@ class Hopper : public Subsystem
 public:
 	Hopper();
 	~Hopper();
+	
 	void SetRollerMotor(float power);
 	void StopRollerMotor();
+	
 	bool IsLoadPistonExtended();
 	void SetLoadPiston(bool piston_state);
 	void InvertCurrentLoadPistonState();
 	void ExtendLoadPiston();
 	void RetractLoadPiston();
-	void FireThenRetractLoadPiston(double wait_time);
+	void FireThenRetractLoadPiston();
+	
 	bool IsDiscReadyToBePunchedDown();
 	bool IsDiscUnderneathRollers(); // These are some long function names but it will pay off in the end -SLC
 	bool IsFull();

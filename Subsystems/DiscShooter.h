@@ -25,7 +25,7 @@ public:
 	void InvertCurrentFirePistonState();
 	void ExtendFirePiston();
 	void RetractFirePiston();
-	void FireThenRetract(double wait_time);
+	void FireThenRetract();
 	
 private:
 	static const double PISTON_DELAY_TIME = 0.15; // in seconds
