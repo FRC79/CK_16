@@ -1,5 +1,6 @@
 #include "AutoLoad.h"
 #include "Timer.h"
+#include "../RobotState.h"
 
 AutoLoad::AutoLoad()
 {
@@ -9,22 +10,8 @@ AutoLoad::AutoLoad()
 // Called just before this Command runs the first time
 void AutoLoad::Initialize()
 {
-	fire_piston_locked = false;
-}
-
-bool AutoLoad::IsFirePistonLocked()
-{
-	return fire_piston_locked;
-}
-
-void AutoLoad::LockFirePiston()
-{
-	fire_piston_locked = true;
-}
-
-void AutoLoad::UnlockFirePiston()
-{
-	fire_piston_locked = false;
+	RobotState::auto_load_piston_locked = false;
+	RobotState::auto_loading = true;
 }
 
 // Called repeatedly when this Command is scheduled to run
@@ -41,7 +28,7 @@ void AutoLoad::Execute()
 		hopper->StopRollerMotor();
 		
 		// If the fire piston isn't locked, punch the next disc into the fire chamber.
-		if(!IsFirePistonLocked())
+		if(!RobotState::auto_load_piston_locked)
 		{
 			hopper->FireThenRetractLoadPiston(0.15);
 			Wait(0.15); // Wait for piston to retract.
@@ -52,7 +39,7 @@ void AutoLoad::Execute()
 // Make this return true when this Command no longer needs to run execute()
 bool AutoLoad::IsFinished()
 {
-	return false;
+	return !RobotState::auto_loading;
 }
 
 // Called once after isFinished returns true

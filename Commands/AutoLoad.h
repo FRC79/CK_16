@@ -16,13 +16,6 @@ public:
 	virtual bool IsFinished();
 	virtual void End();
 	virtual void Interrupted();
-	
-	bool IsFirePistonLocked();
-	void LockFirePiston();
-	void UnlockFirePiston();
-	
-private:
-	bool fire_piston_locked;
 };
 
 #endif
