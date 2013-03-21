@@ -31,7 +31,7 @@ void BangBang_Controller::CallCalculate(void *controller)
 
 BangBang_Controller::BangBang_Controller(CANJaguar *referenceMotor, float period)
 {
-	m_controlLoop = new Notifier(BangBang_Controller::CallCalculate, this);
+//	m_controlLoop = new Notifier(BangBang_Controller::CallCalculate, this);
 	
 	motor = referenceMotor;
 	enable = false;
@@ -39,12 +39,17 @@ BangBang_Controller::BangBang_Controller(CANJaguar *referenceMotor, float period
 	targetSpeed = 0.0;
 	m_period = period;
 	
-	m_controlLoop->StartPeriodic(m_period);
+//	m_controlLoop->StartPeriodic(m_period);
 }
 
 void BangBang_Controller::Set(float controlVelocity)
 {
 	targetSpeed = controlVelocity;
+}
+
+float BangBang_Controller::Get()
+{
+	return motor->GetSpeed();
 }
 
 void BangBang_Controller::Enable()

@@ -8,13 +8,18 @@
 class DiscShooter : public Subsystem
 {
 public:
+	
+	typedef enum {kFront, kBack} ShooterWheel;
+	
 	DiscShooter();
 	~DiscShooter();
 	void InitDefaultCommand();
 	
+	CANJaguar* GetShooterWheel(ShooterWheel wheel);
 	void SetFrontAndBackMotorOutputs(float front_power, float back_power);
 	void SetMotorOutputs(float power);
 	void StopMotors();
+	
 	bool IsFirePistonExtended();
 	void SetFirePiston(bool piston_state);
 	void InvertCurrentFirePistonState();

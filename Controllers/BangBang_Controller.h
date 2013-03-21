@@ -23,6 +23,7 @@ public:
     void Calculate();
     BangBang_Controller(CANJaguar *referenceMotor, float period=0.05);
     void Set(float controlVelocity);
+    float Get();
     void Enable();
     void Disable();
     void Reverse();

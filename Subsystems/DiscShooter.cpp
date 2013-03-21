@@ -25,6 +25,21 @@ DiscShooter::~DiscShooter()
 	delete FirePiston;
 }
 
+CANJaguar* DiscShooter::GetShooterWheel(ShooterWheel wheel)
+{
+	switch(wheel){
+	case kFront:
+		return FrontShooterWheel;
+		break;
+	case kBack:
+		return BackShooterWheel;
+		break;
+	default:
+		return NULL;
+		break;
+	}
+}
+
 /* Only sets an individual power rating to each jag (open loop). */
 void DiscShooter::SetFrontAndBackMotorOutputs(float front_power, float back_power)
 {
