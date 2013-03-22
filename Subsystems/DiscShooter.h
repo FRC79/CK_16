@@ -4,7 +4,6 @@
 #include "Commands/Subsystem.h"
 #include "CANJaguar.h"
 #include "Solenoid.h"
-#include "../RobotMap.h"
 
 class DiscShooter : public Subsystem
 {

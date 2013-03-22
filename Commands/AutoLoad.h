@@ -16,6 +16,9 @@ public:
 	virtual bool IsFinished();
 	virtual void End();
 	virtual void Interrupted();
+	
+private:
+	double roller_power;
 };
 
 #endif

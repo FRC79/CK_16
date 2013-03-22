@@ -1,10 +1,11 @@
 #include "OperatorShooterControl.h"
+#include "../../RobotMap.h"
 
 OperatorShooterControl::OperatorShooterControl()
 {
 	Requires(shooter);
 	
-	shooter_power = -0.60; // 60%
+	shooter_power = RobotMap::SHOOTER_POWER;
 	wheels_spinning = false;
 }
 

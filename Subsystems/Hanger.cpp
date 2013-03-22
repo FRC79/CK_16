@@ -27,8 +27,6 @@ void Hanger::Set(bool extend_state)
 {
 	HangPiston_A->Set(extend_state ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
 	HangPiston_B->Set(!extend_state ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
-	// PROBABLY NEED TO ADD A DELAY IN HERE SINCE
-	// IT TAKES SOME TIME TO CHANGE POSTION.
 	is_extended = extend_state;
 }
 

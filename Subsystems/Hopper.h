@@ -5,7 +5,6 @@
 #include "CANJaguar.h"
 #include "Solenoid.h"
 #include "DigitalInput.h"
-#include "../RobotMap.h"
 
 class Hopper : public Subsystem
 { 

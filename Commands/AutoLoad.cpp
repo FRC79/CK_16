@@ -1,10 +1,13 @@
 #include "AutoLoad.h"
 #include "Timer.h"
+#include "../RobotMap.h"
 #include "../RobotState.h"
 
 AutoLoad::AutoLoad()
 {
 	Requires(hopper);
+	
+	roller_power = RobotMap::ROLLER_POWER;
 }
 
 // Called just before this Command runs the first time
@@ -20,7 +23,7 @@ void AutoLoad::Execute()
 	// Roll the rollers until the hopper is full
 	if(!hopper->IsFull())
 	{
-		hopper->SetRollerMotor(0.5);
+		hopper->SetRollerMotor(roller_power);
 	}
 	else
 	{

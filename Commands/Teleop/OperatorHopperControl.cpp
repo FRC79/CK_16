@@ -1,10 +1,11 @@
 #include "OperatorHopperControl.h"
+#include "../../RobotMap.h"
 
 OperatorHopperControl::OperatorHopperControl()
 {
 	Requires(hopper);
 	
-	roller_power = 0.5;
+	roller_power = RobotMap::ROLLER_POWER;
 }
 
 // Called just before this Command runs the first time

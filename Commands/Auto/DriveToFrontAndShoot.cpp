@@ -3,7 +3,7 @@
 
 DriveToFrontAndShoot::DriveToFrontAndShoot() : CommandGroup("DriveToFrontAndShoot")
 {
-	AddParallel(new SpinShooterWheelsBB(3500.0)); // Start continuously spinning shooter wheels
+	AddParallel(new SpinShooterWheelsBB(RobotMap::SHOOTER_SPEED)); // Start continuously spinning shooter wheels
 	AddSequential(new DriveDistance(RobotMap::DRIVE_DISTANCE_TO_GOAL, DriveDistance::kForward)); // Drive forward to goal
 	AddParallel(new AutoLoad()); // Start continuously autoloading	
 	AddSequential(new FireDisc()); // Fire Disc 1

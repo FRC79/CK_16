@@ -6,7 +6,7 @@ CSVReader* RobotMap::CAN_IDS_CSV = NULL;
 CSVReader* RobotMap::DigitalIO_CSV = NULL;
 CSVReader* RobotMap::Solenoid_CSV = NULL;
 CSVReader* RobotMap::PWM_CSV = NULL;
-CSVReader* RobotMap::ROBOT_CONFIG_CSV = NULL;
+CSVReader* RobotMap::RobotConfig_CSV = NULL;
 
 // Initialize ids to 0. (Take note of this when you are debugging.)
 // Speed Controllers
@@ -39,11 +39,12 @@ CSVReader* RobotMap::ROBOT_CONFIG_CSV = NULL;
 // PWMs
 
 // RobotConfig
-double RobotMap::PISTON_DELAY_TIME = 0;
-double RobotMap::SHOOTER_SPEED = 0;
-double RobotMap::SHOOTER_POWER = 0;
-double RobotMap::DRIVE_DISTANCE_TO_GOAL = 0;
-double RobotMap::DRIVE_DISTANCE_TO_HALFCOURT = 0;
+double RobotMap::PISTON_DELAY_TIME = 0.0;
+double RobotMap::SHOOTER_SPEED = 0.0;
+double RobotMap::SHOOTER_POWER = 0.0;
+double RobotMap::ROLLER_POWER = 0.0;
+double RobotMap::DRIVE_DISTANCE_TO_GOAL = 0.0;
+double RobotMap::DRIVE_DISTANCE_TO_HALFCOURT = 0.0;
 
  
 // SmartDashboard Keys
@@ -61,7 +62,7 @@ void RobotMap::init()
 	DigitalIO_CSV = new CSVReader("DigitalIO.csv");
 	Solenoid_CSV = new CSVReader("Solenoid.csv");
 	PWM_CSV = new CSVReader("PWM.csv");
-	ROBOT_CONFIG_CSV = new CSVReader("RobotConfig.csv");
+	RobotConfig_CSV = new CSVReader("RobotConfig.csv");
 	
 	// Init RobotMap ids
 	// Speed Controllers
@@ -94,11 +95,12 @@ void RobotMap::init()
 	// PWMs
 	
 	//RobotConfig
-	PISTON_DELAY_TIME = ROBOT_CONFIG_CSV->GetValue("PISTON_DELAY_TIME");
-	SHOOTER_SPEED = ROBOT_CONFIG_CSV->GetValue("SHOOTER_SPEED");
-	SHOOTER_POWER = ROBOT_CONFIG_CSV->GetValue("SHOTER_POWER");
-	DRIVE_DISTANCE_TO_GOAL = ROBOT_CONFIG_CSV->GetValue("DRIVE_DISTANCE_TO_GOAL");
-	DRIVE_DISTANCE_TO_HALFCOURT = ROBOT_CONFIG_CSV->GetValue("DRIVE_DISTANCE_TO_HALFCOURT");
+	PISTON_DELAY_TIME = RobotConfig_CSV->GetValue("PISTON_DELAY_TIME");
+	SHOOTER_SPEED = RobotConfig_CSV->GetValue("SHOOTER_SPEED");
+	SHOOTER_POWER = RobotConfig_CSV->GetValue("SHOTER_POWER");
+	ROLLER_POWER = RobotConfig_CSV->GetValue("ROLLER_POWER");
+	DRIVE_DISTANCE_TO_GOAL = RobotConfig_CSV->GetValue("DRIVE_DISTANCE_TO_GOAL");
+	DRIVE_DISTANCE_TO_HALFCOURT = RobotConfig_CSV->GetValue("DRIVE_DISTANCE_TO_HALFCOURT");
 		 
 	// SmartDashboard Keys
 	FOUND_KEY = "found";
