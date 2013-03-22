@@ -8,6 +8,7 @@ DiscShooter::DiscShooter() : Subsystem("DiscShooter")
 	FrontShooterWheel = new CANJaguar(RobotMap::FRONT_SHOOTER_WHEEL_ID);
 	BackShooterWheel = new CANJaguar(RobotMap::BACK_SHOOTER_WHEEL_ID);
 	FirePiston = new Solenoid(RobotMap::SHOOTER_FIRE_PISTON_ID);
+	piston_delay_time = RobotMap::PISTON_DELAY_TIME;
 	
 	// Setup encoders on the Jags
 	FrontShooterWheel->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
@@ -89,9 +90,9 @@ void DiscShooter::RetractFirePiston()
 void DiscShooter::FireThenRetract()
 {
 	ExtendFirePiston();
-	Wait(PISTON_DELAY_TIME);
+	Wait(piston_delay_time);
 	RetractFirePiston();
-	Wait(PISTON_DELAY_TIME);
+	Wait(piston_delay_time);
 }
 
 void DiscShooter::InitDefaultCommand()

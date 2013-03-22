@@ -4,6 +4,7 @@
 #include "Commands/Subsystem.h"
 #include "CANJaguar.h"
 #include "Solenoid.h"
+#include "../RobotMap.h"
 
 class DiscShooter : public Subsystem
 {
@@ -28,7 +29,7 @@ public:
 	void FireThenRetract();
 	
 private:
-	static const double PISTON_DELAY_TIME = 0.15; // in seconds
+	double piston_delay_time;
 	bool is_fire_piston_extended;
 	CANJaguar *FrontShooterWheel, *BackShooterWheel;
 	Solenoid *FirePiston;

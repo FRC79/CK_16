@@ -9,6 +9,7 @@ Hopper::Hopper() : Subsystem("Hopper")
 	LoadPiston = new Solenoid(RobotMap::HOPPER_LOAD_PISTON_ID);
 	LoadBeam = new DigitalInput(RobotMap::LOAD_BEAM_SENSOR_ID);
 	RollerBeam = new DigitalInput(RobotMap::ROLLER_BEAM_SENSOR_ID);
+	piston_delay_time = RobotMap::PISTON_DELAY_TIME;
 	
 	is_extended = false; // Prevent explosions
 }
@@ -54,9 +55,9 @@ void Hopper::RetractLoadPiston() {
  * certain period of time. */
 void Hopper::FireThenRetractLoadPiston() {
 	ExtendLoadPiston();
-	Wait(PISTON_DELAY_TIME);
+	Wait(piston_delay_time);
 	RetractLoadPiston();
-	Wait(PISTON_DELAY_TIME);
+	Wait(piston_delay_time);
 }
 
 bool Hopper::IsDiscReadyToBePunchedDown() {

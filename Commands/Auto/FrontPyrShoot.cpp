@@ -1,5 +1,6 @@
 #include "FrontPyrShoot.h"
 #include "Timer.h"
+#include "../../RobotMap.h"
 
 FrontPyrShoot::FrontPyrShoot()
 {
@@ -7,7 +8,7 @@ FrontPyrShoot::FrontPyrShoot()
 	Requires(shooter);
 	Requires(tilt);
 	
-	shooter_power = -0.6;
+	shooter_power = RobotMap::SHOOTER_POWER;
 	is_finished = false;
 }
 
