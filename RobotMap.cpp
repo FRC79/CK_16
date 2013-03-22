@@ -6,6 +6,7 @@ CSVReader* RobotMap::CAN_IDS_CSV = NULL;
 CSVReader* RobotMap::DigitalIO_CSV = NULL;
 CSVReader* RobotMap::Solenoid_CSV = NULL;
 CSVReader* RobotMap::PWM_CSV = NULL;
+CSVReader* RobotMap::ROBOT_CONFIG_CSV = NULL;
 
 // Initialize ids to 0. (Take note of this when you are debugging.)
 // Speed Controllers
@@ -36,6 +37,14 @@ CSVReader* RobotMap::PWM_CSV = NULL;
  UINT8 RobotMap::TURN_GYRO_ID = 0;
 	
 // PWMs
+
+// RobotConfig
+double RobotMap::PISTON_DELAY_TIME = 0;
+double RobotMap::SHOOTER_SPEED = 0;
+double RobotMap::SHOOTER_POWER = 0;
+double RobotMap::DRIVE_DISTANCE_TO_GOAL = 0;
+double RobotMap::DRIVE_DISTANCE_TO_HALFCOURT = 0;
+
  
 // SmartDashboard Keys
  std::string RobotMap::FOUND_KEY = ""; 
@@ -52,6 +61,7 @@ void RobotMap::init()
 	DigitalIO_CSV = new CSVReader("DigitalIO.csv");
 	Solenoid_CSV = new CSVReader("Solenoid.csv");
 	PWM_CSV = new CSVReader("PWM.csv");
+	ROBOT_CONFIG_CSV = new CSVReader("RobotConfig.csv");
 	
 	// Init RobotMap ids
 	// Speed Controllers
@@ -74,15 +84,22 @@ void RobotMap::init()
 	HANG_PISTON_B_OUT_ID = (UINT8)Solenoid_CSV->GetValue("HANG_B_OUT_ID");
 //	
 //	// Digital Inputs
-	LOAD_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("TOP_BEAM_ID");
-	FIRE_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("BOTTOM_BEAM_ID");
-	ROLLER_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("FRONT_BEAM_ID");
+	LOAD_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("LOAD_BEAM_ID");
+	FIRE_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("FIRE_BEAM_ID");
+	ROLLER_BEAM_SENSOR_ID = (UINT8)DigitalIO_CSV->GetValue("ROLLER_BEAM_ID");
 	
 	// Analog Inputs
 	TURN_GYRO_ID = (UINT8)AnalogInputs_CSV->GetValue("YAW_GYRO_ID");
 		
 	// PWMs
 	
+	//RobotConfig
+	PISTON_DELAY_TIME = ROBOT_CONFIG_CSV->GetValue("PISTON_DELAY_TIME");
+	SHOOTER_SPEED = ROBOT_CONFIG_CSV->GetValue("SHOOTER_SPEED");
+	SHOOTER_POWER = ROBOT_CONFIG_CSV->GetValue("SHOTER_POWER");
+	DRIVE_DISTANCE_TO_GOAL = ROBOT_CONFIG_CSV->GetValue("DRIVE_DISTANCE_TO_GOAL");
+	DRIVE_DISTANCE_TO_HALFCOURT = ROBOT_CONFIG_CSV->GetValue("DRIVE_DISTANCE_TO_HALFCOURT");
+		 
 	// SmartDashboard Keys
 	FOUND_KEY = "found";
 	AZIMUTH_KEY = "azimuth";

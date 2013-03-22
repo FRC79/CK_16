@@ -52,6 +52,13 @@ public:
 		
 	// PWMs
 	
+	// RobotConfig
+	static double PISTON_DELAY_TIME;
+	static double SHOOTER_SPEED;
+	static double SHOOTER_POWER;
+	static double DRIVE_DISTANCE_TO_GOAL;
+	static double DRIVE_DISTANCE_TO_HALFCOURT;
+		
 	// SmartDashboard Keys
 	static std::string FOUND_KEY; 
 	static std::string AZIMUTH_KEY; 
@@ -62,7 +69,7 @@ public:
 	
 private:
 	static CSVReader *PWM_CSV, *AnalogInputs_CSV, 
-		*DigitalIO_CSV, *Solenoid_CSV, *CAN_IDS_CSV;
+		*DigitalIO_CSV, *Solenoid_CSV, *CAN_IDS_CSV, *ROBOT_CONFIG_CSV;
 };
 
 #endif
