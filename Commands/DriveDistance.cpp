@@ -8,6 +8,7 @@ DriveDistance::DriveDistance(double distance_in_inches, Direction direction)
 	
 	directionCoeff = (float)direction;
 	revs_to_distance = fabs(distance_in_inches) / WHEEL_CIRCUMFERENCE;
+	prev_rev_compensation = -drive->GetPosition(Drivetrain::kFrontLeft); // Since we can't reset, we compensate
 	motorOut = 0.0;
 }
 
@@ -21,7 +22,7 @@ void DriveDistance::Initialize()
 void DriveDistance::Execute()
 {
 	// Store the encoder rev readings from the encoders (absolute value only).
-	double currentEncoderRevs = fabs(drive->GetPosition(Drivetrain::kFrontLeft));
+	double currentEncoderRevs = fabs(drive->GetPosition(Drivetrain::kFrontLeft) + prev_rev_compensation);
 	
 	// Check to see if we have reached our destination.
 	if(currentEncoderRevs < revs_to_distance)

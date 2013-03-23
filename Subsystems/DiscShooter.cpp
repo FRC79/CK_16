@@ -11,8 +11,8 @@ DiscShooter::DiscShooter() : Subsystem("DiscShooter")
 	piston_delay_time = RobotMap::PISTON_DELAY_TIME;
 	
 	// Setup encoders on the Jags
-	FrontShooterWheel->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
-	BackShooterWheel->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+	FrontShooterWheel->SetSpeedReference(CANJaguar::kSpeedRef_QuadEncoder);
+	BackShooterWheel->SetSpeedReference(CANJaguar::kSpeedRef_QuadEncoder);
 	FrontShooterWheel->ConfigEncoderCodesPerRev(TICS_PER_SHOOTER_REV);
 	BackShooterWheel->ConfigEncoderCodesPerRev(TICS_PER_SHOOTER_REV);
 	

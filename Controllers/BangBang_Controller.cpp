@@ -12,7 +12,7 @@ void BangBang_Controller::Calculate()
 	if(motor->GetSpeed() >= targetSpeed){
 		motor->Set(0.0);
 	} else {
-		motor->Set(reverse?-0.6:0.6);
+		motor->Set(reverse?-1.0:1.0);
 	}
 }
 

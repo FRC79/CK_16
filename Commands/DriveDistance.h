@@ -23,6 +23,7 @@ public:
 private:
 	float directionCoeff;
 	double revs_to_distance;
+	double prev_rev_compensation;
 	float motorOut;
 	bool finished_driving;
 };
