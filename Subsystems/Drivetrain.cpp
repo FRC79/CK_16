@@ -3,11 +3,25 @@
 
 Drivetrain::Drivetrain() : Subsystem("Drivetrain")
 {
+	// Init speed controllers
 	Front_R = new CANJaguar(RobotMap::FRONT_RIGHT_DRIVE_ID);
 	Front_L = new CANJaguar(RobotMap::FRONT_LEFT_DRIVE_ID);
 	Rear_R = new CANJaguar(RobotMap::REAR_RIGHT_DRIVE_ID);
 	Rear_L = new CANJaguar(RobotMap::REAR_LEFT_DRIVE_ID);
 	
+	// Set encoder position references for motors
+	Front_R->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+	Front_L->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+	Rear_R->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+	Rear_L->SetPositionReference(CANJaguar::kPosRef_QuadEncoder);
+	
+	// Set how many tics are in one revolution of the wheel
+	Front_R->ConfigEncoderCodesPerRev(TICS_PER_REV);
+	Front_L->ConfigEncoderCodesPerRev(TICS_PER_REV);
+	Rear_R->ConfigEncoderCodesPerRev(TICS_PER_REV);
+	Rear_L->ConfigEncoderCodesPerRev(TICS_PER_REV);
+	
+	// Init other components
 	RoboDrive = new RobotDrive(Front_R, Front_L, Rear_R, Rear_L);
 	TurnGyro = new Gyro(RobotMap::TURN_GYRO_ID);
 }

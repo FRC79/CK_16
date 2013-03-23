@@ -22,8 +22,7 @@ public:
 	
 private:
 	float directionCoeff;
-	double revs;
-	double tics;
+	double revs_to_distance;
 	float motorOut;
 	bool finished_driving;
 };

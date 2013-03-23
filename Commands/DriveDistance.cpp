@@ -7,8 +7,7 @@ DriveDistance::DriveDistance(double distance_in_inches, Direction direction)
 	Requires(drive);
 	
 	directionCoeff = (float)direction;
-	revs = fabs(distance_in_inches) / WHEEL_CIRCUMFERENCE;
-	tics = revs * TICS_PER_REV;
+	revs_to_distance = fabs(distance_in_inches) / WHEEL_CIRCUMFERENCE;
 	motorOut = 0.0;
 }
 
@@ -21,16 +20,16 @@ void DriveDistance::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void DriveDistance::Execute()
 {
-	// Store the encoder tic readings from the encoders (absolute value only).
-	double encoderPos = fabs(drive->GetPosition(Drivetrain::kFrontLeft));
+	// Store the encoder rev readings from the encoders (absolute value only).
+	double currentEncoderRevs = fabs(drive->GetPosition(Drivetrain::kFrontLeft));
 	
 	// Check to see if we have reached our destination.
-	if(encoderPos < tics)
+	if(currentEncoderRevs < revs_to_distance)
 	{
 		// Use P Loop to set our motor output according to how far we are.
 		// For this, we find out how far we have driven and feed the inverse value to
 		// the motors because velocity is inversely proportional to the distance driven.
-		motorOut = directionCoeff - (encoderPos * directionCoeff / tics);
+		motorOut = directionCoeff - (currentEncoderRevs * directionCoeff / revs_to_distance);
 		drive->SetMotorOutputs(motorOut);
 	}
 	else
