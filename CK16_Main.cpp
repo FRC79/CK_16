@@ -1,7 +1,10 @@
 #include "WPILib.h"
 #include "Commands/Command.h"
+#include "SmartDashboard/SmartDashboard.h"
+#include "SmartDashboard/SendableChooser.h"
 
 #include "Commands/Auto/DriveToFrontAndShoot.h"
+#include "Commands/Auto/FrontPyrShoot.h"
 #include "Commands/Teleop/OperatorControl.h"
 #include "Commands/FillAirTanks.h"
 
@@ -11,14 +14,20 @@
 class CK16_Main : public IterativeRobot {
 private:
 	Command *autonCommand, *teleopCommand, *compressorCommand;
+	SendableChooser *autonChooser;
 	LiveWindow *lw;
 	
 	virtual void RobotInit() {
 		RobotMap::init(); // Load CSV values into RobotMap
 		CommandBase::init(); // Init subsystems and values in CommandBase
 		
+		// Init Chooser to pick autonomous mode
+		autonChooser = new SendableChooser();
+		autonChooser->AddDefault("Drive to Front Shoot 3", new DriveToFrontAndShoot());
+		autonChooser->AddObject("From Front Shoot 2", new FrontPyrShoot());
+		SmartDashboard::PutData("Autonomous Mode Chooser", autonChooser);
+		
 		// Init Commands
-		autonCommand = new DriveToFrontAndShoot();
 		teleopCommand = new OperatorControl();
 		compressorCommand = new FillAirTanks();
 //		lw = LiveWindow::GetInstance();
@@ -61,6 +70,7 @@ private:
 	virtual void AutonomousInit() {
 		CancelAllCommands();	// Cancel all previously running commmands.
 		compressorCommand->Start();
+		autonCommand = (Command*)autonChooser->GetSelected(); // Dynamically load chosen auton
 		autonCommand->Start();
 		
 		printf("Auton Init Completed\n");

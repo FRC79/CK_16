@@ -16,8 +16,8 @@ SpinShooterWheelsBB::SpinShooterWheelsBB(float shooter_rpms)
 void SpinShooterWheelsBB::Initialize()
 {
 	// Start the control loops.
-	frontSpeed->Set(rpms);
-	backSpeed->Set(rpms);
+	frontSpeed->Set(rpms); // This is geared 1:2.5
+	backSpeed->Set(rpms / 2.5); // This is geared 1:1
 	frontSpeed->Enable();
 	backSpeed->Enable();
 }
