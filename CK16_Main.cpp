@@ -23,7 +23,10 @@ private:
 		
 		// Init Chooser to pick autonomous mode
 		autonChooser = new SendableChooser();
-		autonChooser->AddDefault("Drive to Front Shoot 3", new DriveToFrontAndShoot());
+		autonChooser->AddDefault("Drive to Front Shoot 3 (right)", 
+				new DriveToFrontAndShoot(DriveToFrontAndShoot::kRight));
+		autonChooser->AddObject("Drive to Front Shoot 3 (left)", 
+				new DriveToFrontAndShoot(DriveToFrontAndShoot::kLeft));
 		autonChooser->AddObject("From Front Shoot 2", new FrontPyrShoot());
 		SmartDashboard::PutData("Autonomous Mode Chooser", autonChooser);
 		
@@ -37,7 +40,9 @@ private:
 	}
 	
 	void CancelAllCommands(){
-		autonCommand->Cancel();
+		if(autonCommand != NULL){
+			autonCommand->Cancel();
+		}
 		teleopCommand->Cancel();
 		compressorCommand->Cancel();  // I don't think we need to cancel this.
 	}

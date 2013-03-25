@@ -1,21 +1,51 @@
 #include "PointTurn.h"
 #include "../RobotMap.h"
+#include "../RobotState.h"
 #include "Math.h"
+
+/* Constructor used for Goal Alignment. DO NOT USE FOR OTHER PURPOSES. */
+PointTurn::PointTurn()
+{
+	Requires(drive);
+	
+	motorOut = 0.0;
+	special_init = true; // Call for a special Camera Align init.
+}
+
+/* Initialize function for Goal Alignment ONLY. */
+void PointTurn::GoalAlignmentInit()
+{
+	// Determine which direction we need to turn and at what angle.
+	directionCoeff = RobotState::azimuth / fabs(RobotState::azimuth);
+	directionCoeff *= -1.0; // We need to go in the opposite direction of our offset to compensate.
+	finalAngle = fabs(RobotState::azimuth);
+}
 
 PointTurn::PointTurn(float angle, TurnDirection direction)
 {
 	Requires(drive);
 	
+	// Determine which direction we need to turn and at what angle.
 	directionCoeff = (float)direction;
 	finalAngle = fabs(angle);
 	motorOut = 0.0;
+	special_init = false; // We aren't using the Camera to align with goal.
+}
+
+void PointTurn::RegularInit()
+{
+	finished_turning = false;
+	drive->GetTurnGyro()->Reset(); // Reset gyro to 0.0 heading
 }
 
 // Called just before this Command runs the first time
 void PointTurn::Initialize()
 {
-	finished_turning = false;
-	drive->GetTurnGyro()->Reset(); // Reset gyro to 0.0 heading
+	RegularInit();
+	
+	if(special_init){
+		GoalAlignmentInit();
+	}
 }
 
 // Called repeatedly when this Command is scheduled to run

@@ -1,38 +1,7 @@
 #include "AlignWithGoal.h"
 
-AlignWithGoal::AlignWithGoal()
+AlignWithGoal::AlignWithGoal() : CommandGroup("AlignWithGoal")
 {
-	// Use Requires() here to declare subsystem dependencies
-	// eg. Requires(chassis);
-}
-
-// Called just before this Command runs the first time
-void AlignWithGoal::Initialize()
-{
-	
-}
-
-// Called repeatedly when this Command is scheduled to run
-void AlignWithGoal::Execute()
-{
-	
-}
-
-// Make this return true when this Command no longer needs to run execute()
-bool AlignWithGoal::IsFinished()
-{
-	return false;
-}
-
-// Called once after isFinished returns true
-void AlignWithGoal::End()
-{
-	
-}
-
-// Called when another command which requires one or more of the same
-// subsystems is scheduled to run
-void AlignWithGoal::Interrupted()
-{
-	
+	AddSequential(new FindGoal()); // Query the SmartDashboard for Vision Tracking results.
+	AddSequential(new PointTurn()); // Point turns to the desired angle to compensate for our offset.
 }

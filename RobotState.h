@@ -13,6 +13,11 @@ public:
 	static bool shooter_wheels_spinning;
 	static bool auto_load_piston_locked;
 	static bool auto_loading;
+	
+	// Vision Tracking Variables
+	static bool target_found;
+	static double azimuth;
+	static double range;
 };
 
 #endif

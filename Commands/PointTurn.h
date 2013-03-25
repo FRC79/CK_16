@@ -13,6 +13,7 @@ public:
 	
 	typedef enum {kClockwise = 1, kCounterClockwise = -1} TurnDirection;
 	
+	PointTurn(); // Only use this constructor if you are using Camera for alignment.
 	PointTurn(float angle, TurnDirection direction);
 	virtual void Initialize();
 	virtual void Execute();
@@ -21,6 +22,10 @@ public:
 	virtual void Interrupted();
 	
 private:
+	void RegularInit();
+	void GoalAlignmentInit();
+	
+	bool special_init;
 	float directionCoeff;
 	float finalAngle;
 	float motorOut;

@@ -13,7 +13,10 @@
 class DriveToFrontAndShoot : public CommandGroup
 {
 public:
-	DriveToFrontAndShoot();
+	
+	typedef enum {kLeft, kRight} StartingSide;
+	
+	DriveToFrontAndShoot(StartingSide side_of_pyr);
 };
 
 #endif

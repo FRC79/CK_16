@@ -9,6 +9,11 @@ SpinShooterWheelsBB::SpinShooterWheelsBB(float shooter_rpms)
 	// Init BangBang Controllers for each motor.
 	frontSpeed = new BangBang_Controller(shooter->GetShooterWheel(DiscShooter::kFront));
 	backSpeed = new BangBang_Controller(shooter->GetShooterWheel(DiscShooter::kBack));
+	
+	// Reverse BangBang Outputs to spin in the right direction.
+	frontSpeed->Reverse();
+	backSpeed->Reverse();
+	
 	rpms = shooter_rpms;
 }
 
