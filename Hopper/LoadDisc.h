@@ -1,20 +1,21 @@
-#ifndef STOPAUTOLOAD_H
-#define STOPAUTOLOAD_H
+#ifndef LOADDISC_H
+#define LOADDISC_H
 
 #include "../CommandBase.h"
+#include "../RobotState.h"
 
-/* This command handles stopping the auto loader. */
+/* Description */
 
-class StopAutoLoad : public CommandBase 
+class LoadDisc : public CommandBase 
 {
 public:
-	StopAutoLoad();
+	LoadDisc();
 	virtual void Initialize();
 	virtual void Execute();
 	virtual bool IsFinished();
 	virtual void End();
 	virtual void Interrupted();
-	
+
 private:
 	bool is_finished;
 };

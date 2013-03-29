@@ -1,24 +1,24 @@
-#ifndef BACKPYRSHOOT_H
-#define BACKPYRSHOOT_H
+#ifndef OPERATORHOPPER_H
+#define OPERATORHOPPER_H
 
 #include "../../CommandBase.h"
+#include "../../Hopper/AutoLoad.h"
 
 /* Description */
 
-class BackPyrShoot : public CommandBase 
+class OperatorHopper : public CommandBase 
 {
 public:
-	BackPyrShoot();
+	OperatorHopper();
 	virtual void Initialize();
 	virtual void Execute();
 	virtual bool IsFinished();
 	virtual void End();
 	virtual void Interrupted();
-	
+
 private:
-	bool is_finished;
-	float shooter_power;
-	float roller_power;
+	Command *autoLoad;
+	bool auto_loading;
 };
 
 #endif

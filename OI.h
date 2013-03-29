@@ -8,6 +8,7 @@ class OI {
 private:
 	Joystick *operatorGamepad1, *operatorGamepad2;
 	ButtonHelper *buttonHelper1, *buttonHelper2;
+	JoystickButton *autoLoadEnableButton;
 	
 public:
 	OI();

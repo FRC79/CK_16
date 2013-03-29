@@ -1,14 +1,15 @@
-#ifndef SETMOTOROUTPUTS_H
-#define SETMOTOROUTPUTS_H
+#ifndef RUNROLLERWITHBEAMS_H
+#define RUNROLLERWITHBEAMS_H
 
 #include "../CommandBase.h"
+#include "../RobotMap.h"
 
 /* Description */
 
-class SetMotorOutputs : public CommandBase 
+class RunRollerWithBeams : public CommandBase 
 {
 public:
-	SetMotorOutputs(float power);
+	RunRollerWithBeams();
 	virtual void Initialize();
 	virtual void Execute();
 	virtual bool IsFinished();
@@ -17,7 +18,7 @@ public:
 
 private:
 	bool is_finished;
-	float m_power;
+	float roller_power;
 };
 
 #endif
