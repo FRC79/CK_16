@@ -9,7 +9,7 @@ Hanger::Hanger() : Subsystem("Hanger")
 	HangPiston_B = new DoubleSolenoid(RobotMap::HANG_PISTON_B_IN_ID,
 			RobotMap::HANG_PISTON_B_OUT_ID);
 	
-	is_extended = false;
+	is_extended = true;
 }
 
 Hanger::~Hanger()

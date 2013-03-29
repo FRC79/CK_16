@@ -1,4 +1,5 @@
 #include "Drivetrain.h"
+#include "RobotDrive.h"
 #include "../RobotMap.h"
 
 Drivetrain::Drivetrain() : Subsystem("Drivetrain")
@@ -21,8 +22,16 @@ Drivetrain::Drivetrain() : Subsystem("Drivetrain")
 	Rear_R->ConfigEncoderCodesPerRev(TICS_PER_REV);
 	Rear_L->ConfigEncoderCodesPerRev(TICS_PER_REV);
 	
-	// Init other components
-	RoboDrive = new RobotDrive(Front_R, Front_L, Rear_R, Rear_L);
+	// Init RobotDrive
+	RoboDrive = new RobotDrive(Front_L, Rear_L, Front_R, Rear_R);
+	
+	// Invert motors
+	RoboDrive->SetInvertedMotor(RobotDrive::kFrontRightMotor, true);
+	RoboDrive->SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);
+	RoboDrive->SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
+	RoboDrive->SetInvertedMotor(RobotDrive::kRearRightMotor, true);
+	
+	// Init Gyro
 	TurnGyro = new Gyro(RobotMap::TURN_GYRO_ID);
 }
 

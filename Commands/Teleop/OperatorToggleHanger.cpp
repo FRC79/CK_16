@@ -13,7 +13,7 @@ void OperatorToggleHanger::Execute()
 {
 	// If the user toggled the hang button, the hang pistons change
 	// to the opposite position.
-	if(oi->GetButtonHelper1()->WasButtonToggled(1))
+	if(oi->GetButtonHelper1()->WasButtonToggled(6))
 	{
 		hanger->InverseCurrentState();
 	}

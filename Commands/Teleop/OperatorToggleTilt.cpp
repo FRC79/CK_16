@@ -13,7 +13,7 @@ void OperatorToggleTilt::Execute()
 {
 	// If either user toggles the tilt button, the tilt piston changes 
 	// to the opposite position.
-	if(oi->GetButtonHelper1()->WasButtonToggled(5) ||
+	if(oi->GetButtonHelper1()->WasButtonToggled(8) ||
 			oi->GetButtonHelper2()->WasButtonToggled(5))
 	{
 		tilt->InvertCurrentState();

@@ -1,29 +1,31 @@
-#include "FrontPyrShoot.h"
+#include "BackPyrShoot.h"
 #include "Timer.h"
 #include "../../RobotMap.h"
 
-FrontPyrShoot::FrontPyrShoot()
+BackPyrShoot::BackPyrShoot()
 {
 	Requires(hopper);
 	Requires(shooter);
 	Requires(tilt);
+	Requires(hanger);
 	
 	shooter_power = RobotMap::SHOOTER_POWER;
+	roller_power = RobotMap::ROLLER_POWER;
 	is_finished = false;
 }
 
-// Called just before this Command runs the first time
-void FrontPyrShoot::Initialize()
+void BackPyrShoot::Initialize()
 {
-	tilt->TiltUp();
+	hanger->Retract();
+	tilt->TiltDown();
 	is_finished = false;
 }
 
 // Called repeatedly when this Command is scheduled to run
-void FrontPyrShoot::Execute()
+void BackPyrShoot::Execute()
 {
 	Wait(0.25);
-	
+		
 	shooter->SetMotorOutputs(-shooter_power); // Spin up wheels
 	
 	Wait(4.0);
@@ -34,26 +36,36 @@ void FrontPyrShoot::Execute()
 	
 	shooter->FireThenRetract(); // Fire disc
 	
+	hopper->SetRollerMotor(roller_power);
+	
+	Wait(1.0);
+	
+	hopper->StopRollerMotor();
+	
+	hopper->FireThenRetractLoadPiston(); // Load disc into chamber
+		
+	shooter->FireThenRetract(); // Fire disc	
+	
 	shooter->StopMotors(); // Stop wheels
 	
 	is_finished = true;
 }
 
 // Make this return true when this Command no longer needs to run execute()
-bool FrontPyrShoot::IsFinished()
+bool BackPyrShoot::IsFinished()
 {
 	return is_finished;
 }
 
 // Called once after isFinished returns true
-void FrontPyrShoot::End()
+void BackPyrShoot::End()
 {
 	
 }
 
 // Called when another command which requires one or more of the same
 // subsystems is scheduled to run
-void FrontPyrShoot::Interrupted()
+void BackPyrShoot::Interrupted()
 {
 	
 }

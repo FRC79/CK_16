@@ -29,10 +29,14 @@ void AutoLoad::Execute()
 	{
 		// When it's full, stop the rollers.
 		hopper->StopRollerMotor();
-		
+	}
+	
+	if(hopper->IsDiscReadyToBePunchedDown())
+	{
 		// If the fire piston isn't locked, punch the next disc into the fire chamber.
-		if(!RobotState::auto_load_piston_locked)
+		if(!RobotState::auto_load_piston_locked && !hopper->IsDiscInChamber())
 		{
+			Wait(0.5);
 			hopper->FireThenRetractLoadPiston();
 		}
 	}

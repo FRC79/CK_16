@@ -5,6 +5,7 @@
 
 #include "Commands/Auto/DriveToFrontAndShoot.h"
 #include "Commands/Auto/FrontPyrShoot.h"
+#include "Commands/Auto/BackPyrShoot.h"
 #include "Commands/Teleop/OperatorControl.h"
 #include "Commands/FillAirTanks.h"
 
@@ -22,12 +23,14 @@ private:
 		CommandBase::init(); // Init subsystems and values in CommandBase
 		
 		// Init Chooser to pick autonomous mode
+		autonCommand = new FrontPyrShoot();
 		autonChooser = new SendableChooser();
-		autonChooser->AddDefault("Drive to Front Shoot 3 (right)", 
+		autonChooser->AddObject("Drive to Front Shoot 3 (right)", 
 				new DriveToFrontAndShoot(DriveToFrontAndShoot::kRight));
 		autonChooser->AddObject("Drive to Front Shoot 3 (left)", 
 				new DriveToFrontAndShoot(DriveToFrontAndShoot::kLeft));
 		autonChooser->AddObject("From Front Shoot 2", new FrontPyrShoot());
+		autonChooser->AddDefault("From Back Shoot 3", new BackPyrShoot());
 		SmartDashboard::PutData("Autonomous Mode Chooser", autonChooser);
 		
 		// Init Commands
@@ -40,9 +43,7 @@ private:
 	}
 	
 	void CancelAllCommands(){
-		if(autonCommand != NULL){
-			autonCommand->Cancel();
-		}
+		autonCommand->Cancel();
 		teleopCommand->Cancel();
 		compressorCommand->Cancel();  // I don't think we need to cancel this.
 	}

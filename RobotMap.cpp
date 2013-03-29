@@ -109,7 +109,7 @@ void RobotMap::init()
 	//RobotConfig
 	PISTON_DELAY_TIME = RobotConfig_CSV->GetValue("PISTON_DELAY_TIME");
 	SHOOTER_SPEED = RobotConfig_CSV->GetValue("SHOOTER_SPEED");
-	SHOOTER_POWER = RobotConfig_CSV->GetValue("SHOTER_POWER");
+	SHOOTER_POWER = RobotConfig_CSV->GetValue("SHOOTER_POWER");
 	ROLLER_POWER = RobotConfig_CSV->GetValue("ROLLER_POWER");
 	DRIVE_DISTANCE_TO_GOAL = RobotConfig_CSV->GetValue("DRIVE_DISTANCE_TO_GOAL");
 	DRIVE_DISTANCE_TO_HALFCOURT = RobotConfig_CSV->GetValue("DRIVE_DISTANCE_TO_HALFCOURT");

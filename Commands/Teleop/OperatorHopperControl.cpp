@@ -1,4 +1,5 @@
 #include "OperatorHopperControl.h"
+#include "SmartDashboard/SmartDashboard.h"
 #include "../../RobotMap.h"
 
 OperatorHopperControl::OperatorHopperControl()
@@ -32,6 +33,12 @@ void OperatorHopperControl::Execute()
 		// Stop the rollers.
 		hopper->StopRollerMotor();
 	}
+	
+	// Directly map load piston to joystick
+	hopper->SetLoadPiston(oi->GetOperatorGamepad2()->GetRawButton(1));
+	
+	SmartDashboard::PutNumber("LOAD BEAM", (int)hopper->IsDiscReadyToBePunchedDown());
+	SmartDashboard::PutNumber("ROLLER BEAM", (int)hopper->IsDiscUnderneathRollers());
 }
 
 // Make this return true when this Command no longer needs to run execute()

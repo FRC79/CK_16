@@ -15,8 +15,8 @@ void OperatorArcadeDrive::Execute()
 {
 	// Map joystick to motor output curve
 	float powerOut, rotOut;
-	powerOut = TeleopHelper::mapJoystickToSpeedOutput(driveJoystick->GetRawAxis(5));
-	rotOut = TeleopHelper::mapJoystickToSpeedOutput(driveJoystick->GetRawAxis(4));
+	powerOut = TeleopHelper::mapJoystickToSpeedOutput(driveJoystick->GetRawAxis(2));
+	rotOut = TeleopHelper::mapJoystickToSpeedOutput(driveJoystick->GetRawAxis(1));
 	
 	drive->ArcadeDrive(powerOut, rotOut);
 }

@@ -22,6 +22,7 @@ public:
 	void RetractLoadPiston();
 	void FireThenRetractLoadPiston();
 	
+	bool IsDiscInChamber();
 	bool IsDiscReadyToBePunchedDown();
 	bool IsDiscUnderneathRollers(); // These are some long function names but it will pay off in the end -SLC
 	bool IsFull();
@@ -30,7 +31,7 @@ public:
 private:
 	CANJaguar *Roller; // Speed controller to control rollers
 	Solenoid *LoadPiston; // Piston to punch down disc from hopper to shooter
-	DigitalInput *LoadBeam, *RollerBeam; // LoadBeam: Says if we can punch down
+	DigitalInput *LoadBeam, *RollerBeam, *FireBeam; // LoadBeam: Says if we can punch down
 										  // RollerBeam: Checks to see if we need to keep 
 										  // rolling for a new disc 
 	double piston_delay_time;
