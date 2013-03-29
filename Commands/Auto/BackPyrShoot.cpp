@@ -38,7 +38,7 @@ void BackPyrShoot::Execute()
 	
 	hopper->SetRollerMotor(roller_power);
 	
-	Wait(3.0);
+	Wait(1.0);
 	
 	hopper->StopRollerMotor();
 	

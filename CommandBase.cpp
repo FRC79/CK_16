@@ -16,7 +16,6 @@ DiscShooter* CommandBase::shooter = NULL;
 Drivetrain* CommandBase::drive = NULL;
 Hanger* CommandBase::hanger = NULL;
 Hopper* CommandBase::hopper = NULL;
-Tilt* CommandBase::tilt = NULL;
 OI* CommandBase::oi = NULL;
 
 // Initialize DriverStation variables
@@ -37,7 +36,6 @@ void CommandBase::init() {
 	drive = new Drivetrain();
 	hanger = new Hanger();
 	hopper = new Hopper();
-	tilt = new Tilt();
 	oi = new OI();
 	
 	// Init static instances of our Driverstation variables.

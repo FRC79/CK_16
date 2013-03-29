@@ -5,11 +5,10 @@
 #include "DriverStation.h"
 #include "DriverStationLCD.h"
 
-#include "Subsystems/DiscShooter.h"
-#include "Subsystems/Drivetrain.h"
-#include "Subsystems/Hopper.h"
-#include "Subsystems/Hanger.h"
-#include "Subsystems/Tilt.h"
+#include "Shooter/DiscShooter.h"
+#include "Drivetrain/Drivetrain.h"
+#include "Hopper/Hopper.h"
+#include "Hanger/Hanger.h"
 #include "OI.h"
 
 /**
@@ -29,7 +28,6 @@ public:
 	static Drivetrain *drive;
 	static Hopper *hopper;
 	static Hanger *hanger;
-	static Tilt *tilt;
 	static OI *oi;
 	
 	//SHOOTER TILTED UP TO SMARTDASHBOARD

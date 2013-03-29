@@ -17,6 +17,12 @@ DiscShooter::DiscShooter() : Subsystem("DiscShooter")
 	BackShooterWheel->ConfigEncoderCodesPerRev(TICS_PER_SHOOTER_REV);
 	
 	is_fire_piston_extended = false;
+	
+	// Instantiate corresponding components into DualSolenoids
+	TiltPiston = new DoubleSolenoid(RobotMap::TILT_PISTON_IN_ID, 
+			RobotMap::TILT_PISTON_OUT_ID);
+	
+	is_tilted_up = true;
 }
 
 DiscShooter::~DiscShooter()
@@ -24,6 +30,7 @@ DiscShooter::~DiscShooter()
 	delete FrontShooterWheel;
 	delete BackShooterWheel;
 	delete FirePiston;
+	delete TiltPiston;
 }
 
 CANJaguar* DiscShooter::GetShooterWheel(ShooterWheel wheel)
@@ -93,6 +100,33 @@ void DiscShooter::FireThenRetract()
 	Wait(piston_delay_time);
 	RetractFirePiston();
 	Wait(piston_delay_time);
+}
+
+bool DiscShooter::IsTiltedUp()
+{
+	return is_tilted_up;
+}
+
+void DiscShooter::SetTilt(bool tilted_up)
+{
+	TiltPiston->Set(tilted_up ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
+	SmartDashboard::PutBoolean(RobotMap::SHOOTER_TILTED_KEY, tilted_up); // send state to SmartDashboard
+	is_tilted_up = tilted_up;
+}
+
+void DiscShooter::InvertCurrentTiltState()
+{
+	SetTilt(!IsTiltedUp());
+}
+
+void DiscShooter::TiltUp()
+{
+	SetTilt(true);
+}
+
+void DiscShooter::TiltDown()
+{
+	SetTilt(false);
 }
 
 void DiscShooter::InitDefaultCommand()
