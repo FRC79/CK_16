@@ -9,6 +9,8 @@
 #include "Commands/Teleop/OperatorControl.h"
 #include "Commands/FillAirTanks.h"
 #include "Commands/AutoLoad.h"
+#include "Commands/ForwardRollers.h"
+#include "Commands/ReverseRollers.h"
 
 #include "RobotMap.h"
 #include "CommandBase.h"
@@ -36,6 +38,8 @@ private:
 		
 		// Init Commands
 		CommandBase::oi->autoLoadButton->WhenPressed(new AutoLoad());
+		CommandBase::oi->reverseRollerButton->WhenActive(new ReverseRollers(-RobotMap::ROLLER_POWER));
+		CommandBase::oi->forwardRollerButton->WhenActive(new ForwardRollers(RobotMap::ROLLER_POWER));
 		teleopCommand = new OperatorControl();
 		compressorCommand = new FillAirTanks();
 //		lw = LiveWindow::GetInstance();

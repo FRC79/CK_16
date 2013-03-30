@@ -22,6 +22,7 @@ public:
 private:
 	float shooter_power;
 	bool wheels_spinning;
+	bool wasPressed;
 };
 
 #endif

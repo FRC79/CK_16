@@ -1,5 +1,6 @@
 #include "OperatorShooterControl.h"
 #include "../../RobotMap.h"
+#include "Timer.h"
 
 OperatorShooterControl::OperatorShooterControl()
 {
@@ -14,6 +15,7 @@ void OperatorShooterControl::Initialize()
 {
 	// Starting the robot in the same way every time
 	shooter->StopMotors();
+	wasPressed = false;
 }
 
 void OperatorShooterControl::Execute()
@@ -37,6 +39,19 @@ void OperatorShooterControl::Execute()
 	
 	// Map fire piston position state to button directly.
 	shooter->SetFirePiston(oi->GetOperatorGamepad2()->GetRawButton(6));
+	
+	if(!wasPressed && oi->GetOperatorGamepad2()->GetRawButton(6))
+	{
+		wasPressed = true;
+	}
+	
+	if(wasPressed && !oi->GetOperatorGamepad2()->GetRawButton(6))
+	{
+		wasPressed = false;
+		Wait(0.5);
+	}
+	
+	
 }
 
 bool OperatorShooterControl::IsFinished()

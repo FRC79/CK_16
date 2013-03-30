@@ -12,7 +12,8 @@ private:
 public:
 	OI();
 	
-	JoystickButton *autoLoadButton;
+	JoystickButton *autoLoadButton, *reverseRollerButton, 
+		*forwardRollerButton;
 	Joystick* GetOperatorGamepad1();
 	Joystick* GetOperatorGamepad2();
 	ButtonHelper* GetButtonHelper1();

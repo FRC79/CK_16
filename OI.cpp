@@ -7,6 +7,8 @@ OI::OI() {
 	buttonHelper1 = new ButtonHelper(operatorGamepad1);
 	buttonHelper2 = new ButtonHelper(operatorGamepad2);
 	autoLoadButton = new JoystickButton(operatorGamepad2, 8);
+	reverseRollerButton = new JoystickButton(operatorGamepad2, 7);
+	forwardRollerButton = new JoystickButton(operatorGamepad2, 3);
 }
 
 Joystick* OI::GetOperatorGamepad1()

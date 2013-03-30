@@ -2,7 +2,7 @@
 
 LoadDisc::LoadDisc()
 {
-	Requires(hopper);
+//	Requires(hopper);
 }
 
 // Called just before this Command runs the first time
@@ -13,6 +13,7 @@ void LoadDisc::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void LoadDisc::Execute()
 {
+	
 	if(hopper->IsDiscReadyToBePunchedDown())
 	{
 		// If the fire piston isn't locked, punch the next disc into the fire chamber.
@@ -20,6 +21,7 @@ void LoadDisc::Execute()
 		{
 			Wait(0.5);
 			hopper->FireThenRetractLoadPiston();
+			
 		}
 	}
 }

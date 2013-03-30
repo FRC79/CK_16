@@ -1,6 +1,6 @@
-#include "SetRollerMotor.h"
+#include "ForwardRollers.h"
 
-SetRollerMotor::SetRollerMotor(float power)
+ForwardRollers::ForwardRollers(float power)
 {
 	Requires(hopper);
 	
@@ -8,32 +8,31 @@ SetRollerMotor::SetRollerMotor(float power)
 }
 
 // Called just before this Command runs the first time
-void SetRollerMotor::Initialize()
+void ForwardRollers::Initialize()
 {
-	is_finished = false;
 }
 
 // Called repeatedly when this Command is scheduled to run
-void SetRollerMotor::Execute()
+void ForwardRollers::Execute()
 {
 	hopper->SetRollerMotor(roller_power);
 }
 
 // Make this return true when this Command no longer needs to run execute()
-bool SetRollerMotor::IsFinished()
+bool ForwardRollers::IsFinished()
 {
-	return false;
+	return !oi->GetOperatorGamepad2()->GetRawButton(3);
 }
 
 // Called once after isFinished returns true
-void SetRollerMotor::End()
+void ForwardRollers::End()
 {
 	
 }
 
 // Called when another command which requires one or more of the same
 // subsystems is scheduled to run
-void SetRollerMotor::Interrupted()
+void ForwardRollers::Interrupted()
 {
 	
 }

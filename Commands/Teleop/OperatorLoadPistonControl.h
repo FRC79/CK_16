@@ -1,18 +1,18 @@
-#ifndef OPERATORHOPPERCONTROL_H
-#define OPERATORHOPPERCONTROL_H
+#ifndef OPERATORLOADPISTONCONTROL_H
+#define OPERATORLOADPISTONCONTROL_H
 
 #include "../../CommandBase.h"
 
 /* 
  * This class allows for hopper conrol during teleop
  * including the use of the roller motor, the load piston,
- * and the beam sensors to let us know if our hopper is full.
+ * and the beam sensors to let us know if our LoadPiston is full.
  */
 
-class OperatorHopperControl : public CommandBase
+class OperatorLoadPistonControl : public CommandBase
 {
 public:
-	OperatorHopperControl();
+	OperatorLoadPistonControl();
 	virtual void Initialize();
 	virtual void Execute();
 	virtual bool IsFinished();

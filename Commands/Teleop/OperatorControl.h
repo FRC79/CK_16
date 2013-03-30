@@ -4,7 +4,7 @@
 #include "Commands/CommandGroup.h"
 
 #include "OperatorArcadeDrive.h"
-#include "OperatorHopperControl.h"
+#include "OperatorLoadPistonControl.h"
 #include "OperatorShooterControl.h"
 #include "OperatorToggleHanger.h"
 #include "OperatorToggleTilt.h"

@@ -2,8 +2,8 @@
 
 RunRollerWithBeams::RunRollerWithBeams()
 {
-	Requires(hopper);
-	
+//	Requires(hopper);
+
 	roller_power = RobotMap::ROLLER_POWER;
 }
 
