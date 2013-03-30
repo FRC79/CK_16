@@ -6,6 +6,7 @@ OI::OI() {
 	operatorGamepad2 = new Joystick(2);
 	buttonHelper1 = new ButtonHelper(operatorGamepad1);
 	buttonHelper2 = new ButtonHelper(operatorGamepad2);
+	autoLoadButton = new JoystickButton(operatorGamepad2, 8);
 }
 
 Joystick* OI::GetOperatorGamepad1()

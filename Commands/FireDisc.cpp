@@ -20,7 +20,7 @@ FireDisc::FireDisc(double start_delay)
 void FireDisc::Initialize()
 {
 	is_finished = false;
-	RobotState::auto_load_piston_locked = true;
+	RobotState::load_piston_locked = true;
 }
 
 // Called repeatedly when this Command is scheduled to run
@@ -48,7 +48,7 @@ bool FireDisc::IsFinished()
 // Called once after isFinished returns true
 void FireDisc::End()
 {
-	RobotState::auto_load_piston_locked = false;
+	RobotState::load_piston_locked = false;
 }
 
 // Called when another command which requires one or more of the same

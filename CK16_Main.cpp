@@ -8,6 +8,7 @@
 #include "Commands/Auto/BackPyrShoot.h"
 #include "Commands/Teleop/OperatorControl.h"
 #include "Commands/FillAirTanks.h"
+#include "Commands/AutoLoad.h"
 
 #include "RobotMap.h"
 #include "CommandBase.h"
@@ -34,6 +35,7 @@ private:
 		SmartDashboard::PutData("Autonomous Mode Chooser", autonChooser);
 		
 		// Init Commands
+		CommandBase::oi->autoLoadButton->WhenPressed(new AutoLoad());
 		teleopCommand = new OperatorControl();
 		compressorCommand = new FillAirTanks();
 //		lw = LiveWindow::GetInstance();

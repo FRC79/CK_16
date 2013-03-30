@@ -11,8 +11,10 @@ class RobotState
 public:
 	// Shooting States
 	static bool shooter_wheels_spinning;
-	static bool auto_load_piston_locked;
+	static bool load_piston_locked;
 	static bool auto_loading;
+	static bool raised;
+	static bool hooksExtended;
 	
 	// Vision Tracking Variables
 	static bool target_found;
