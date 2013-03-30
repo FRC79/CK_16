@@ -4,6 +4,12 @@
 #include "SmartDashboard/SendableChooser.h"
 
 #include "Commands/Teleop/OperatorControl.h"
+#include "Shooter/FireDisc.h"
+#include "Hopper/AutoLoad.h"
+#include "Shooter/ToggleShooterTilt.h"
+#include "Hanger/ToggleHangPiston.h"
+#include "Drivetrain/ArcadeDrive.h"
+
 
 #include "RobotMap.h"
 #include "CommandBase.h"
@@ -11,6 +17,7 @@
 class CK16_Main : public IterativeRobot {
 private:
 	Command *autonCommand, *teleopCommand, *compressorCommand;
+	Command *tilt, *hang;
 	SendableChooser *autonChooser;
 	LiveWindow *lw;
 	
@@ -31,8 +38,17 @@ private:
 		
 		// Init Commands
 		teleopCommand = new OperatorControl();
+		tilt = new ToggleShooterTilt();
+		hang = new ToggleHangPiston();
+		
+		CommandBase::oi->fireButton->WhenPressed(new FireDisc());
+		CommandBase::oi->autoLoadButton->WhenPressed(new AutoLoad());
+		CommandBase::oi->driverTiltButton->WhenPressed(tilt);
+		CommandBase::oi->operatorTiltButton->WhenPressed(tilt);
+		CommandBase::oi->extendHangerButton->WhenPressed(hang);
 //		compressorCommand = new FillAirTanks();
 //		lw = LiveWindow::GetInstance();
+		(new ArcadeDrive())->Start();
 		
 		printf("RobotInit() completed.\n");
 		printf("TEAM 79 FOR THE WIN!\n");

@@ -2,7 +2,7 @@
 
 TiltUp::TiltUp()
 {
-	Requires(shooter);
+//	Requires(shooter);
 }
 
 // Called just before this Command runs the first time
@@ -15,6 +15,7 @@ void TiltUp::Initialize()
 void TiltUp::Execute()
 {
 	shooter->TiltUp();
+	RobotState::raised = true;
 	is_finished = true;
 }
 

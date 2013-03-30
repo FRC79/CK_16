@@ -16,7 +16,7 @@ void LoadDisc::Execute()
 	if(hopper->IsDiscReadyToBePunchedDown())
 	{
 		// If the fire piston isn't locked, punch the next disc into the fire chamber.
-		if(!RobotState::auto_load_piston_locked && !hopper->IsDiscInChamber())
+		if(!RobotState::load_piston_locked && !hopper->IsDiscInChamber())
 		{
 			Wait(0.5);
 			hopper->FireThenRetractLoadPiston();

@@ -1,23 +1,23 @@
-#ifndef TILTUP_H
-#define TILTUP_H
+#ifndef SETSHOOTERSPEED_H
+#define SETSHOOTERSPEED_H
 
 #include "../CommandBase.h"
-#include "../RobotState.h"
 
-/* Description */
-
-class TiltUp : public CommandBase 
-{
+/**
+ *
+ *
+ * @author Andrew Schreiber
+ */
+class SetShooterSpeed: public CommandBase {
 public:
-	TiltUp();
+	SetShooterSpeed(float speed);
 	virtual void Initialize();
 	virtual void Execute();
 	virtual bool IsFinished();
 	virtual void End();
 	virtual void Interrupted();
-	
 private:
-	bool is_finished;
+	float _speed;
 };
 
 #endif

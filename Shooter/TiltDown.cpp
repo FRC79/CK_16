@@ -2,7 +2,7 @@
 
 TiltDown::TiltDown()
 {
-	Requires(shooter);
+//	Requires(shooter);
 }
 
 // Called just before this Command runs the first time
@@ -15,6 +15,7 @@ void TiltDown::Initialize()
 void TiltDown::Execute()
 {
 	shooter->TiltDown();
+	RobotState::raised = false;
 	is_finished = true;
 }
 

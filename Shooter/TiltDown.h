@@ -2,6 +2,7 @@
 #define TILTDOWN_H
 
 #include "../CommandBase.h"
+#include "../RobotState.h"
 
 /* Description */
 

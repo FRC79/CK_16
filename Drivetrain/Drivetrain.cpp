@@ -87,5 +87,4 @@ double Drivetrain::GetPosition(Motor encoder_motor)
 
 void Drivetrain::InitDefaultCommand()
 {
-	
 }

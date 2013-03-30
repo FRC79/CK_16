@@ -1,23 +1,24 @@
-#ifndef TILTUP_H
-#define TILTUP_H
+#ifndef FIREDISC_H
+#define FIREDISC_H
 
 #include "../CommandBase.h"
 #include "../RobotState.h"
 
-/* Description */
-
-class TiltUp : public CommandBase 
-{
+/**
+ *
+ *
+ * @author Andrew Schreiber
+ */
+class FireDisc: public CommandBase {
 public:
-	TiltUp();
+	FireDisc();
 	virtual void Initialize();
 	virtual void Execute();
 	virtual bool IsFinished();
 	virtual void End();
 	virtual void Interrupted();
-	
 private:
-	bool is_finished;
+	bool isFinished;
 };
 
 #endif
