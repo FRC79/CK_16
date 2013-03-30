@@ -40,6 +40,11 @@ void OperatorShooterControl::Execute()
 	// Map fire piston position state to button directly.
 	shooter->SetFirePiston(oi->GetOperatorGamepad2()->GetRawButton(6));
 	
+	if(shooter->IsFirePistonExtended())
+	{
+		RobotState::load_piston_locked = true;
+	}
+	
 	if(!wasPressed && oi->GetOperatorGamepad2()->GetRawButton(6))
 	{
 		wasPressed = true;
@@ -49,6 +54,7 @@ void OperatorShooterControl::Execute()
 	{
 		wasPressed = false;
 		Wait(0.5);
+		RobotState::load_piston_locked = false;
 	}
 	
 	
