@@ -1,6 +1,7 @@
 #include "OperatorShooterControl.h"
 #include "../../RobotMap.h"
 #include "Timer.h"
+#include "../../RobotState.h"
 
 OperatorShooterControl::OperatorShooterControl()
 {
@@ -53,7 +54,7 @@ void OperatorShooterControl::Execute()
 	if(wasPressed && !oi->GetOperatorGamepad2()->GetRawButton(6))
 	{
 		wasPressed = false;
-		Wait(0.5);
+		Wait(0.5); // Wait for fire piston to come back
 		RobotState::load_piston_locked = false;
 	}
 	
