@@ -48,6 +48,8 @@ double RobotMap::SHOOTER_POWER = 0.0;
 double RobotMap::ROLLER_POWER = 0.0;
 double RobotMap::DRIVE_DISTANCE_TO_GOAL = 0.0;
 double RobotMap::DRIVE_DISTANCE_TO_HALFCOURT = 0.0;
+double RobotMap::ROLLER_TO_PUNCH_ZONE_DELAY = 0.0;
+double RobotMap::AUTOLOAD_RESUME_DELAY = 0.0;
 
 // SmartDashboard Keys
 std::string RobotMap::FOUND_KEY = ""; 
@@ -124,6 +126,8 @@ void RobotMap::loadValues(bool initCSVs)
 	ROLLER_POWER = RobotConfig_CSV->GetValue("ROLLER_POWER");
 	DRIVE_DISTANCE_TO_GOAL = RobotConfig_CSV->GetValue("DRIVE_DISTANCE_TO_GOAL");
 	DRIVE_DISTANCE_TO_HALFCOURT = RobotConfig_CSV->GetValue("DRIVE_DISTANCE_TO_HALFCOURT");
+	ROLLER_TO_PUNCH_ZONE_DELAY = RobotConfig_CSV->GetValue("ROLLER_TO_PUNCH_ZONE_DELAY");
+	AUTOLOAD_RESUME_DELAY = RobotConfig_CSV->GetValue("AUTOLOAD_RESUME_DELAY");
 		 
 	// SmartDashboard Keys
 	FOUND_KEY = "found";

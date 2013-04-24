@@ -1,15 +1,16 @@
-#ifndef STOPSHOOTERWHEELS_H
-#define STOPSHOOTERWHEELS_H
+#ifndef WAITCOMMAND_H
+#define WAITCOMMAND_H
 
 #include "Commands/Command.h"
+#include "Commands/Subsystem.h"
 
 /* Description */
 
-class StopShooterWheels : public Command 
+class WaitC : public Command 
 {
 public:
-	StopShooterWheels();
-	StopShooterWheels(bool runContinuously);
+	WaitC(double timeInSeconds);
+	WaitC(double timeInSeconds, Subsystem *s);
 	virtual void Initialize();
 	virtual void Execute();
 	virtual bool IsFinished();
@@ -18,7 +19,6 @@ public:
 
 private:
 	bool isFinished;
-	bool runsForever;
 };
 
 #endif

@@ -1,14 +1,15 @@
 #ifndef RETRACTLOADPISTON_H
 #define RETRACTLOADPISTON_H
 
-#include "../CommandBase.h"
+#include "Commands/Command.h"
 
 /* Description */
 
-class RetractLoadPiston : public CommandBase 
+class RetractLoadPiston : public Command 
 {
 public:
 	RetractLoadPiston();
+	RetractLoadPiston(bool runContinuously);
 	virtual void Initialize();
 	virtual void Execute();
 	virtual bool IsFinished();
@@ -17,6 +18,7 @@ public:
 
 private:
 	bool isFinished;
+	bool runsForever;
 };
 
 #endif

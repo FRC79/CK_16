@@ -11,12 +11,26 @@ CommandBase::CommandBase() : Command()
 	
 }
 
+ShooterWheels* CommandBase::shooterWheels = NULL;
+FirePiston* CommandBase::firePiston = NULL;
+Rollers* CommandBase::rollers = NULL;
+Drivetrain* CommandBase::drivetrain = NULL;
+LoadPiston* CommandBase::loadPiston = NULL;
+TiltPiston* CommandBase::tiltPiston = NULL;
+Hanger* CommandBase::hanger = NULL;
+HopperState* CommandBase::hopperState = NULL;
+
+
 void CommandBase::init() {
     // Init single static instance of all of our subsystems.
-	shooterPistons = new ShooterPistons();
 	shooterWheels = new ShooterWheels();
+	firePiston = new FirePiston();
+	rollers = new Rollers(); 
+	drivetrain = new Drivetrain();
+	loadPiston = new LoadPiston();
+	tiltPiston = new TiltPiston();
 	hanger = new Hanger();
-	hopper = new Hopper();
+	hopperState = new HopperState();
 	oi = new OI();
 	
 	// Init static instances of our Driverstation variables.

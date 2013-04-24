@@ -2,24 +2,33 @@
 
 RunRollersWithBeams::RunRollersWithBeams()
 {
+	Requires(rollers);
 }
 
 // Called just before this Command runs the first time
 void RunRollersWithBeams::Initialize()
 {
-	isFinished = false;
 }
 
 // Called repeatedly when this Command is scheduled to run
 void RunRollersWithBeams::Execute()
 {
-	isFinished = true;
+	// Roll the rollers until the hopperState is full
+    if(!hopperState->IsFull())
+    {
+        rollers->Set(RobotMap::ROLLER_POWER);
+    }
+    else
+    {
+        // When it's full, stop the rollers.
+        rollers->Stop();
+    }
 }
 
 // Make this return true when this Command no longer needs to run execute()
 bool RunRollersWithBeams::IsFinished()
 {
-	return isFinished;
+	return false;
 }
 
 // Called once after isFinished returns true

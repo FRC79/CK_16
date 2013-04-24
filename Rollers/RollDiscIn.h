@@ -2,6 +2,7 @@
 #define ROLLDISCIN_H
 
 #include "../CommandBase.h"
+#include "../RobotMap.h"
 
 /* Description */
 

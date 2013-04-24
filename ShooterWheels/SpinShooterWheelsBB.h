@@ -8,7 +8,10 @@
 class SpinShooterWheelsBB : public CommandBase 
 {
 public:
-	SpinShooterWheelsBB();
+	static const double GEAR_RATIO = 1.0 / 2.5;
+	
+	SpinShooterWheelsBB(double front_rpms);
+	SpinShooterWheelsBB(double front_rpms, double back_rpms);
 	virtual void Initialize();
 	virtual void Execute();
 	virtual bool IsFinished();
@@ -16,7 +19,8 @@ public:
 	virtual void Interrupted();
 
 private:
-	bool isFinished;
+	BangBang_Controller *frontCtrl, *backCtrl;
+	double frontSpeed, backSpeed;
 };
 
 #endif

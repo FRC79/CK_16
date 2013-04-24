@@ -15,6 +15,8 @@ void InvertHangerState::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void InvertHangerState::Execute()
 {
+	hanger->InvertCurrentState();
+	
 	if(!isFinished){
 		hanger->InvertCurrentState();
 		isFinished = true;

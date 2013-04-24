@@ -1,15 +1,14 @@
-#ifndef PUNCHDISC_H
-#define PUNCHDISC_H
+#ifndef DONOTHING_H
+#define DONOTHING_H
 
 #include "../CommandBase.h"
-#include "../RobotMap.h"
 
 /* Description */
 
-class PunchDisc : public CommandBase 
+class DoNothing : public CommandBase 
 {
 public:
-	PunchDisc();
+	DoNothing();
 	virtual void Initialize();
 	virtual void Execute();
 	virtual bool IsFinished();
@@ -17,7 +16,7 @@ public:
 	virtual void Interrupted();
 
 private:
-	
+
 };
 
 #endif

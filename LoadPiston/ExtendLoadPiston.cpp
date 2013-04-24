@@ -7,6 +7,7 @@ ExtendLoadPiston::ExtendLoadPiston()
 
 ExtendLoadPiston::ExtendLoadPiston(bool runContinuously)
 {
+	Requires(loadPiston);
 	runsForever = runContinuously;
 }
 
@@ -19,6 +20,8 @@ void ExtendLoadPiston::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void ExtendLoadPiston::Execute()
 {
+	loadPiston->Extend();
+	
 	if(!runsForever){
 		isFinished = true;
 	}

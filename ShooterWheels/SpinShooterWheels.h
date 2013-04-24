@@ -2,6 +2,7 @@
 #define SPINSHOOTERWHEELS_H
 
 #include "../CommandBase.h"
+#include "../RobotMap.h"
 
 /* Description */
 

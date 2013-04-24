@@ -5,14 +5,30 @@
 
 #include "Hopper/AutoLoad.h"
 #include "Drivetrain/ArcadeDrive.h"
-
+#include "Compressor/RunCompressor.h"
+#include "TiltPiston/InvertTiltState.h"
+#include "ShooterWheels/SpinShooterWheels.h"
+#include "Misc/WaitCommand.h"
+#include "Misc/DoNothing.h"
+#include "Misc/CancelCommand.h"
+#include "Hanger/InvertHangerState.h"
+#include "FirePiston/ExtendFirePiston.h"
+#include "Rollers/RollDiscIn.h"
+#include "Rollers/RollDiscOut.h"
+#include "LoadPiston/ExtendLoadPiston.h"
+#include "LoadPiston/RetractLoadPiston.h"
+#include "Commands/Subsystem.h"
+#include "Drivetrain/ArcadeDrive.h"
+#include "Autonomous/SimpleFrontPyrShoot.h"
+#include "Autonomous/SimpleBackPyrShoot.h"
 
 #include "RobotMap.h"
 #include "CommandBase.h"
 
 class CK16_Main : public IterativeRobot {
 private:
-	Command *autonCommand, *teleopCommand, *compressorCommand;
+	Command *compressorCommand, *autoLoadCommand, *tiltCommand, *shooterWheelsCommand,
+		*arcadeDriveCommand, *autonCommand;
 	Command *tilt, *hang;
 	SendableChooser *autonChooser;
 	LiveWindow *lw;
@@ -22,22 +38,36 @@ private:
 		CommandBase::init(); // Init subsystems and values in CommandBase
 		
 		// Init Chooser to pick autonomous mode
-//		autonCommand = new FrontPyrShoot();
-//		autonChooser = new SendableChooser();
-//		autonChooser->AddObject("Drive to Front Shoot 3 (right)", 
-//				new DriveToFrontAndShoot(DriveToFrontAndShoot::kRight));
-//		autonChooser->AddObject("Drive to Front Shoot 3 (left)", 
-//				new DriveToFrontAndShoot(DriveToFrontAndShoot::kLeft));
-//		autonChooser->AddObject("From Front Shoot 2", new FrontPyrShoot());
-//		autonChooser->AddDefault("From Back Shoot 3", new BackPyrShoot());
-//		SmartDashboard::PutData("Autonomous Mode Chooser", autonChooser);
+		autonCommand = new SimpleBackPyrShoot();
+		autonChooser = new SendableChooser();
+		autonChooser->AddObject("From Front Shoot 2", new SimpleFrontPyrShoot());
+		autonChooser->AddDefault("From Back Shoot 3", new SimpleBackPyrShoot());
+		SmartDashboard::PutData("Autonomous Mode Chooser", autonChooser);
 		
 		// Init Commands
+		compressorCommand = new RunCompressor();
+		autoLoadCommand = new AutoLoad();
+		tiltCommand = new InvertTiltState();
+		shooterWheelsCommand = new SpinShooterWheels(true);
+		arcadeDriveCommand = new ArcadeDrive();
 		
+		CommandBase::oi->buttonInvertTiltJoy1->WhenPressed(!tiltCommand->IsRunning() ? tiltCommand : new DoNothing());
+        CommandBase::oi->buttonInvertTiltJoy2->WhenPressed(!tiltCommand->IsRunning() ? tiltCommand : new DoNothing());
+        CommandBase::oi->buttonInvertHangPiston->WhenPressed(new InvertHangerState());
+        CommandBase::oi->buttonToggleAutoLoad->WhenPressed(!autoLoadCommand->IsRunning() ? 
+                autoLoadCommand : new CancelCommand(autoLoadCommand));
+        CommandBase::oi->buttonExtendFirePiston->WhileHeld(new ExtendFirePiston(true));
+        CommandBase::oi->buttonExtendFirePiston->WhenReleased(new WaitC(RobotMap::AUTOLOAD_RESUME_DELAY, 
+                (Subsystem*)CommandBase::firePiston));
+        CommandBase::oi->buttonForwardRollers->WhileHeld(new RollDiscIn(true));
+        CommandBase::oi->buttonReverseRollers->WhileHeld(new RollDiscOut(true));
+        CommandBase::oi->buttonManualLoadPiston->WhenPressed(new CancelCommand(autoLoadCommand));
+        CommandBase::oi->buttonManualLoadPiston->WhileHeld(new ExtendLoadPiston(true));
+        CommandBase::oi->buttonManualLoadPiston->WhenReleased(new RetractLoadPiston());
+        CommandBase::oi->buttonToggleShooterWheels->WhenPressed(!shooterWheelsCommand->IsRunning() ? 
+                shooterWheelsCommand : new CancelCommand(shooterWheelsCommand));
 		
-//		compressorCommand = new FillAirTanks();
 //		lw = LiveWindow::GetInstance();
-		(new ArcadeDrive())->Start();
 		
 		printf("RobotInit() completed.\n");
 		printf("TEAM 79 FOR THE WIN!\n");
@@ -45,14 +75,12 @@ private:
 	
 	void CancelAllCommands(){
 //		autonCommand->Cancel();
-		teleopCommand->Cancel();
 //		compressorCommand->Cancel();  // I don't think we need to cancel this.
 	}
 	
 	virtual void DisabledInit(){
 		CommandBase::disabledPeriodicLoops = 0; // Reset loop counter for disabled periodic.
 		
-		CancelAllCommands();	// Cancel all previously running commmands.
 		
 		// Move the cursor down a few, since we'll move it back up in periodic.
 		printf("\x1b[2B");
@@ -75,10 +103,10 @@ private:
 	}
 	
 	virtual void AutonomousInit() {
-		CancelAllCommands();	// Cancel all previously running commmands.
-//		compressorCommand->Start();
-//		autonCommand = (Command*)autonChooser->GetSelected(); // Dynamically load chosen auton
-//		autonCommand->Start();
+//		CancelAllCommands();	// Cancel all previously running commmands.
+		compressorCommand->Start();
+		autonCommand = (Command*)autonChooser->GetSelected(); // Dynamically load chosen auton
+		autonCommand->Start();
 		
 		printf("Auton Init Completed\n");
 	}
@@ -88,22 +116,21 @@ private:
 	}
 	
 	virtual void TeleopInit() {
-		CancelAllCommands();	// Cancel all previously running commmands.
-//		compressorCommand->Start();
-		teleopCommand->Start();
+//		CancelAllCommands();	// Cancel all previously running commmands.
+		compressorCommand->Start();
+		arcadeDriveCommand->Start();
+		autoLoadCommand->Start();
 		
 		printf("Teleop Init Completed\n");
 	}
 	
 	virtual void TeleopPeriodic() 
 	{
-		// Update ButtonHelpers
-		
 		Scheduler::GetInstance()->Run(); // Periodically runs teleop command group
 	}
 	
 	virtual void TestInit(){
-		CancelAllCommands();	// Cancel all previously running commmands.
+//		CancelAllCommands();	// Cancel all previously running commmands.
 		
 		printf("Test Init Completed\n");
 	}

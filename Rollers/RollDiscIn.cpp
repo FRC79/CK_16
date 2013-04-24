@@ -7,7 +7,7 @@ RollDiscIn::RollDiscIn()
 
 RollDiscIn::RollDiscIn(bool runContinuously)
 {
-	Requires(hopper);
+	Requires(rollers);
 	runsForever = runContinuously;
 }
 
@@ -20,6 +20,8 @@ void RollDiscIn::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void RollDiscIn::Execute()
 {
+	rollers->Set(RobotMap::ROLLER_POWER);
+	
 	if(!runsForever){
 		isFinished = true;
 	}

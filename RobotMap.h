@@ -60,6 +60,8 @@ public:
 	static double ROLLER_POWER;
 	static double DRIVE_DISTANCE_TO_GOAL;
 	static double DRIVE_DISTANCE_TO_HALFCOURT;
+	static double ROLLER_TO_PUNCH_ZONE_DELAY;
+	static double AUTOLOAD_RESUME_DELAY;
 		
 	// SmartDashboard Keys
 	static std::string FOUND_KEY; 

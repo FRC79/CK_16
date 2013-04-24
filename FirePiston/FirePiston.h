@@ -8,6 +8,14 @@ class FirePiston : public Subsystem
 public:
 	FirePiston();
 	~FirePiston();
+	
+	void Set(bool state);
+	bool IsExtended();
+	void Extend();
+	void Retract();
+	void InvertCurrentState();
+	void FireThenRetract();
+	
 	void InitDefaultCommand();
 	
 private:

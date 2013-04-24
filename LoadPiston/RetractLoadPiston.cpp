@@ -1,7 +1,13 @@
 #include "RetractLoadPiston.h"
+#include "../CommandBase.h"
 
-RetractLoadPiston::RetractLoadPiston()
-{
+RetractLoadPiston::RetractLoadPiston(){
+	RetractLoadPiston(false);
+}
+
+RetractLoadPiston::RetractLoadPiston(bool runContinuously){
+	Requires(CommandBase::loadPiston);
+	runsForever = runContinuously;
 }
 
 // Called just before this Command runs the first time
@@ -13,7 +19,11 @@ void RetractLoadPiston::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void RetractLoadPiston::Execute()
 {
-	isFinished = true;
+	CommandBase::loadPiston->Retract();
+	
+	if(!runsForever){
+		isFinished = true;
+	}
 }
 
 // Make this return true when this Command no longer needs to run execute()

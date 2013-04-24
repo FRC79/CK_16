@@ -1,15 +1,14 @@
-#ifndef STOPSHOOTERWHEELS_H
-#define STOPSHOOTERWHEELS_H
+#ifndef CANCELCOMMAND_H
+#define CANCELCOMMAND_H
 
 #include "Commands/Command.h"
 
 /* Description */
 
-class StopShooterWheels : public Command 
+class CancelCommand : public Command
 {
 public:
-	StopShooterWheels();
-	StopShooterWheels(bool runContinuously);
+	CancelCommand(Command *command);
 	virtual void Initialize();
 	virtual void Execute();
 	virtual bool IsFinished();
@@ -18,7 +17,7 @@ public:
 
 private:
 	bool isFinished;
-	bool runsForever;
+	Command* commandToCancel;
 };
 
 #endif

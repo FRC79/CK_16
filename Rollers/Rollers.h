@@ -2,16 +2,20 @@
 #define ROLLERS_H
 
 #include "Commands/Subsystem.h"
+#include "../RobotMap.h"
 
 class Rollers : public Subsystem
 {
 public:
 	Rollers();
-	~Rollers();
+
+	void Set(float power);
+	void Stop();
+	
 	void InitDefaultCommand();
 	
 private:
-	
+	CANJaguar* roller;
 };
 
 #endif

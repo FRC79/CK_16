@@ -1,4 +1,5 @@
 #include "StopRollers.h"
+#include "../CommandBase.h"
 
 StopRollers::StopRollers()
 {
@@ -7,7 +8,7 @@ StopRollers::StopRollers()
 
 StopRollers::StopRollers(bool runContinuously) : Command("StopRollers")
 {
-	Requires(rollers);
+	Requires(CommandBase::rollers);
 	runsForever = runContinuously;
 }
 
@@ -20,6 +21,8 @@ void StopRollers::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void StopRollers::Execute()
 {
+	CommandBase::rollers->Stop();
+	
 	if(!runsForever){
 		isFinished = true;
 	}

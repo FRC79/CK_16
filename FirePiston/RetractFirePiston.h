@@ -5,7 +5,7 @@
 
 /* Description */
 
-class RetractFirePiston : public CommandBase 
+class RetractFirePiston : public Command 
 {
 public:
 	RetractFirePiston();

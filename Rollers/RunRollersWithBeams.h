@@ -2,6 +2,7 @@
 #define RUNROLLERSWITHBEAMS_H
 
 #include "../CommandBase.h"
+#include "../RobotMap.h"
 
 /* Description */
 
@@ -16,7 +17,7 @@ public:
 	virtual void Interrupted();
 
 private:
-	bool isFinished;
+
 };
 
 #endif

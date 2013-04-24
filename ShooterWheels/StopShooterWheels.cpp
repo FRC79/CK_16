@@ -1,4 +1,5 @@
 #include "StopShooterWheels.h"
+#include "../CommandBase.h"
 
 StopShooterWheels::StopShooterWheels()
 {
@@ -7,7 +8,7 @@ StopShooterWheels::StopShooterWheels()
 
 StopShooterWheels::StopShooterWheels(bool runContinuously)
 {
-	Requires(shooterWheels);
+	Requires(CommandBase::shooterWheels);
 	runsForever = runContinuously;
 }
 
@@ -20,6 +21,8 @@ void StopShooterWheels::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void StopShooterWheels::Execute()
 {
+	CommandBase::shooterWheels->Stop();
+	
 	if(!runsForever){
 		isFinished = true;
 	}

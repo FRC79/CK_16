@@ -1,11 +1,11 @@
 #ifndef STOPROLLERS_H
 #define STOPROLLERS_H
 
-#include "../CommandBase.h"
+#include "Commands/Command.h"
 
 /* Description */
 
-class StopRollers : public CommandBase 
+class StopRollers : public Command 
 {
 public:
 	StopRollers();

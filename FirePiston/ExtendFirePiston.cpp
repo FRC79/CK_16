@@ -5,7 +5,7 @@ ExtendFirePiston::ExtendFirePiston()
 	ExtendFirePiston(false);
 }
 
-ExtendFirePiston::ExtendFirePiston(bool runContinuously) : Command("ExtendFirePiston")
+ExtendFirePiston::ExtendFirePiston(bool runContinuously) : CommandBase("ExtendFirePiston")
 {
 	Requires(firePiston);
 	runsForever = runContinuously;
@@ -20,6 +20,8 @@ void ExtendFirePiston::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void ExtendFirePiston::Execute()
 {
+	firePiston->Extend();
+	
 	if(!runsForever){
 		isFinished = true;
 	}

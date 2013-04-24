@@ -2,6 +2,8 @@
 #define SIMPLEBACKPYRSHOOT_H
 
 #include "../CommandBase.h"
+#include "../RobotMap.h"
+#include "Timer.h"
 
 /* Description */
 

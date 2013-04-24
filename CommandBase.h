@@ -6,10 +6,13 @@
 #include "DriverStationLCD.h"
 
 #include "ShooterWheels/ShooterWheels.h"
-#include "ShooterPistons/ShooterPistons.h"
+#include "FirePiston/FirePiston.h"
+#include "LoadPiston/LoadPiston.h"
+#include "Rollers/Rollers.h"
+#include "TiltPiston/TiltPiston.h"
 #include "Drivetrain/Drivetrain.h"
-#include "Hopper/Hopper.h"
 #include "Hanger/Hanger.h"
+#include "Hopper/HopperState.h"
 #include "OI.h"
 
 
@@ -23,15 +26,19 @@ class CommandBase: public Command {
 public:
 	CommandBase(const char *name);
 	CommandBase();
-	static void init();
 	
 	// Static instances of our subsystems
 	static ShooterWheels *shooterWheels;
-	static ShooterPistons *shooterPistons;
+	static FirePiston *firePiston;
+	static Rollers *rollers;
 	static Drivetrain *drivetrain;
-	static Hopper *hopper;
+	static LoadPiston *loadPiston;
+	static TiltPiston *tiltPiston;
 	static Hanger *hanger;
+	static HopperState *hopperState;
 	static OI *oi;
+	
+	static void init();
 	
 	// Static DriverStation objects and variables
 	static DriverStation *ds; // driver station object

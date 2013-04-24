@@ -5,7 +5,7 @@ InvertTiltState::InvertTiltState()
 	InvertTiltState(false);
 }
 
-InvertTiltState::InvertTiltState(bool runContinuously) : Command("InvertTiltState")
+InvertTiltState::InvertTiltState(bool runContinuously) : CommandBase("InvertTiltState")
 {
 	Requires(tiltPiston);
 	runsForever = runContinuously;
@@ -20,9 +20,8 @@ void InvertTiltState::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void InvertTiltState::Execute()
 {
-	if(!runsForever){
-		isFinished = true;
-	}
+	tiltPiston->InvertCurrentState();
+	isFinished = true;
 }
 
 // Make this return true when this Command no longer needs to run execute()

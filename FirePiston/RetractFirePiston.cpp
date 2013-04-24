@@ -1,4 +1,5 @@
 #include "RetractFirePiston.h"
+#include "../CommandBase.h"
 
 RetractFirePiston::RetractFirePiston()
 {
@@ -7,7 +8,7 @@ RetractFirePiston::RetractFirePiston()
 
 RetractFirePiston::RetractFirePiston(bool runContinuously) : Command("RetractFirePiston")
 {
-	Requires(firePiston);
+	Requires(CommandBase::firePiston);
 	runsForever = runContinuously;
 }
 
@@ -20,6 +21,8 @@ void RetractFirePiston::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void RetractFirePiston::Execute()
 {
+	CommandBase::firePiston->Retract();
+	
 	if(!runsForever){
 		isFinished = true;
 	}
