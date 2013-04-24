@@ -2,24 +2,23 @@
 
 ArcadeDrive::ArcadeDrive()
 {
-	Requires(drive);
+	Requires(drivetrain);
 }
 
 // Called just before this Command runs the first time
 void ArcadeDrive::Initialize()
 {
-	
 }
 
 // Called repeatedly when this Command is scheduled to run
 void ArcadeDrive::Execute()
 {
-	// Map joystick to motor output curve
-	float powerOut, rotOut;
-	powerOut = TeleopHelper::mapJoystickToSpeedOutput(oi->GetOperatorGamepad1()->GetRawAxis(2));
-	rotOut = TeleopHelper::mapJoystickToSpeedOutput(oi->GetOperatorGamepad1()->GetRawAxis(1));
+	// Calculate outputs according to drive equation
+	double moveOutput, rotOutput;
+	moveOutput = TeleopHelper::mapJoystickToPowerOutput(oi->GetDriverJoystick()->GetRawAxis(2));
+	rotOutput = TeleopHelper::mapJoystickToPowerOutput(oi->GetDriverJoystick()->GetRawAxis(1));
 	
-	drive->ArcadeDrive(powerOut, rotOut);
+	drivetrain->ArcadeDrive(moveOutput, rotOutput);
 }
 
 // Make this return true when this Command no longer needs to run execute()

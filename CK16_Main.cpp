@@ -3,11 +3,7 @@
 #include "SmartDashboard/SmartDashboard.h"
 #include "SmartDashboard/SendableChooser.h"
 
-#include "Commands/Teleop/OperatorControl.h"
-#include "Shooter/FireDisc.h"
 #include "Hopper/AutoLoad.h"
-#include "Shooter/ToggleShooterTilt.h"
-#include "Hanger/ToggleHangPiston.h"
 #include "Drivetrain/ArcadeDrive.h"
 
 
@@ -37,15 +33,8 @@ private:
 //		SmartDashboard::PutData("Autonomous Mode Chooser", autonChooser);
 		
 		// Init Commands
-		teleopCommand = new OperatorControl();
-		tilt = new ToggleShooterTilt();
-		hang = new ToggleHangPiston();
 		
-		CommandBase::oi->fireButton->WhenPressed(new FireDisc());
-		CommandBase::oi->autoLoadButton->WhenPressed(new AutoLoad());
-		CommandBase::oi->driverTiltButton->WhenPressed(tilt);
-		CommandBase::oi->operatorTiltButton->WhenPressed(tilt);
-		CommandBase::oi->extendHangerButton->WhenPressed(hang);
+		
 //		compressorCommand = new FillAirTanks();
 //		lw = LiveWindow::GetInstance();
 		(new ArcadeDrive())->Start();
@@ -109,8 +98,6 @@ private:
 	virtual void TeleopPeriodic() 
 	{
 		// Update ButtonHelpers
-		CommandBase::oi->GetButtonHelper1()->Update();
-		CommandBase::oi->GetButtonHelper2()->Update();
 		
 		Scheduler::GetInstance()->Run(); // Periodically runs teleop command group
 	}

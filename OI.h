@@ -2,27 +2,22 @@
 #define OI_H
 
 #include "WPILib.h"
-#include "Util/ButtonHelper.h"
 
-class OI {
-private:
-	Joystick *operatorGamepad1, *operatorGamepad2;
-	ButtonHelper *buttonHelper1, *buttonHelper2;
-	JoystickButton *autoLoadEnableButton;
-
-
+class OI 
+{
 public:
+	JoystickButton *buttonInvertTiltJoy1, *buttonInvertTiltJoy2,
+    	*buttonInvertHangPiston, *buttonExtendFirePiston, *buttonToggleShooterWheels,
+    	*buttonForwardRollers, *buttonReverseRollers, *buttonManualLoadPiston,
+    	*buttonToggleAutoLoad;
+	
 	OI();
-
-	Joystick* GetOperatorGamepad1();
-	Joystick* GetOperatorGamepad2();
-	ButtonHelper* GetButtonHelper1();
-	ButtonHelper* GetButtonHelper2();
-	JoystickButton *loadButton, *fireButton, *wheelsButton;
-	JoystickButton *autoLoadButton;
-	JoystickButton *operatorTiltButton;
-	JoystickButton *driverTiltButton;
-	JoystickButton *extendHangerButton;
+	
+	Joystick* GetDriverJoystick();
+	Joystick* GetShooterGamepad();
+	
+private:
+	Joystick *driverJoystick, *shooterGamepad;
 };
 
 #endif

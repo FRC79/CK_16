@@ -1,51 +1,37 @@
 #include "Hanger.h"
-#include "../RobotMap.h"
 
 Hanger::Hanger() : Subsystem("Hanger")
 {
-	// Instantiate the matching solenoid components as DoubleSolenoids
-	HangPiston_A = new DoubleSolenoid(RobotMap::HANG_PISTON_A_IN_ID, 
-			RobotMap::HANG_PISTON_A_OUT_ID);
-	HangPiston_B = new DoubleSolenoid(RobotMap::HANG_PISTON_B_IN_ID,
-			RobotMap::HANG_PISTON_B_OUT_ID);
-	
-	is_extended = true;
+	// Init components
+	isExtended = false;
+	hangA = RobotMap::hangPistonA;
+	hangB = RobotMap::hangPistonB;
 }
 
-Hanger::~Hanger()
-{
-	delete HangPiston_A;
-	delete HangPiston_B;
+void Hanger::Set(bool state){
+	hangA->Set(state ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
+	hangB->Set(!state ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
+	isExtended = state;
 }
 
-bool Hanger::IsHangerExtended()
-{
-	return is_extended;
+bool Hanger::IsExtended(){
+	return isExtended;
 }
 
-void Hanger::Set(bool extend_state)
-{
-	HangPiston_A->Set(extend_state ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
-	HangPiston_B->Set(!extend_state ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
-	is_extended = extend_state;
+void Hanger::Extend(){
+	Set(true);	
 }
 
-void Hanger::InverseCurrentState()
-{
-	Set(!IsHangerExtended());
-}
-
-void Hanger::Extend()
-{
-	Set(true);
-}
-
-void Hanger::Retract()
-{
+void Hanger::Retract(){
 	Set(false);
 }
 
+void Hanger::InvertCurrentState(){
+	Set(!IsExtended());
+}
+
+/* We don't want it to retract on its own because we're going to
+ * be inverting it most of the time. */
 void Hanger::InitDefaultCommand()
 {
-	
 }

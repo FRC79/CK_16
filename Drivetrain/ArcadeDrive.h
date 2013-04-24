@@ -4,7 +4,9 @@
 #include "../CommandBase.h"
 #include "../Util/TeleopHelper.h"
 
-/* Description */
+/* The teleop control of the drivetrain using a joystick to
+ * control rotation and power output using one vertical axis 
+ * and one horizontal axis. */
 
 class ArcadeDrive : public CommandBase 
 {
@@ -17,7 +19,7 @@ public:
 	virtual void Interrupted();
 
 private:
-	bool is_finished;
+	bool isFinished;
 };
 
 #endif

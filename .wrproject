@@ -249,10 +249,5 @@
                 <folder name="/CK_16" recursive="true"/>
             </contents>
         </buildtarget>
-        <buildtarget buildtool="Partial Image Linker" name="CommandBasedRobotTemplate_partialImage" passed="true" targetname="CommandBasedRobotTemplate_partialImage">
-            <contents>
-                <folder name="/CK_16" recursive="true"/>
-            </contents>
-        </buildtarget>
     </buildtargets>
 </wrxml>

@@ -5,7 +5,8 @@
 #include "DriverStation.h"
 #include "DriverStationLCD.h"
 
-#include "Shooter/DiscShooter.h"
+#include "ShooterWheels/ShooterWheels.h"
+#include "ShooterPistons/ShooterPistons.h"
 #include "Drivetrain/Drivetrain.h"
 #include "Hopper/Hopper.h"
 #include "Hanger/Hanger.h"
@@ -25,13 +26,12 @@ public:
 	static void init();
 	
 	// Static instances of our subsystems
-	static DiscShooter *shooter;
-	static Drivetrain *drive;
+	static ShooterWheels *shooterWheels;
+	static ShooterPistons *shooterPistons;
+	static Drivetrain *drivetrain;
 	static Hopper *hopper;
 	static Hanger *hanger;
 	static OI *oi;
-	
-	//SHOOTER TILTED UP TO SMARTDASHBOARD
 	
 	// Static DriverStation objects and variables
 	static DriverStation *ds; // driver station object
@@ -40,10 +40,7 @@ public:
 	static UINT8 dsPacketsReceivedInCurrentSecond; // keep track of the ds packets received in the current second
 	
 	// Variables to count the number of periodic loops performed
-	static UINT32 autoPeriodicLoops;
 	static UINT32 disabledPeriodicLoops;
-	static UINT32 telePeriodicLoops;
-	static UINT32 testPeriodicLoops;
 };
 
 #endif

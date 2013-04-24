@@ -3,31 +3,25 @@
 
 #include "Commands/Subsystem.h"
 #include "CANJaguar.h"
-#include "Gyro.h"
 #include "RobotDrive.h"
-
+#include "../RobotMap.h"
 
 class Drivetrain : public Subsystem
 {
 public:
 	Drivetrain();
-	~Drivetrain();
 	
-	typedef enum {kFrontRight, kFrontLeft, kRearRight, kRearLeft} Motor;
+	void ArcadeDrive(float moveVal, float rotVal);
+	
+	void SetLeftAndRightMotorOutputs(float powerLeft, float powerRight);
+	void Set(float power);
+	void Stop();
 	
 	void InitDefaultCommand();
 	
-	void ArcadeDrive(float power, float rot);
-	
-	Gyro* GetTurnGyro();
-	void SetLeftAndRightMotorOutputs(float left_power, float right_power);
-	void SetMotorOutputs(float power);
-	double GetPosition(Motor encoder_motor);
-	
 private:
-	CANJaguar *Front_R, *Front_L, *Rear_R, *Rear_L;
-	Gyro *TurnGyro;
-	RobotDrive *RoboDrive;
+	CANJaguar *frontL, *frontR, *rearL, *rearR;
+	RobotDrive *drive;
 };
 
 #endif
