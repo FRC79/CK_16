@@ -2,6 +2,8 @@
 #define FIREPISTON_H
 
 #include "Commands/Subsystem.h"
+#include "../RobotMap.h"
+#include "Timer.h"
 
 class FirePiston : public Subsystem
 {
@@ -19,7 +21,8 @@ public:
 	void InitDefaultCommand();
 	
 private:
-	
+	Solenoid* firePiston;
+	bool isExtended;
 };
 
 #endif
