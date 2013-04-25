@@ -3,13 +3,13 @@
 
 #include "Commands/Subsystem.h"
 #include "../RobotMap.h"
+#include "Solenoid.h"
 #include "Timer.h"
 
 class FirePiston : public Subsystem
 {
 public:
 	FirePiston();
-	~FirePiston();
 	
 	void Set(bool state);
 	bool IsExtended();

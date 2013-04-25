@@ -11,6 +11,10 @@ Drivetrain::Drivetrain() : Subsystem("Drivetrain")
 	drive = RobotMap::robotDrive;
 }
 
+void Drivetrain::ArcadeDrive(float moveVal, float rotVal){
+	drive->ArcadeDrive(moveVal, rotVal);
+}
+
 void Drivetrain::SetLeftAndRightMotorOutputs(float left_power, float right_power){
 	drive->SetLeftRightMotorOutputs(left_power, right_power);
 }

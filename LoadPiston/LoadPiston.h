@@ -10,7 +10,6 @@ class LoadPiston : public Subsystem
 {
 public:
 	LoadPiston();
-	~LoadPiston();
 	
 	bool IsLocked();
 	void SetLocked(bool locked);
