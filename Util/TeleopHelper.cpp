@@ -1,7 +1,7 @@
 #include "TeleopHelper.h"
 #include <math.h>
 
-double TeleopHelper::mapJoystickToSpeedOutput(double input)
+double TeleopHelper::mapJoystickToPowerOutput(double input)
 {
 	if(fabs(input) < 0.05)
 	{

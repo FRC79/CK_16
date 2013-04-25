@@ -1,7 +1,14 @@
 #ifndef ROBOTMAP_H
 #define ROBOTMAP_H
 
-#include "Data/CSVReader.h"
+#include "CSV/CSVReader.h"
+#include "CANJaguar.h"
+#include "RobotDrive.h"
+#include "DoubleSolenoid.h"
+#include "Solenoid.h"
+#include "DigitalInput.h"
+#include "Relay.h"
+#include "Gyro.h"
 
 /*
  * This file contains all of the software mappings for
@@ -13,52 +20,48 @@
 // Compiler Definitions
 #define PI 3.1415
 #define TICS_PER_REV 250
-#define TICS_PER_SHOOTER_REV 250
 #define WHEEL_CIRCUMFERENCE (6.0 * PI)
 #define INCHES_PER_TIC (-WHEEL_CIRCUMFERENCE)
 
 class RobotMap
 {	
 public:
-	static const int PRESSURE_SWITCH_CHANNEL = 1;
-	static const int COMPRESSOR_RELAY_CHANNEL = 1;
-	
 	// Speed Controllers
-	static UINT8 FRONT_RIGHT_DRIVE_ID;
-	static UINT8 FRONT_LEFT_DRIVE_ID;
-	static UINT8 REAR_RIGHT_DRIVE_ID;
-	static UINT8 REAR_LEFT_DRIVE_ID;
-	static UINT8 ROLLER_MOTOR_ID;
-	static UINT8 FRONT_SHOOTER_WHEEL_ID;
-	static UINT8 BACK_SHOOTER_WHEEL_ID;
+	static CANJaguar *rollerMotor;
+	static CANJaguar *shooterFrontWheel, *shooterBackWheel;
+	static CANJaguar *frontLeftWheel, *frontRightWheel, 
+		*rearLeftWheel, *rearRightWheel;
+	
+	// RobotDrive
+	static RobotDrive *robotDrive;
 	
 	// Solenoids
-	static UINT8 HOPPER_LOAD_PISTON_ID;
-	static UINT8 SHOOTER_FIRE_PISTON_ID;
-	static UINT8 TILT_PISTON_IN_ID;
-	static UINT8 TILT_PISTON_OUT_ID;
-	static UINT8 HANG_PISTON_A_IN_ID;
-	static UINT8 HANG_PISTON_A_OUT_ID;
-	static UINT8 HANG_PISTON_B_IN_ID;
-	static UINT8 HANG_PISTON_B_OUT_ID;
-//
-//	// Digital Inputs
-	static UINT8 LOAD_BEAM_SENSOR_ID;
-	static UINT8 FIRE_BEAM_SENSOR_ID;
-	static UINT8 ROLLER_BEAM_SENSOR_ID;
+	static DoubleSolenoid *hangPistonA, *hangPistonB;
+	static DoubleSolenoid *tiltPiston;
+	static Solenoid *firePiston;
+	static Solenoid *loadPiston;
+
+	// Digital Inputs
+	static DigitalInput *pressureSwitch;
+	static DigitalInput *rollerBeam, *loadBeam, *fireBeam;
+	
+	// Relays
+	static Relay *compressor;
 		
 	// Analog Inputs
-	static UINT8 TURN_GYRO_ID;
+	static Gyro *turnGyro;
 		
 	// PWMs
 	
 	// RobotConfig
-	static double PISTON_DELAY_TIME;
+	static double PISTON_DELAY;
 	static double SHOOTER_SPEED;
 	static double SHOOTER_POWER;
 	static double ROLLER_POWER;
 	static double DRIVE_DISTANCE_TO_GOAL;
 	static double DRIVE_DISTANCE_TO_HALFCOURT;
+	static double ROLLER_TO_PUNCH_ZONE_DELAY;
+	static double AUTOLOAD_RESUME_DELAY;
 		
 	// SmartDashboard Keys
 	static std::string FOUND_KEY; 
@@ -67,6 +70,10 @@ public:
 	static std::string SHOOTER_TILTED_KEY;
 	
 	static void init();
+	
+	static void loadValues(bool initCSVs);
+	
+	static void initCSVReaders();
 	
 private:
 	static CSVReader *PWM_CSV, *AnalogInputs_CSV, 

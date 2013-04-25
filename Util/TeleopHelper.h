@@ -10,7 +10,7 @@
 class TeleopHelper
 {
 public:
-	static double mapJoystickToSpeedOutput(double input);
+	static double mapJoystickToPowerOutput(double input);
 };
 
 #endif

@@ -4,20 +4,24 @@
 #include "WPILib.h"
 #include "Util/ButtonHelper.h"
 
-class OI {
-private:
-	Joystick *operatorGamepad1, *operatorGamepad2;
-	ButtonHelper *buttonHelper1, *buttonHelper2;
-	
+class OI 
+{
 public:
+	JoystickButton *buttonInvertTiltJoy1, *buttonInvertTiltJoy2,
+    	/**buttonInvertHangPiston,*/ *buttonExtendFirePiston, *buttonToggleShooterWheels,
+    	*buttonForwardRollers, *buttonReverseRollers, *buttonManualLoadPiston,
+    	*buttonToggleAutoLoad;
+	
 	OI();
 	
-	JoystickButton *autoLoadButton, *reverseRollerButton, 
-		*forwardRollerButton;
-	Joystick* GetOperatorGamepad1();
-	Joystick* GetOperatorGamepad2();
+	Joystick* GetDriverJoystick();
+	Joystick* GetShooterGamepad();
 	ButtonHelper* GetButtonHelper1();
 	ButtonHelper* GetButtonHelper2();
+	
+private:
+	Joystick *driverJoystick, *shooterGamepad;
+	ButtonHelper *buttonHelper1, *buttonHelper2;
 };
 
 #endif

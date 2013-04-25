@@ -11,33 +11,38 @@ CommandBase::CommandBase() : Command()
 	
 }
 
-// Initialize a single static instance of all of our subsystems to NULL
-DiscShooter* CommandBase::shooter = NULL;
-Drivetrain* CommandBase::drive = NULL;
+ShooterWheels* CommandBase::shooterWheels = NULL;
+FirePiston* CommandBase::firePiston = NULL;
+Rollers* CommandBase::rollers = NULL;
+Drivetrain* CommandBase::drivetrain = NULL;
+LoadPiston* CommandBase::loadPiston = NULL;
+TiltPiston* CommandBase::tiltPiston = NULL;
 Hanger* CommandBase::hanger = NULL;
-Hopper* CommandBase::hopper = NULL;
-Tilt* CommandBase::tilt = NULL;
+HopperState* CommandBase::hopperState = NULL;
 OI* CommandBase::oi = NULL;
 
-// Initialize DriverStation variables
+// Static DriverStation objects and variables
 DriverStation* CommandBase::ds = NULL;
 DriverStationLCD* CommandBase::ds_lcd = NULL;
 UINT32 CommandBase::priorPacketNumber = 0;
 UINT8 CommandBase::dsPacketsReceivedInCurrentSecond = 0;
 
-// Initialize periodic loop variables
-UINT32 CommandBase::autoPeriodicLoops = 0;
+// Variables to count the number of periodic loops performed
 UINT32 CommandBase::disabledPeriodicLoops = 0;
-UINT32 CommandBase::telePeriodicLoops = 0;
-UINT32 CommandBase::testPeriodicLoops = 0;
+
+// Variables to count the number of periodic loops performed
+static UINT32 disabledPeriodicLoops;
 
 void CommandBase::init() {
     // Init single static instance of all of our subsystems.
-	shooter = new DiscShooter();
-	drive = new Drivetrain();
+	shooterWheels = new ShooterWheels();
+	firePiston = new FirePiston();
+	rollers = new Rollers(); 
+	drivetrain = new Drivetrain();
+	loadPiston = new LoadPiston();
+	tiltPiston = new TiltPiston();
 	hanger = new Hanger();
-	hopper = new Hopper();
-	tilt = new Tilt();
+	hopperState = new HopperState();
 	oi = new OI();
 	
 	// Init static instances of our Driverstation variables.

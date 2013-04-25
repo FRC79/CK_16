@@ -5,12 +5,16 @@
 #include "DriverStation.h"
 #include "DriverStationLCD.h"
 
-#include "Subsystems/DiscShooter.h"
-#include "Subsystems/Drivetrain.h"
-#include "Subsystems/Hopper.h"
-#include "Subsystems/Hanger.h"
-#include "Subsystems/Tilt.h"
+#include "ShooterWheels/ShooterWheels.h"
+#include "FirePiston/FirePiston.h"
+#include "LoadPiston/LoadPiston.h"
+#include "Rollers/Rollers.h"
+#include "TiltPiston/TiltPiston.h"
+#include "Drivetrain/Drivetrain.h"
+#include "Hanger/Hanger.h"
+#include "Hopper/HopperState.h"
 #include "OI.h"
+
 
 /**
  * The base for all commands. All [atomic] commands should subclass CommandBase.
@@ -22,17 +26,19 @@ class CommandBase: public Command {
 public:
 	CommandBase(const char *name);
 	CommandBase();
-	static void init();
 	
 	// Static instances of our subsystems
-	static DiscShooter *shooter;
-	static Drivetrain *drive;
-	static Hopper *hopper;
+	static ShooterWheels *shooterWheels;
+	static FirePiston *firePiston;
+	static Rollers *rollers;
+	static Drivetrain *drivetrain;
+	static LoadPiston *loadPiston;
+	static TiltPiston *tiltPiston;
 	static Hanger *hanger;
-	static Tilt *tilt;
+	static HopperState *hopperState;
 	static OI *oi;
 	
-	//SHOOTER TILTED UP TO SMARTDASHBOARD
+	static void init();
 	
 	// Static DriverStation objects and variables
 	static DriverStation *ds; // driver station object
@@ -41,10 +47,7 @@ public:
 	static UINT8 dsPacketsReceivedInCurrentSecond; // keep track of the ds packets received in the current second
 	
 	// Variables to count the number of periodic loops performed
-	static UINT32 autoPeriodicLoops;
 	static UINT32 disabledPeriodicLoops;
-	static UINT32 telePeriodicLoops;
-	static UINT32 testPeriodicLoops;
 };
 
 #endif
