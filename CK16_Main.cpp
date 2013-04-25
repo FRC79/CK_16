@@ -37,7 +37,7 @@ private:
 		SmartDashboard::PutData("Autonomous Mode Chooser", autonChooser);
 		
 		// Init Commands
-		CommandBase::oi->autoLoadButton->WhenPressed(new AutoLoad());
+//		CommandBase::oi->autoLoadButton->WhenPressed(new AutoLoad());
 		CommandBase::oi->reverseRollerButton->WhileHeld(new ReverseRollers(RobotMap::ROLLER_POWER));
 		CommandBase::oi->forwardRollerButton->WhileHeld(new ForwardRollers(RobotMap::ROLLER_POWER));
 		teleopCommand = new OperatorControl();

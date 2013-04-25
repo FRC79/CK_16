@@ -21,18 +21,18 @@ void ReverseRollers::Execute()
 // Make this return true when this Command no longer needs to run execute()
 bool ReverseRollers::IsFinished()
 {
-	return !oi->GetOperatorGamepad2()->GetRawButton(7);
+	return false;
 }
 
 // Called once after isFinished returns true
 void ReverseRollers::End()
 {
-	
+	hopper->StopRollerMotor();
 }
 
 // Called when another command which requires one or more of the same
 // subsystems is scheduled to run
 void ReverseRollers::Interrupted()
 {
-	
+	hopper->StopRollerMotor();
 }
