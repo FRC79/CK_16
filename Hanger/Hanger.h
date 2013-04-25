@@ -9,7 +9,6 @@ class Hanger : public Subsystem
 {
 public:
 	Hanger();
-
 	void Set(bool state);
 	bool IsExtended();
 	void Extend();
@@ -19,7 +18,7 @@ public:
 	void InitDefaultCommand();
 	
 private:
-	bool isExtended;
+	bool is_Extended;
 	DoubleSolenoid *hangA, *hangB;
 };
 

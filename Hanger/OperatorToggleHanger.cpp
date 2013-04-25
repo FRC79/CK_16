@@ -2,7 +2,7 @@
 
 OperatorToggleHanger::OperatorToggleHanger()
 {
-	Requires(hanger);
+	Requires(CommandBase::hanger);
 }
 
 // Called just before this Command runs the first time
@@ -13,9 +13,10 @@ void OperatorToggleHanger::Execute()
 {
 	// If the user toggled the hang button, the hang pistons change
 	// to the opposite position.
-	if(oi->GetButtonHelper1()->WasButtonToggled(6))
+	if(CommandBase::oi->GetButtonHelper1()->WasButtonToggled(6))
 	{
-		hanger->InvertCurrentState();
+		CommandBase::hanger->InvertCurrentState();
+		printf("HANG CHANGED\n");
 	}
 }
 

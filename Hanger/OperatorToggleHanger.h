@@ -1,6 +1,7 @@
 #ifndef OPERATORTOGGLEHANGER_H
 #define OPERATORTOGGLEHANGER_H
 
+#include "Commands/Command.h"
 #include "../CommandBase.h"
 
 /*
@@ -9,7 +10,7 @@
  * period.
  */
 
-class OperatorToggleHanger : public CommandBase 
+class OperatorToggleHanger : public Command 
 {
 public:
 	OperatorToggleHanger();

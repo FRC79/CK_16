@@ -29,7 +29,7 @@
 class CK16_Main : public IterativeRobot {
 private:
 	Command *compressorCommand, *autoLoadCommand, *tiltCommand, *shooterWheelsCommand,
-		*arcadeDriveCommand, *autonCommand;
+		*arcadeDriveCommand, *autonCommand, *toggleHangCommand;
 	Command *tilt, *hang;
 	SendableChooser *autonChooser;
 	LiveWindow *lw;
@@ -49,22 +49,22 @@ private:
 		compressorCommand = new RunCompressor();
 //		autoLoadCommand = new AutoLoad();
 		tiltCommand = new InvertTiltState();
-//		shooterWheelsCommand = new SpinShooterWheels(true);
+		shooterWheelsCommand = new SpinShooterWheels(true);
 		arcadeDriveCommand = new ArcadeDrive();
+		toggleHangCommand = new OperatorToggleHanger();
 		
 		CommandBase::oi->buttonInvertTiltJoy1->WhenPressed(!tiltCommand->IsRunning() ? tiltCommand : new DoNothing());
         CommandBase::oi->buttonInvertTiltJoy2->WhenPressed(!tiltCommand->IsRunning() ? tiltCommand : new DoNothing());
-//        CommandBase::oi->buttonInvertHangPiston->WhenPressed(new InvertHangerState());
+//        CommandBase::oi->buttonInvertHangPiston->WhenPressed(new InvertHangerState()); // Don't use this
 //        CommandBase::oi->buttonToggleAutoLoad->WhenPressed(!autoLoadCommand->IsRunning() ? 
 //                autoLoadCommand : new CancelCommand(autoLoadCommand));
-//        CommandBase::oi->buttonExtendFirePiston->WhileHeld(new ExtendFirePiston(true));
+        CommandBase::oi->buttonExtendFirePiston->WhileHeld(new ExtendFirePiston(true));
 //        CommandBase::oi->buttonExtendFirePiston->WhenReleased(new WaitC(RobotMap::AUTOLOAD_RESUME_DELAY, 
 //                (Subsystem*)CommandBase::firePiston));
-//        CommandBase::oi->buttonForwardRollers->WhileHeld(new RollDiscIn(true));
-//        CommandBase::oi->buttonReverseRollers->WhileHeld(new RollDiscOut(true));
+        CommandBase::oi->buttonForwardRollers->WhileHeld(new RollDiscIn(true));
+        CommandBase::oi->buttonReverseRollers->WhileHeld(new RollDiscOut(true));
 //        CommandBase::oi->buttonManualLoadPiston->WhenPressed(new CancelCommand(autoLoadCommand));
-//        CommandBase::oi->buttonManualLoadPiston->WhileHeld(new ExtendLoadPiston(true));
-//        CommandBase::oi->buttonManualLoadPiston->WhenReleased(new RetractLoadPiston());
+        CommandBase::oi->buttonManualLoadPiston->WhileHeld(new ExtendLoadPiston(true));
 //        CommandBase::oi->buttonToggleShooterWheels->WhenPressed(!shooterWheelsCommand->IsRunning() ? 
 //                shooterWheelsCommand : new CancelCommand(shooterWheelsCommand));
 		
@@ -72,7 +72,7 @@ private:
 		
 		printf("RobotInit() completed.\n");
 		printf("TEAM 79 FOR THE WIN!\n");
-		printf("ST. LOUIS\n");
+		printf("ST. LOUIS EXP\n");
 	}
 	
 	void CancelAllCommands(){
@@ -121,8 +121,8 @@ private:
 //		CancelAllCommands();	// Cancel all previously running commmands.
 		compressorCommand->Start();
 		arcadeDriveCommand->Start();
-		(new OperatorToggleHanger())->Start();
-//		autoLoadCommand->Start();
+		toggleHangCommand->Start();
+		//		autoLoadCommand->Start();
 		
 		printf("Teleop Init Completed\n");
 	}

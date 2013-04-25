@@ -3,7 +3,7 @@
 Hanger::Hanger() : Subsystem("Hanger")
 {
 	// Init components
-	isExtended = false;
+	is_Extended = false;
 	hangA = RobotMap::hangPistonA;
 	hangB = RobotMap::hangPistonB;
 }
@@ -11,11 +11,11 @@ Hanger::Hanger() : Subsystem("Hanger")
 void Hanger::Set(bool state){
 	hangA->Set(state ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
 	hangB->Set(!state ? DoubleSolenoid::kForward : DoubleSolenoid::kReverse);
-	isExtended = state;
+	is_Extended = state;
 }
 
 bool Hanger::IsExtended(){
-	return isExtended;
+	return is_Extended;
 }
 
 void Hanger::Extend(){

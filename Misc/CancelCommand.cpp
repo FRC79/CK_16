@@ -13,6 +13,7 @@ void CancelCommand::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void CancelCommand::Execute()
 {
+	printf("CANCELING COMMAND\n");
 	commandToCancel->Cancel();
 	isFinished = true;
 }
