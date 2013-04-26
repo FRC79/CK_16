@@ -55,6 +55,7 @@ public:
 	
 	// RobotConfig
 	static double PISTON_DELAY;
+	static double FIRE_PISTON_DELAY;
 	static double LOAD_PISTON_DELAY;
 	static double SHOOTER_SPEED;
 	static double SHOOTER_POWER;

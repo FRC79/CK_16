@@ -5,7 +5,7 @@
 #include "../CommandBase.h"
 #include "../FirePiston/ExtendFirePiston.h"
 #include "../RobotMap.h"
-#include "../Misc/WaitC.h"
+#include "../Misc/WaitCommand.h"
 
 class ExtendFirePistonAndWait : public CommandGroup
 {

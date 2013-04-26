@@ -8,9 +8,9 @@ class OI
 {
 public:
 	JoystickButton *buttonInvertTiltJoy1, *buttonInvertTiltJoy2,
-    	/**buttonInvertHangPiston,*/ *buttonExtendFirePiston, *buttonToggleShooterWheels,
+    	*buttonInvertHangPiston, *buttonExtendFirePiston, *buttonToggleShooterWheels,
     	*buttonForwardRollers, *buttonReverseRollers, *buttonManualLoadPiston,
-    	*buttonToggleAutoLoad, *buttonStopShooterWheels;
+    	*buttonStartAutoLoad, *buttonStopShooterWheels;
 	
 	OI();
 	

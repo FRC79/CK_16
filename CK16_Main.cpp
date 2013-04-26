@@ -20,7 +20,6 @@
 #include "Drivetrain/ArcadeDrive.h"
 #include "Autonomous/SimpleFrontPyrShoot.h"
 #include "Autonomous/SimpleBackPyrShoot.h"
-#include "Hanger/OperatorToggleHanger.h"
 #include "FirePiston/ExtendFirePistonAndWait.h"
 
 #include "RobotMap.h"
@@ -29,7 +28,7 @@
 class CK16_Main : public IterativeRobot {
 private:
 	Command *compressorCommand, *autoLoadCommand, *tiltCommand, *shooterWheelsCommand,
-		*arcadeDriveCommand, *autonCommand, *toggleHangCommand;
+		*arcadeDriveCommand, *autonCommand;
 	Command *tilt, *hang;
 	SendableChooser *autonChooser;
 	LiveWindow *lw;
@@ -51,14 +50,14 @@ private:
 		tiltCommand = new InvertTiltState();
 		shooterWheelsCommand = new SpinShooterWheels(true);
 		arcadeDriveCommand = new ArcadeDrive();
-		toggleHangCommand = new OperatorToggleHanger();
 		
+		CommandBase::oi->buttonStartAutoLoad->WhenPressed(!autoLoadCommand->IsRunning() ? autoLoadCommand : new DoNothing());
 		CommandBase::oi->buttonInvertTiltJoy1->WhenPressed(!tiltCommand->IsRunning() ? tiltCommand : new DoNothing());
         CommandBase::oi->buttonInvertTiltJoy2->WhenPressed(!tiltCommand->IsRunning() ? tiltCommand : new DoNothing());
-//        CommandBase::oi->buttonInvertHangPiston->WhenPressed(new InvertHangerState()); // Don't use this
+        CommandBase::oi->buttonInvertHangPiston->WhenPressed(new InvertHangerState());
         CommandBase::oi->buttonExtendFirePiston->WhileHeld(new ExtendFirePistonAndWait());
-//        CommandBase::oi->buttonExtendFirePiston->WhenReleased(new WaitC(RobotMap::AUTOLOAD_RESUME_DELAY, 
-//                (Subsystem*)CommandBase::firePiston));
+//        CommandBase::oi->buttonExtendFirePiston->WhenReleased(new WaitC(RobotMap::FIRE_PISTON_DELAY, 
+//        		(Subsystem*)CommandBase::firePiston));
         CommandBase::oi->buttonForwardRollers->WhileHeld(new RollDiscIn(true));
         CommandBase::oi->buttonReverseRollers->WhileHeld(new RollDiscOut(true));
         CommandBase::oi->buttonManualLoadPiston->WhenPressed(new CancelCommand(autoLoadCommand));
@@ -119,7 +118,6 @@ private:
 //		CancelAllCommands();	// Cancel all previously running commmands.
 		compressorCommand->Start();
 		arcadeDriveCommand->Start();
-		toggleHangCommand->Start();
 		autoLoadCommand->Start();
 		
 		printf("Teleop Init Completed\n");
