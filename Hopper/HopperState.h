@@ -11,6 +11,8 @@ public:
 	static const UINT8 SOLID = 1;
 	
 	static void init();
+	static bool IsAutoLoadHalted();
+	static void SetAutoLoadHalt(bool isHalted);
 	static bool IsDiscUnderneathRollers();
 	static bool IsDiscReadyToLoad();
 	static bool IsDiscInChamber();
@@ -18,6 +20,7 @@ public:
 	
 private:
 	static DigitalInput *rollerBeam, *loadBeam, *fireBeam;
+	static bool autoLoadHalted;
 };
 
 #endif

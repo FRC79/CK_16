@@ -52,16 +52,21 @@ private:
 		arcadeDriveCommand = new ArcadeDrive();
 		
 		CommandBase::oi->buttonStartAutoLoad->WhenPressed(!autoLoadCommand->IsRunning() ? autoLoadCommand : new DoNothing());
+		
 		CommandBase::oi->buttonInvertTiltJoy1->WhenPressed(!tiltCommand->IsRunning() ? tiltCommand : new DoNothing());
         CommandBase::oi->buttonInvertTiltJoy2->WhenPressed(!tiltCommand->IsRunning() ? tiltCommand : new DoNothing());
+        
         CommandBase::oi->buttonInvertHangPiston->WhenPressed(new InvertHangerState());
+        
         CommandBase::oi->buttonExtendFirePiston->WhileHeld(new ExtendFirePistonAndWait());
-//        CommandBase::oi->buttonExtendFirePiston->WhenReleased(new WaitC(RobotMap::FIRE_PISTON_DELAY, 
-//        		(Subsystem*)CommandBase::firePiston));
+        
         CommandBase::oi->buttonForwardRollers->WhileHeld(new RollDiscIn(true));
         CommandBase::oi->buttonReverseRollers->WhileHeld(new RollDiscOut(true));
-        CommandBase::oi->buttonManualLoadPiston->WhenPressed(new CancelCommand(autoLoadCommand));
         CommandBase::oi->buttonManualLoadPiston->WhileHeld(new ExtendLoadPiston(true));
+        CommandBase::oi->buttonManualLoadPiston->WhenPressed(new CancelCommand(autoLoadCommand));
+        CommandBase::oi->buttonForwardRollers->WhenPressed(new CancelCommand(autoLoadCommand));
+        CommandBase::oi->buttonForwardRollers->WhenPressed(new CancelCommand(autoLoadCommand));
+        
         CommandBase::oi->buttonToggleShooterWheels->WhenPressed(shooterWheelsCommand);
         CommandBase::oi->buttonStopShooterWheels->WhenPressed(new CancelCommand(shooterWheelsCommand));
 		
@@ -72,9 +77,12 @@ private:
 		printf("ST. LOUIS EXP\n");
 	}
 	
-	void CancelAllCommands(){
-//		autonCommand->Cancel();
-//		compressorCommand->Cancel();  // I don't think we need to cancel this.
+	void CancelCommands(){
+		compressorCommand->Cancel();
+		arcadeDriveCommand->Cancel();
+		autoLoadCommand->Cancel();
+		tiltCommand->Cancel();
+		shooterWheelsCommand->Cancel();
 	}
 	
 	virtual void DisabledInit(){
