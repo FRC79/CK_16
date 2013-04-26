@@ -7,6 +7,14 @@ FirePiston::FirePiston() : Subsystem("FirePiston")
 	isExtended = false;
 }
 
+bool FirePiston::IsLocked(){
+	return is_Locked;
+}
+
+void FirePiston::SetLocked(bool locked){
+	is_Locked = locked;
+}
+
 void FirePiston::Set(bool state){
 	firePiston->Set(state);
 	isExtended = state;

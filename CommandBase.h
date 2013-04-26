@@ -35,7 +35,6 @@ public:
 	static LoadPiston *loadPiston;
 	static TiltPiston *tiltPiston;
 	static Hanger *hanger;
-	static HopperState *hopperState;
 	static OI *oi;
 	
 	static void init();

@@ -17,7 +17,7 @@ public:
 	virtual void Interrupted();
 
 private:
-	
+	bool rolling;
 };
 
 #endif

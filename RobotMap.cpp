@@ -43,6 +43,7 @@ Gyro* RobotMap::turnGyro = NULL;
 
 // RobotConfig
 double RobotMap::PISTON_DELAY = 0.0;
+double RobotMap::LOAD_PISTON_DELAY = 0.0;
 double RobotMap::SHOOTER_SPEED = 0.0;
 double RobotMap::SHOOTER_POWER = 0.0;
 double RobotMap::ROLLER_POWER = 0.0;
@@ -121,6 +122,7 @@ void RobotMap::loadValues(bool initCSVs)
 	
 	//RobotConfig
 	PISTON_DELAY = RobotConfig_CSV->GetValue("PISTON_DELAY_TIME");
+	LOAD_PISTON_DELAY = RobotConfig_CSV->GetValue("LOAD_PISTON_DELAY");
 	SHOOTER_SPEED = RobotConfig_CSV->GetValue("SHOOTER_SPEED");
 	SHOOTER_POWER = RobotConfig_CSV->GetValue("SHOOTER_POWER");
 	ROLLER_POWER = RobotConfig_CSV->GetValue("ROLLER_POWER");

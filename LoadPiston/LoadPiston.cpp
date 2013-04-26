@@ -33,9 +33,9 @@ void LoadPiston::Retract(){
 
 void LoadPiston::FireThenRetract(){
 	Extend();
-	Wait(RobotMap::PISTON_DELAY);
+	Wait(RobotMap::LOAD_PISTON_DELAY);
 	Retract();
-	Wait(RobotMap::PISTON_DELAY);
+	Wait(RobotMap::LOAD_PISTON_DELAY);
 }
 
 void LoadPiston::InvertCurrentState(){

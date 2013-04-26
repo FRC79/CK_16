@@ -18,6 +18,7 @@ OI::OI()
     buttonReverseRollers = new JoystickButton(shooterGamepad, 7); // Manually run rollers in reverse
     buttonManualLoadPiston = new JoystickButton(shooterGamepad, 1); // Manually control load piston
     buttonToggleAutoLoad = new JoystickButton(shooterGamepad, 8); // Toggle AutoLoad
+    buttonStopShooterWheels = new JoystickButton(shooterGamepad, 4);
 }
 
 Joystick* OI::GetDriverJoystick()

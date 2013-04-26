@@ -10,7 +10,7 @@ public:
 	JoystickButton *buttonInvertTiltJoy1, *buttonInvertTiltJoy2,
     	/**buttonInvertHangPiston,*/ *buttonExtendFirePiston, *buttonToggleShooterWheels,
     	*buttonForwardRollers, *buttonReverseRollers, *buttonManualLoadPiston,
-    	*buttonToggleAutoLoad;
+    	*buttonToggleAutoLoad, *buttonStopShooterWheels;
 	
 	OI();
 	

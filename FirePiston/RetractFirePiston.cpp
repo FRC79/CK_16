@@ -21,7 +21,10 @@ void RetractFirePiston::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void RetractFirePiston::Execute()
 {
-	CommandBase::firePiston->Retract();
+	if(!CommandBase::firePiston->IsLocked()){
+		CommandBase::firePiston->Retract();
+		CommandBase::loadPiston->SetLocked(false);
+	}
 	
 	if(!runsForever){
 		isFinished = true;

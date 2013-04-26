@@ -10,14 +10,14 @@ public:
 	static const UINT8 BROKEN = 0;
 	static const UINT8 SOLID = 1;
 	
-	HopperState();
-	bool IsDiscUnderneathRollers();
-	bool IsDiscReadyToLoad();
-	bool IsDiscInChamber();
-	bool IsFull();
+	static void init();
+	static bool IsDiscUnderneathRollers();
+	static bool IsDiscReadyToLoad();
+	static bool IsDiscInChamber();
+	static bool IsFull();
 	
 private:
-	DigitalInput *rollerBeam, *loadBeam, *fireBeam;
+	static DigitalInput *rollerBeam, *loadBeam, *fireBeam;
 };
 
 #endif

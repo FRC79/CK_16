@@ -18,7 +18,6 @@ Drivetrain* CommandBase::drivetrain = NULL;
 LoadPiston* CommandBase::loadPiston = NULL;
 TiltPiston* CommandBase::tiltPiston = NULL;
 Hanger* CommandBase::hanger = NULL;
-HopperState* CommandBase::hopperState = NULL;
 OI* CommandBase::oi = NULL;
 
 // Static DriverStation objects and variables
@@ -42,7 +41,7 @@ void CommandBase::init() {
 	loadPiston = new LoadPiston();
 	tiltPiston = new TiltPiston();
 	hanger = new Hanger();
-	hopperState = new HopperState();
+	HopperState::init();
 	oi = new OI();
 	
 	// Init static instances of our Driverstation variables.

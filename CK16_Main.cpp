@@ -12,7 +12,6 @@
 #include "Misc/DoNothing.h"
 #include "Misc/CancelCommand.h"
 #include "Hanger/InvertHangerState.h"
-#include "FirePiston/ExtendFirePiston.h"
 #include "Rollers/RollDiscIn.h"
 #include "Rollers/RollDiscOut.h"
 #include "LoadPiston/ExtendLoadPiston.h"
@@ -22,6 +21,7 @@
 #include "Autonomous/SimpleFrontPyrShoot.h"
 #include "Autonomous/SimpleBackPyrShoot.h"
 #include "Hanger/OperatorToggleHanger.h"
+#include "FirePiston/ExtendFirePistonAndWait.h"
 
 #include "RobotMap.h"
 #include "CommandBase.h"
@@ -47,7 +47,7 @@ private:
 		
 		// Init Commands
 		compressorCommand = new RunCompressor();
-//		autoLoadCommand = new AutoLoad();
+		autoLoadCommand = new AutoLoad();
 		tiltCommand = new InvertTiltState();
 		shooterWheelsCommand = new SpinShooterWheels(true);
 		arcadeDriveCommand = new ArcadeDrive();
@@ -56,17 +56,15 @@ private:
 		CommandBase::oi->buttonInvertTiltJoy1->WhenPressed(!tiltCommand->IsRunning() ? tiltCommand : new DoNothing());
         CommandBase::oi->buttonInvertTiltJoy2->WhenPressed(!tiltCommand->IsRunning() ? tiltCommand : new DoNothing());
 //        CommandBase::oi->buttonInvertHangPiston->WhenPressed(new InvertHangerState()); // Don't use this
-//        CommandBase::oi->buttonToggleAutoLoad->WhenPressed(!autoLoadCommand->IsRunning() ? 
-//                autoLoadCommand : new CancelCommand(autoLoadCommand));
-        CommandBase::oi->buttonExtendFirePiston->WhileHeld(new ExtendFirePiston(true));
+        CommandBase::oi->buttonExtendFirePiston->WhileHeld(new ExtendFirePistonAndWait());
 //        CommandBase::oi->buttonExtendFirePiston->WhenReleased(new WaitC(RobotMap::AUTOLOAD_RESUME_DELAY, 
 //                (Subsystem*)CommandBase::firePiston));
         CommandBase::oi->buttonForwardRollers->WhileHeld(new RollDiscIn(true));
         CommandBase::oi->buttonReverseRollers->WhileHeld(new RollDiscOut(true));
-//        CommandBase::oi->buttonManualLoadPiston->WhenPressed(new CancelCommand(autoLoadCommand));
+        CommandBase::oi->buttonManualLoadPiston->WhenPressed(new CancelCommand(autoLoadCommand));
         CommandBase::oi->buttonManualLoadPiston->WhileHeld(new ExtendLoadPiston(true));
-//        CommandBase::oi->buttonToggleShooterWheels->WhenPressed(!shooterWheelsCommand->IsRunning() ? 
-//                shooterWheelsCommand : new CancelCommand(shooterWheelsCommand));
+        CommandBase::oi->buttonToggleShooterWheels->WhenPressed(shooterWheelsCommand);
+        CommandBase::oi->buttonStopShooterWheels->WhenPressed(new CancelCommand(shooterWheelsCommand));
 		
 //		lw = LiveWindow::GetInstance();
 		
@@ -122,7 +120,7 @@ private:
 		compressorCommand->Start();
 		arcadeDriveCommand->Start();
 		toggleHangCommand->Start();
-		//		autoLoadCommand->Start();
+		autoLoadCommand->Start();
 		
 		printf("Teleop Init Completed\n");
 	}

@@ -20,7 +20,7 @@ void SpinShooterWheels::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void SpinShooterWheels::Execute()
 {
-	shooterWheels->SetBothWheels(RobotMap::SHOOTER_POWER);
+	shooterWheels->SetBothWheels(-RobotMap::SHOOTER_POWER);
 	
 	if(!runsForever){
 		isFinished = true;

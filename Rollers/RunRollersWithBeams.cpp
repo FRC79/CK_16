@@ -14,7 +14,7 @@ void RunRollersWithBeams::Initialize()
 void RunRollersWithBeams::Execute()
 {
 	// Roll the rollers until the hopperState is full
-    if(!hopperState->IsFull())
+    if(!HopperState::IsFull() && !rollers->IsLocked())
     {
         rollers->Set(RobotMap::ROLLER_POWER);
     }

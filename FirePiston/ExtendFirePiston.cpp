@@ -20,7 +20,10 @@ void ExtendFirePiston::Initialize()
 // Called repeatedly when this Command is scheduled to run
 void ExtendFirePiston::Execute()
 {
-	firePiston->Extend();
+	if(!firePiston->IsLocked()){
+		firePiston->Extend();
+		loadPiston->SetLocked(true);
+	}
 	
 	if(!runsForever){
 		isFinished = true;

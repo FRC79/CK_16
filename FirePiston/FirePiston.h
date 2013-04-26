@@ -12,6 +12,8 @@ public:
 	FirePiston();
 	
 	void Set(bool state);
+	bool IsLocked();
+	void SetLocked(bool locked);
 	bool IsExtended();
 	void Extend();
 	void Retract();
@@ -23,6 +25,7 @@ public:
 private:
 	Solenoid* firePiston;
 	bool isExtended;
+	bool is_Locked;
 };
 
 #endif

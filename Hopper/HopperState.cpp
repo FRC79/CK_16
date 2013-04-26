@@ -1,6 +1,10 @@
 #include "HopperState.h"
 
-HopperState::HopperState(){
+DigitalInput* HopperState::rollerBeam = NULL;
+DigitalInput* HopperState::loadBeam = NULL;
+DigitalInput* HopperState::fireBeam = NULL;
+
+void HopperState::init(){
 	rollerBeam = RobotMap::rollerBeam;
 	loadBeam = RobotMap::loadBeam;
 	fireBeam = RobotMap::fireBeam;

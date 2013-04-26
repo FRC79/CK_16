@@ -6,6 +6,14 @@ Rollers::Rollers() : Subsystem("Rollers")
 	roller = RobotMap::rollerMotor;
 }
 
+bool Rollers::IsLocked(){
+	return is_Locked;
+}
+
+void Rollers::SetLocked(bool locked){
+	is_Locked = locked;
+}
+
 void Rollers::Set(float power){
 	roller->Set(power);
 }
