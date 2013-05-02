@@ -7,7 +7,8 @@
 #include "Drivetrain/ArcadeDrive.h"
 #include "Compressor/RunCompressor.h"
 #include "TiltPiston/InvertTiltState.h"
-#include "ShooterWheels/SpinShooterWheels.h"
+#include "ShooterWheels/InvertWheelState.h"
+#include "ShooterWheels/UpdateShooterWheels.h"
 #include "Misc/WaitCommand.h"
 #include "Misc/DoNothing.h"
 #include "Misc/CancelCommand.h"
@@ -27,7 +28,8 @@
 
 class CK16_Main : public IterativeRobot {
 private:
-	Command *compressorCommand, *autoLoadCommand, *tiltCommand, *shooterWheelsCommand,
+	Command *compressorCommand, *autoLoadCommand, *tiltCommand, 
+		*updateShooterWheelsCommand, *invertShooterWheelsCommand,
 		*arcadeDriveCommand, *autonCommand;
 	Command *tilt, *hang;
 	SendableChooser *autonChooser;
@@ -48,10 +50,11 @@ private:
 		compressorCommand = new RunCompressor();
 		autoLoadCommand = new AutoLoad();
 		tiltCommand = new InvertTiltState();
-		shooterWheelsCommand = new SpinShooterWheels(true);
+		invertShooterWheelsCommand = new InvertWheelState();
+		updateShooterWheelsCommand = new UpdateShooterWheels();
 		arcadeDriveCommand = new ArcadeDrive();
 		
-		CommandBase::oi->buttonStartAutoLoad->WhenPressed(!autoLoadCommand->IsRunning() ? autoLoadCommand : new DoNothing());
+		CommandBase::oi->buttonStartAutoLoad->WhenPressed(autoLoadCommand);
 		
 		CommandBase::oi->buttonInvertTiltJoy1->WhenPressed(!tiltCommand->IsRunning() ? tiltCommand : new DoNothing());
         CommandBase::oi->buttonInvertTiltJoy2->WhenPressed(!tiltCommand->IsRunning() ? tiltCommand : new DoNothing());
@@ -67,8 +70,7 @@ private:
         CommandBase::oi->buttonForwardRollers->WhenPressed(new CancelCommand(autoLoadCommand));
         CommandBase::oi->buttonForwardRollers->WhenPressed(new CancelCommand(autoLoadCommand));
         
-        CommandBase::oi->buttonToggleShooterWheels->WhenPressed(shooterWheelsCommand);
-        CommandBase::oi->buttonStopShooterWheels->WhenPressed(new CancelCommand(shooterWheelsCommand));
+        CommandBase::oi->buttonToggleShooterWheels->WhenPressed(invertShooterWheelsCommand);
 		
 //		lw = LiveWindow::GetInstance();
 		
@@ -82,12 +84,14 @@ private:
 		arcadeDriveCommand->Cancel();
 		autoLoadCommand->Cancel();
 		tiltCommand->Cancel();
-		shooterWheelsCommand->Cancel();
+		invertShooterWheelsCommand->Cancel();
+		updateShooterWheelsCommand->Cancel();
 	}
 	
 	virtual void DisabledInit(){
 		CommandBase::disabledPeriodicLoops = 0; // Reset loop counter for disabled periodic.
 		
+		CancelCommands();
 		
 		// Move the cursor down a few, since we'll move it back up in periodic.
 		printf("\x1b[2B");
@@ -126,7 +130,7 @@ private:
 //		CancelAllCommands();	// Cancel all previously running commmands.
 		compressorCommand->Start();
 		arcadeDriveCommand->Start();
-		autoLoadCommand->Start();
+		updateShooterWheelsCommand->Start();
 		
 		printf("Teleop Init Completed\n");
 	}

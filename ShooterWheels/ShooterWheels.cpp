@@ -7,6 +7,16 @@ ShooterWheels::ShooterWheels() : Subsystem("ShooterWheels")
 	backWheel = RobotMap::shooterBackWheel;
 	frontBB = new BangBang_Controller(frontWheel);
 	backBB = new BangBang_Controller(backWheel);
+	wheelsSpinning = false;
+	shooter_power = 0.0;
+}
+
+bool ShooterWheels::AreWheelsSpinning(){
+	return wheelsSpinning;
+}
+
+void ShooterWheels::SetWheelsSpinning(bool spinning){
+	wheelsSpinning = spinning;
 }
 
 BangBang_Controller* ShooterWheels::GetFrontBBController(){
@@ -49,5 +59,5 @@ void ShooterWheels::Stop(){
 void ShooterWheels::InitDefaultCommand()
 {
 	// Set the default command for a subsystem here.
-	SetDefaultCommand(new StopShooterWheels(true));
+//	SetDefaultCommand(new StopShooterWheels(true));
 }

@@ -10,6 +10,8 @@ class ShooterWheels : public Subsystem
 public:
 	ShooterWheels();
 
+	bool AreWheelsSpinning();
+	void SetWheelsSpinning(bool spinning);
 	BangBang_Controller* GetFrontBBController();
 	BangBang_Controller* GetBackBBController();
 	double GetFrontWheelSpeed();
@@ -25,6 +27,8 @@ public:
 private:
 	CANJaguar *frontWheel, *backWheel;
 	BangBang_Controller *frontBB, *backBB;
+	bool wheelsSpinning;
+	float shooter_power;
 };
 
 #endif

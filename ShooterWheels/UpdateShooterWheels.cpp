@@ -1,28 +1,30 @@
-#include "StopShooterWheels.h"
-#include "../CommandBase.h"
+#include "UpdateShooterWheels.h"
 
-StopShooterWheels::StopShooterWheels()
+UpdateShooterWheels::UpdateShooterWheels()
 {
-	StopShooterWheels(false);
+	UpdateShooterWheels(false);
 }
 
-StopShooterWheels::StopShooterWheels(bool runContinuously)
+UpdateShooterWheels::UpdateShooterWheels(bool runContinuously)
 {
 	Requires(CommandBase::shooterWheels);
 	runsForever = runContinuously;
 }
 
 // Called just before this Command runs the first time
-void StopShooterWheels::Initialize()
+void UpdateShooterWheels::Initialize()
 {
 	isFinished = false;
 }
 
 // Called repeatedly when this Command is scheduled to run
-void StopShooterWheels::Execute()
+void UpdateShooterWheels::Execute()
 {
-	CommandBase::shooterWheels->Stop();
-	CommandBase::shooterWheels->SetWheelsSpinning(false);
+	if(CommandBase::shooterWheels->AreWheelsSpinning()){
+		CommandBase::shooterWheels->SetBothWheels(-RobotMap::SHOOTER_POWER);
+	} else {
+		CommandBase::shooterWheels->Stop();
+	}
 	
 	if(!runsForever){
 		isFinished = true;
@@ -30,20 +32,20 @@ void StopShooterWheels::Execute()
 }
 
 // Make this return true when this Command no longer needs to run execute()
-bool StopShooterWheels::IsFinished()
+bool UpdateShooterWheels::IsFinished()
 {
 	return isFinished;
 }
 
 // Called once after isFinished returns true
-void StopShooterWheels::End()
+void UpdateShooterWheels::End()
 {
 	
 }
 
 // Called when another command which requires one or more of the same
 // subsystems is scheduled to run
-void StopShooterWheels::Interrupted()
+void UpdateShooterWheels::Interrupted()
 {
 	
 }

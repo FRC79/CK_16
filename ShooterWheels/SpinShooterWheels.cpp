@@ -21,6 +21,7 @@ void SpinShooterWheels::Initialize()
 void SpinShooterWheels::Execute()
 {
 	shooterWheels->SetBothWheels(-RobotMap::SHOOTER_POWER);
+	shooterWheels->SetWheelsSpinning(true);
 	
 	if(!runsForever){
 		isFinished = true;
